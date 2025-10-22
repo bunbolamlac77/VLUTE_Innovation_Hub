@@ -7,9 +7,23 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// ---- Khu nội bộ (ví dụ) ----
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
+
+    // Ví dụ các module nội bộ
+    Route::prefix('ideas')->group(function () {
+        Route::get('/', fn() => 'Ideas index');     // -> view thực tế của bạn
+        Route::get('/create', fn() => 'Create idea');
+        // ...
+    });
+
+    // Trang admin / approvals ...
+    Route::prefix('admin')->group(function () {
+        Route::get('/', fn() => 'Admin Home');
+        // ...
+    });
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -17,4 +31,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
