@@ -14,27 +14,41 @@ class ApprovalController extends Controller
      */
     public function index()
     {
-        $pending = User::where('approval_status', 'pending')
+        $pending = \App\Models\User::where('approval_status', 'pending')
             ->orderByDesc('created_at')
-            ->get();
+            ->get()
+            ->map(function ($u) {
+                $email = strtolower($u->email);
+                $domain = \Illuminate\Support\Str::of($email)->after('@')->toString();
+
+                // Gợi ý role theo domain
+                $suggested = match ($domain) {
+                    'vlute.edu.vn' => ['staff', 'center', 'board'], // chỉ 3 lựa chọn
+                    default => ['enterprise'],                // còn lại là DN
+                };
+
+                return [
+                    'model' => $u,
+                    'suggested' => $suggested,
+                ];
+            });
 
         return view('admin.approvals.index', compact('pending'));
     }
 
-    /**
-     * Duyệt tài khoản + set role (admin có thể chọn lại role trong form).
-     */
-    public function approve(Request $request, User $user): RedirectResponse
+    public function approve(Request $request, \App\Models\User $user)
     {
         $role = $request->string('role')->toString();
+        $email = strtolower($user->email);
+        $domain = \Illuminate\Support\Str::of($email)->after('@')->toString();
 
-        // Nếu form không gửi role, gợi ý theo email
-        if (!$role) {
-            $role = $this->guessRoleByEmail($user->email);
-        }
+        // Chỉ cho phép role hợp lệ theo domain
+        $allowed = $domain === 'vlute.edu.vn'
+            ? ['staff', 'center', 'board']
+            : ['enterprise'];
 
-        if (!in_array($role, ['student', 'staff', 'enterprise', 'admin'], true)) {
-            return back()->with('status', 'Role không hợp lệ.');
+        if (!in_array($role, $allowed, true)) {
+            return back()->with('status', 'Vai trò không hợp lệ cho email này.');
         }
 
         $user->update([
@@ -44,9 +58,8 @@ class ApprovalController extends Controller
             'approved_at' => now(),
         ]);
 
-        return back()->with('status', 'Đã duyệt: ' . $user->email . " (role: {$role})");
+        return back()->with('status', '✅ Đã duyệt tài khoản: ' . $user->email . ' (' . \App\Models\User::roleLabel($role) . ')');
     }
-
     /**
      * Từ chối tài khoản.
      */

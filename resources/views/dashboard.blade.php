@@ -17,4 +17,5 @@
     @endif
 
     {{-- Nội dung dashboard khác của bạn --}}
+    <p>Vai trò: <strong>{{ auth()->user()->role_label }}</strong></p>
 </x-app-layout>

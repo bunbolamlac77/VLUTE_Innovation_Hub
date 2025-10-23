@@ -75,4 +75,42 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return in_array($this->role, ['staff', 'enterprise'], true);
     }
+    public function roles()
+    {
+        return $this->belongsToMany(\App\Models\Role::class)->withTimestamps()->withPivot('assigned_by');
+    }
+
+    public function hasRole(string $slug): bool
+    {
+        if ($this->role === $slug)
+            return true; // vai chính, để tương thích middleware cũ
+        return $this->roles->contains(fn($r) => $r->slug === $slug);
+    }
+
+    public function syncRoles(array $slugs, ?int $by = null): void
+    {
+        $roleIds = \App\Models\Role::whereIn('slug', $slugs)->pluck('id')->all();
+        // Đồng bộ pivot
+        $this->roles()->sync(array_fill_keys($roleIds, ['assigned_by' => $by]));
+    }
+    // Việt hoá nhãn vai trò
+    public static function roleLabel(string $slug): string
+    {
+        return match ($slug) {
+            'student' => 'Sinh viên',
+            'staff' => 'Giảng viên',
+            'center' => 'Trung tâm ĐMST',
+            'board' => 'Ban giám hiệu',
+            'enterprise' => 'Doanh nghiệp',
+            'reviewer' => 'Người phản biện',
+            'admin' => 'Quản trị',
+            default => ucfirst($slug),
+        };
+    }
+
+    // Dùng trong Blade: {{ $user->role_label }}
+    public function getRoleLabelAttribute(): string
+    {
+        return self::roleLabel($this->role ?? '');
+    }
 }

@@ -49,11 +49,11 @@ class RegisteredUserController extends Controller
 
         // @vlute.edu.vn -> staff (cần duyệt)
         if ($domain === 'vlute.edu.vn') {
+            // Mặc định staff để vào hàng chờ; Admin sẽ đổi sang Giảng viên/Trung tâm/BGH khi approve
             $role = 'staff';
             $approval = 'pending';
-        }
-        // domain khác (không phải @st.vlute.edu.vn) -> enterprise (cần duyệt)
-        elseif ($domain !== 'st.vlute.edu.vn') {
+        } elseif ($domain !== 'st.vlute.edu.vn') {
+            // Domain ngoài trường
             $role = 'enterprise';
             $approval = 'pending';
         }
@@ -74,6 +74,17 @@ class RegisteredUserController extends Controller
             'position' => $position,
             'interest' => $interest,
         ]);
+        // Sau khi $user = User::create([...]);
+
+        // Xác định slug cho pivot (trùng với role chính đã set)
+        $pivotSlug = $role; // 'student' | 'staff' | 'enterprise' (theo domain)
+
+        try {
+            $user->syncRoles([$pivotSlug]); // đưa user vào bảng role_user
+        } catch (\Throwable $e) {
+            // không chặn đăng ký nếu pivot gặp lỗi, chỉ log
+            \Log::warning('Sync roles on register failed', ['user' => $user->id, 'err' => $e->getMessage()]);
+        }
 
         // Gửi email xác thực (Laravel sẽ bắn notification khi event Registered được fire)
         event(new Registered($user));
