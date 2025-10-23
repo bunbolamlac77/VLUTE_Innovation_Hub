@@ -1,66 +1,78 @@
-@extends('layouts.app') {{-- hoặc layout khác bạn đang dùng --}}
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Phê duyệt tài khoản') }}
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="container" style="max-width:1000px">
-  <h1 style="margin:8px 0 16px;font-weight:800">Phê duyệt tài khoản</h1>
+    <div class="py-6">
+        <div class="mx-auto max-w-5xl sm:px-6 lg:px-8">
+            @if (session('status'))
+                <div class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-emerald-700 font-semibold">
+                    {{ session('status') }}
+                </div>
+            @endif
 
-  @if (session('status'))
-    <div style="margin:10px 0;padding:10px 12px;border-radius:10px;background:#ecfdf5;color:#065f46;font-weight:700">
-      {{ session('status') }}
+            @if ($pending->isEmpty())
+                <div class="rounded-xl border border-gray-200 bg-white p-6">
+                    <p>Hiện không có tài khoản chờ duyệt.</p>
+                </div>
+            @else
+                <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50 text-left text-gray-600">
+                            <tr>
+                                <th class="px-4 py-3">Email</th>
+                                <th class="px-4 py-3">Họ tên</th>
+                                <th class="px-4 py-3">Role gợi ý</th>
+                                <th class="px-4 py-3">Chọn role khi duyệt</th>
+                                <th class="px-4 py-3 text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach ($pending as $u)
+                                @php
+                                    $email = strtolower($u->email);
+                                    $domain = \Illuminate\Support\Str::of($email)->after('@')->toString();
+                                    $suggested = $domain === 'st.vlute.edu.vn' ? 'student' : ($domain === 'vlute.edu.vn' ? 'staff' : 'enterprise');
+                                @endphp
+                                <tr>
+                                    <td class="px-4 py-3">{{ $u->email }}</td>
+                                    <td class="px-4 py-3">{{ $u->name }}</td>
+                                    <td class="px-4 py-3">
+                                        <code class="rounded bg-gray-100 px-2 py-1">{{ $suggested }}</code>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <form action="{{ route('admin.approvals.approve', $u) }}" method="POST" class="flex items-center gap-2">
+                                            @csrf
+                                            <select name="role" class="rounded-lg border-gray-300">
+                                                @foreach (['student','staff','enterprise','admin'] as $r)
+                                                    <option value="{{ $r }}" @selected(($u->role ?? $suggested) === $r)>{{ ucfirst($r) }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="submit" class="rounded-lg bg-emerald-600 px-3 py-2 text-white hover:bg-emerald-700">
+                                                Duyệt
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <form action="{{ route('admin.approvals.reject', $u) }}" method="POST" class="inline-block">
+                                            @csrf
+                                            <button type="submit" class="rounded-lg bg-rose-600 px-3 py-2 text-white hover:bg-rose-700">
+                                                Từ chối
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+
+            <div class="mt-4">
+                <a href="{{ route('dashboard') }}" class="text-blue-600 hover:underline">← Về Dashboard</a>
+            </div>
+        </div>
     </div>
-  @endif
-
-  @if (empty($pending) || count($pending) === 0)
-    <p>Hiện không có tài khoản chờ phê duyệt.</p>
-  @else
-    <div style="overflow:auto;border:1px solid #e5e7eb;border-radius:12px">
-      <table style="width:100%;border-collapse:collapse">
-        <thead>
-          <tr style="background:#f9fafb">
-            <th style="text-align:left;padding:10px;border-bottom:1px solid #e5e7eb">Email</th>
-            <th style="text-align:left;padding:10px;border-bottom:1px solid #e5e7eb">Họ tên</th>
-            <th style="text-align:left;padding:10px;border-bottom:1px solid #e5e7eb">Gợi ý role</th>
-            <th style="text-align:left;padding:10px;border-bottom:1px solid #e5e7eb">Chọn role</th>
-            <th style="padding:10px;border-bottom:1px solid #e5e7eb">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach ($pending as $u)
-            <tr>
-              <td style="padding:10px">{{ $u['email'] }}</td>
-              <td style="padding:10px">{{ $u['name'] }}</td>
-              <td style="padding:10px"><code>{{ $u['suggested'] }}</code></td>
-              <td style="padding:10px">
-                <form action="{{ route('admin.approvals.updateRole', $u['id']) }}" method="POST" style="display:flex;gap:8px;align-items:center">
-                  @csrf
-                  <select name="role" style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px">
-                    @foreach (['student','staff','enterprise','admin'] as $r)
-                      <option value="{{ $r }}" @selected(($u['role'] ?? $u['suggested']) === $r)>{{ ucfirst($r) }}</option>
-                    @endforeach
-                  </select>
-                  <button type="submit" style="padding:8px 12px;border:0;border-radius:8px;background:#e5e7eb;cursor:pointer">Cập nhật</button>
-                </form>
-              </td>
-              <td style="padding:10px;white-space:nowrap">
-                <form action="{{ route('admin.approvals.approve', $u['id']) }}" method="POST" style="display:inline-block;margin-right:6px">
-                  @csrf
-                  <input type="hidden" name="role" value="{{ $u['role'] ?: $u['suggested'] }}">
-                  <button type="submit" style="padding:8px 12px;border:0;border-radius:8px;background:#22c55e;color:#fff;cursor:pointer">Duyệt</button>
-                </form>
-                <form action="{{ route('admin.approvals.reject', $u['id']) }}" method="POST" style="display:inline-block">
-                  @csrf
-                  <button type="submit" style="padding:8px 12px;border:0;border-radius:8px;background:#ef4444;color:#fff;cursor:pointer">Từ chối</button>
-                </form>
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-  @endif
-
-  <div style="margin-top:14px">
-    <a href="{{ url('/admin') }}">← Về trang Admin</a>
-  </div>
-</div>
-@endsection
+</x-app-layout>

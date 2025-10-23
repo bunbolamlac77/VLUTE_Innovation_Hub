@@ -7,33 +7,24 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// ---- Khu nội bộ (ví dụ) ----
-// Dùng alias đã đăng ký: verified.to.login + approved.to.login
+// ---- Khu nội bộ (đã đăng nhập + đã verify + đã approved) ----
 Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(function () {
+
     Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
 
     // Ví dụ các module nội bộ
     Route::prefix('ideas')->group(function () {
-        Route::get('/', fn() => 'Ideas index');     // -> view thực tế của bạn
+        Route::get('/', fn() => 'Ideas index');
         Route::get('/create', fn() => 'Create idea');
         // ...
     });
 
-    // Trang admin chung (nếu có trang home admin)
+    // Trang admin Home (nếu muốn)
     Route::prefix('admin')->group(function () {
-        Route::get('/', function () {
-            return <<<HTML
-            <div style="padding:24px;font-family:system-ui,Arial">
-              <h1>Admin Home</h1>
-              <p><a href="/admin/approvals" style="font-weight:700">Quản lý phê duyệt tài khoản</a></p>
-            </div>
-        HTML;
-        });
+        Route::get('/', fn() => 'Admin Home');
     });
 
-    // ===== Chỉ dành cho admin: phê duyệt tài khoản =====
-    // ... trong Route::middleware(['auth','verified.to.login','approved.to.login'])->group(function () { ... });
-
+    // ---- CHỈ ADMIN: phê duyệt tài khoản ----
     Route::prefix('admin')->name('admin.')->middleware('is.admin')->group(function () {
         Route::get('/approvals', [\App\Http\Controllers\Admin\ApprovalController::class, 'index'])->name('approvals.index');
         Route::post('/approvals/{user}/approve', [\App\Http\Controllers\Admin\ApprovalController::class, 'approve'])->name('approvals.approve');
@@ -42,10 +33,12 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
     });
 });
 
+// ---- Khu người dùng (chỉ cần đăng nhập) ----
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Routes Breeze (login / register / verify / forgot ...)
 require __DIR__ . '/auth.php';

@@ -5,13 +5,16 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
-                </div>
+    @if (auth()->user()?->role === 'admin')
+        <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 py-6">
+            <div class="rounded-xl border border-dashed border-gray-300 bg-white p-4">
+                <strong>Admin:</strong>
+                <a href="{{ route('admin.approvals.index') }}" class="ml-2 font-semibold text-blue-600 hover:underline">
+                    Quản lý phê duyệt tài khoản
+                </a>
             </div>
         </div>
-    </div>
+    @endif
+
+    {{-- Nội dung dashboard khác của bạn --}}
 </x-app-layout>

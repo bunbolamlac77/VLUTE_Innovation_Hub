@@ -9,31 +9,30 @@ use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
 {
+    /**
+     * Danh sách tài khoản chờ duyệt.
+     */
     public function index()
     {
-        // Lấy user pending (chờ duyệt) mới nhất trước
         $pending = User::where('approval_status', 'pending')
             ->orderByDesc('created_at')
-            ->get()
-            ->map(function (User $u) {
-                return [
-                    'id' => $u->id,
-                    'name' => $u->name,
-                    'email' => $u->email,
-                    'role' => $u->role,
-                    'suggested' => $this->guessRoleByEmail($u->email), // gợi ý role theo email
-                    'company' => $u->company,
-                    'created_at' => $u->created_at,
-                ];
-            });
+            ->get();
 
         return view('admin.approvals.index', compact('pending'));
     }
 
+    /**
+     * Duyệt tài khoản + set role (admin có thể chọn lại role trong form).
+     */
     public function approve(Request $request, User $user): RedirectResponse
     {
-        // Lấy role từ form (nếu có), nếu không dùng role hiện tại hoặc gợi ý theo email
-        $role = $request->string('role')->toString() ?: $this->guessRoleByEmail($user->email);
+        $role = $request->string('role')->toString();
+
+        // Nếu form không gửi role, gợi ý theo email
+        if (!$role) {
+            $role = $this->guessRoleByEmail($user->email);
+        }
+
         if (!in_array($role, ['student', 'staff', 'enterprise', 'admin'], true)) {
             return back()->with('status', 'Role không hợp lệ.');
         }
@@ -45,9 +44,12 @@ class ApprovalController extends Controller
             'approved_at' => now(),
         ]);
 
-        return back()->with('status', 'Đã duyệt: ' . $user->email . ' (role: ' . $role . ')');
+        return back()->with('status', 'Đã duyệt: ' . $user->email . " (role: {$role})");
     }
 
+    /**
+     * Từ chối tài khoản.
+     */
     public function reject(Request $request, User $user): RedirectResponse
     {
         $user->update([
@@ -59,26 +61,34 @@ class ApprovalController extends Controller
         return back()->with('status', 'Đã từ chối: ' . $user->email);
     }
 
+    /**
+     * Admin cập nhật role (không đổi approval).
+     */
     public function updateRole(Request $request, User $user): RedirectResponse
     {
         $request->validate([
             'role' => ['required', 'in:student,staff,enterprise,admin'],
         ]);
 
-        $user->update(['role' => $request->string('role')->toString()]);
+        $user->update([
+            'role' => $request->string('role')->toString(),
+        ]);
+
         return back()->with('status', 'Đã cập nhật role cho: ' . $user->email);
     }
 
+    /**
+     * Gợi ý role theo domain email.
+     */
     private function guessRoleByEmail(string $email): string
     {
         $email = strtolower($email);
         $domain = str($email)->after('@')->toString();
 
-        if ($domain === 'st.vlute.edu.vn') {
+        if ($domain === 'st.vlute.edu.vn')
             return 'student';
-        } elseif ($domain === 'vlute.edu.vn') {
+        if ($domain === 'vlute.edu.vn')
             return 'staff';
-        }
         return 'enterprise';
     }
 }
