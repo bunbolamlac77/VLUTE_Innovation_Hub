@@ -243,6 +243,20 @@
       pc && pc.addEventListener('input',sync);
       sync();
     })();
+    (function(){
+    const unapproved = "{{ session('unapproved') ? '1' : '' }}";
+    if (unapproved) {
+      const el = document.getElementById('modal-login-block-body');
+      const email = @json(session('unapproved_email'));
+      if (el) {
+        el.innerHTML = `
+          <p>Tài khoản <strong>${email ?? ''}</strong> đang chờ phê duyệt.</p>
+          <p>Vui lòng đợi quản trị viên xác nhận. Bạn có thể quay lại sau.</p>
+        `;
+      }
+      document.getElementById('modal-login-block')?.classList.add('show');
+    }
+  })();
   </script>
 </body>
 </html>

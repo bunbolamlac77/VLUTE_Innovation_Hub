@@ -8,7 +8,8 @@ Route::get('/', function () {
 });
 
 // ---- Khu nội bộ (ví dụ) ----
-Route::middleware(['auth', 'verified'])->group(function () {
+// Dùng alias đã đăng ký: verified.to.login + approved.to.login
+Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(function () {
     Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
 
     // Ví dụ các module nội bộ
@@ -18,10 +19,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // ...
     });
 
-    // Trang admin / approvals ...
+    // Trang admin chung (nếu có trang home admin)
     Route::prefix('admin')->group(function () {
-        Route::get('/', fn() => 'Admin Home');
-        // ...
+        Route::get('/', function () {
+            return <<<HTML
+            <div style="padding:24px;font-family:system-ui,Arial">
+              <h1>Admin Home</h1>
+              <p><a href="/admin/approvals" style="font-weight:700">Quản lý phê duyệt tài khoản</a></p>
+            </div>
+        HTML;
+        });
+    });
+
+    // ===== Chỉ dành cho admin: phê duyệt tài khoản =====
+    // ... trong Route::middleware(['auth','verified.to.login','approved.to.login'])->group(function () { ... });
+
+    Route::prefix('admin')->name('admin.')->middleware('is.admin')->group(function () {
+        Route::get('/approvals', [\App\Http\Controllers\Admin\ApprovalController::class, 'index'])->name('approvals.index');
+        Route::post('/approvals/{user}/approve', [\App\Http\Controllers\Admin\ApprovalController::class, 'approve'])->name('approvals.approve');
+        Route::post('/approvals/{user}/reject', [\App\Http\Controllers\Admin\ApprovalController::class, 'reject'])->name('approvals.reject');
+        Route::post('/approvals/{user}/update-role', [\App\Http\Controllers\Admin\ApprovalController::class, 'updateRole'])->name('approvals.updateRole');
     });
 });
 
