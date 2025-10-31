@@ -18,24 +18,59 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::get('/create', fn() => 'Create idea');
         // ...
     });
-
-    // Trang admin Home (nếu muốn)
-    Route::prefix('admin')->group(function () {
-        Route::get('/', fn() => 'Admin Home');
-    });
-
-    // ---- CHỈ ADMIN: phê duyệt tài khoản ----
-    Route::prefix('admin')->name('admin.')->middleware('is.admin')->group(function () {
-        Route::get('/approvals', [\App\Http\Controllers\Admin\ApprovalController::class, 'index'])->name('approvals.index');
-        Route::post('/approvals/{user}/approve', [\App\Http\Controllers\Admin\ApprovalController::class, 'approve'])->name('approvals.approve');
-        Route::post('/approvals/{user}/reject', [\App\Http\Controllers\Admin\ApprovalController::class, 'reject'])->name('approvals.reject');
-        Route::post('/approvals/{user}/update-role', [\App\Http\Controllers\Admin\ApprovalController::class, 'updateRole'])->name('approvals.updateRole');
-
-        Route::get('/users', [\App\Http\Controllers\Admin\UserRoleController::class, 'index'])->name('users.index');
-        Route::post('/users/{user}/roles', [\App\Http\Controllers\Admin\UserRoleController::class, 'updateRoles'])->name('users.roles.update');
-
-    });
 });
+
+// --- Nhóm Admin: 1 trang duy nhất + các action --- //
+Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin'])
+    ->prefix('admin')->name('admin.')
+    ->group(function () {
+        // Trang một trang (tab theo query)
+        Route::get('/', [\App\Http\Controllers\Admin\AdminHomeController::class, 'index'])
+            ->name('home');
+
+        Route::get('/approvals', [\App\Http\Controllers\Admin\ApprovalController::class, 'index'])
+            ->name('approvals.index');
+        Route::post('/approvals/{user}/update-role', [\App\Http\Controllers\Admin\ApprovalController::class, 'updateRole'])
+            ->name('approvals.updateRole');
+
+        Route::get('/users', [\App\Http\Controllers\Admin\UserRoleController::class, 'index'])
+            ->name('users.index');
+        Route::post('/users/{user}/roles', [\App\Http\Controllers\Admin\UserRoleController::class, 'updateRoles'])
+            ->name('users.roles.update');
+
+        // Approvals
+        Route::post('/approvals/{user}/approve', [\App\Http\Controllers\Admin\ApprovalActionController::class, 'approve'])
+            ->name('approvals.approve');
+        Route::post('/approvals/{user}/reject', [\App\Http\Controllers\Admin\ApprovalActionController::class, 'reject'])
+            ->name('approvals.reject');
+
+        // Users
+        Route::post('/users/{user}/role', [\App\Http\Controllers\Admin\UserActionController::class, 'updateRole'])
+            ->name('users.role');
+        Route::post('/users/{user}/lock', [\App\Http\Controllers\Admin\UserActionController::class, 'lock'])
+            ->name('users.lock');
+        Route::post('/users/{user}/unlock', [\App\Http\Controllers\Admin\UserActionController::class, 'unlock'])
+            ->name('users.unlock');
+        Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserActionController::class, 'destroy'])
+            ->name('users.destroy');
+
+        // Taxonomies (3 nhóm dùng form nhỏ trong 1 trang)
+        Route::post('/taxonomies/faculties', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'storeFaculty'])->name('tax.faculties.store');
+        Route::post('/taxonomies/faculties/{faculty}', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'updateFaculty'])->name('tax.faculties.update');
+        Route::post('/taxonomies/faculties/{faculty}/del', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'destroyFaculty'])->name('tax.faculties.destroy');
+
+        Route::post('/taxonomies/categories', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'storeCategory'])->name('tax.categories.store');
+        Route::post('/taxonomies/categories/{category}', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'updateCategory'])->name('tax.categories.update');
+        Route::post('/taxonomies/categories/{category}/del', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'destroyCategory'])->name('tax.categories.destroy');
+
+        Route::post('/taxonomies/tags', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'storeTag'])->name('tax.tags.store');
+        Route::post('/taxonomies/tags/{tag}', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'updateTag'])->name('tax.tags.update');
+        Route::post('/taxonomies/tags/{tag}/del', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'destroyTag'])->name('tax.tags.destroy');
+
+        // Ideas (MVP: đổi trạng thái + gán reviewer) - TODO: Uncomment when IdeaActionController is created
+        // Route::post('/ideas/{idea}/status', [\App\Http\Controllers\Admin\IdeaActionController::class, 'updateStatus'])->name('ideas.status');
+        // Route::post('/ideas/{idea}/reviewer', [\App\Http\Controllers\Admin\IdeaActionController::class, 'assignReviewer'])->name('ideas.reviewer');
+    });
 
 // ---- Khu người dùng (chỉ cần đăng nhập) ----
 Route::middleware('auth')->group(function () {

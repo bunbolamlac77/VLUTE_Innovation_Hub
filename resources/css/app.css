@@ -1,3 +1,1348 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* -------------------------------------------------------------------------- */
+/*  Auth Verify Email Page                                                    */
+/* -------------------------------------------------------------------------- */
+
+/* Page layout and theme tokens */
+.verify-email-page {
+    --blue: #2563eb;
+    --border: #e5e7eb;
+    --text: #0f172a;
+    --muted: #64748b;
+    --card: #fff;
+    --r: 22px;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    margin: 0;
+    font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial,
+        sans-serif;
+    background: #f3f4f6;
+    color: var(--text);
+}
+
+.verify-email-page * {
+    box-sizing: border-box;
+}
+
+.verify-email-page a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.verify-email-page a:hover {
+    text-decoration: underline;
+}
+
+/* Card shell */
+.verify-email-page .wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        url("/images/panel-truong.jpg") center/cover no-repeat;
+}
+
+.verify-email-page .card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--card);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    padding: 28px 28px 22px;
+}
+
+.verify-email-page .brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.verify-email-page .brand img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.verify-email-page .title {
+    text-align: center;
+    font-weight: 800;
+    margin: 6px 0 10px;
+    font-size: 26px;
+}
+
+.verify-email-page .muted {
+    text-align: center;
+    color: var(--muted);
+    margin: 0 0 12px;
+}
+
+.verify-email-page .row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.verify-email-page .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.verify-email-page .btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+
+.verify-email-page .btn-outline {
+    background: #fff;
+    color: #0f172a;
+    border: 1px solid #e5e7eb;
+}
+
+.verify-email-page .status {
+    color: #059669;
+    font-weight: 800;
+    text-align: center;
+    margin: 8px 0;
+}
+
+/* Modal experience */
+.verify-email-page .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.verify-email-page .modal.show {
+    display: flex;
+}
+
+.verify-email-page .modal__card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+    width: 95%;
+    max-width: 600px;
+    position: relative;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.verify-email-page .modal__close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.verify-email-page .modal__title {
+    margin: 0 0 6px;
+    font-weight: 800;
+    font-size: 20px;
+}
+
+.verify-email-page .modal__desc {
+    margin: 0 0 12px;
+    color: #475569;
+}
+
+.verify-email-page .modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Auth Page (Login & Register)                                              */
+/* -------------------------------------------------------------------------- */
+
+.auth-page {
+    --blue: #2563eb;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --card: #fff;
+    --r: 16px;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    margin: 0;
+    font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial,
+        sans-serif;
+    background: #f3f4f6;
+    color: var(--text);
+}
+
+.auth-page * {
+    box-sizing: border-box;
+}
+
+.auth-page a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.auth-page a:hover {
+    text-decoration: underline;
+}
+
+.auth-page .auth-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        url("/images/panel-truong.jpg") center/cover no-repeat;
+}
+
+.auth-page .card {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    padding: 32px;
+}
+
+.auth-page .auth-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.auth-page .auth-header .logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.auth-page .auth-header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 0.02em;
+}
+
+.auth-page .tabs {
+    display: flex;
+    background: #eef2ff;
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.auth-page .tabs button {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    font-weight: 800;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.auth-page .tabs button.active {
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    color: var(--blue);
+}
+
+.auth-page .group {
+    margin-bottom: 16px;
+}
+
+.auth-page .group label {
+    display: block;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.auth-page .field {
+    position: relative;
+}
+
+.auth-page .field input,
+.auth-page .field select {
+    width: 100%;
+    padding: 12px 44px 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 16px;
+    background: #fff;
+}
+
+.auth-page .field input:focus,
+.auth-page .field select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.auth-page .has-eye {
+    position: relative;
+}
+
+.auth-page .has-eye input {
+    padding-right: 44px;
+}
+
+.auth-page .eye-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-page .eye-toggle svg {
+    width: 22px;
+    height: 22px;
+}
+
+.auth-page .options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+.auth-page .btn-primary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.auth-page .btn-primary[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.auth-page .btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.auth-page .divider {
+    display: flex;
+    align-items: center;
+    color: #64748b;
+    font-size: 14px;
+    margin: 22px 0;
+}
+
+.auth-page .divider::before,
+.auth-page .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+
+.auth-page .divider::before {
+    margin-right: 0.25em;
+}
+
+.auth-page .divider::after {
+    margin-left: 0.25em;
+}
+
+.auth-page .btn-social-dndk {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.auth-page .btn-social-dndk:hover {
+    background: #f8fafc;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+}
+
+.auth-page .hidden {
+    display: none !important;
+}
+
+.auth-page .pw-hint {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.auth-page .pw-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.auth-page .pw-bar > span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #f43f5e, #f59e0b, #22c55e);
+    transition: width 0.25s ease;
+}
+
+.auth-page .pw-ok {
+    color: #059669;
+}
+
+.auth-page .pw-bad {
+    color: #b91c1c;
+}
+
+.auth-page .match-note {
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.auth-page .auth-alert {
+    margin: 10px 0;
+    font-weight: 700;
+}
+
+.auth-page .auth-alert--error {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+.auth-page .auth-alert--success {
+    color: #059669;
+}
+
+.auth-page .auth-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.auth-page .auth-disclaimer {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Forgot Password Page                                                      */
+/* -------------------------------------------------------------------------- */
+
+.forgot-password-page {
+    --blue: #2563eb;
+    --border: #e5e7eb;
+    --text: #0f172a;
+    --muted: #64748b;
+    --card: #fff;
+    --radius: 22px;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    margin: 0;
+    font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial,
+        sans-serif;
+    background: #f3f4f6;
+    color: var(--text);
+}
+
+.forgot-password-page * {
+    box-sizing: border-box;
+}
+
+.forgot-password-page a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.forgot-password-page a:hover {
+    text-decoration: underline;
+}
+
+.forgot-password-page .wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        url("/images/panel-truong.jpg") center/cover no-repeat;
+}
+
+.forgot-password-page .card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 36px;
+}
+
+.forgot-password-page .brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.forgot-password-page .brand img {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.forgot-password-page .title {
+    margin: 8px 0 16px;
+    text-align: center;
+    font-size: 40px;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.forgot-password-page .status {
+    color: #059669;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.forgot-password-page .group {
+    margin-bottom: 18px;
+}
+
+.forgot-password-page .group label {
+    display: block;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.forgot-password-page .field {
+    position: relative;
+}
+
+.forgot-password-page .field input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 16px;
+    background: #fff;
+}
+
+.forgot-password-page .field input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.forgot-password-page .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.forgot-password-page .btn:hover {
+    background: #1d4ed8;
+}
+
+.forgot-password-page .link {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 18px;
+}
+
+.forgot-password-page .error {
+    margin: 8px 0;
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Reset Password Page                                                       */
+/* -------------------------------------------------------------------------- */
+
+.reset-password-page {
+    --blue: #2563eb;
+    --border: #e5e7eb;
+    --text: #0f172a;
+    --muted: #64748b;
+    --card: #fff;
+    --radius: 22px;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    margin: 0;
+    font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial,
+        sans-serif;
+    background: #f3f4f6;
+    color: var(--text);
+}
+
+.reset-password-page * {
+    box-sizing: border-box;
+}
+
+.reset-password-page a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.reset-password-page a:hover {
+    text-decoration: underline;
+}
+
+.reset-password-page .wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        url("/images/panel-truong.jpg") center/cover no-repeat;
+}
+
+.reset-password-page .card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 36px;
+}
+
+.reset-password-page .brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.reset-password-page .brand img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.reset-password-page .brand-name {
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.reset-password-page .title {
+    margin: 8px 0 16px;
+    text-align: center;
+    font-size: 32px;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.reset-password-page .error {
+    margin: 8px 0;
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.reset-password-page .group {
+    margin-bottom: 18px;
+}
+
+.reset-password-page .group label {
+    display: block;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.reset-password-page .field {
+    position: relative;
+}
+
+.reset-password-page .field input {
+    width: 100%;
+    padding: 14px 46px 14px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 16px;
+    background: #fff;
+}
+
+.reset-password-page .field input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.reset-password-page .has-eye {
+    position: relative;
+}
+
+.reset-password-page .eye-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reset-password-page .eye-toggle svg {
+    width: 22px;
+    height: 22px;
+}
+
+.reset-password-page .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.reset-password-page .btn:hover {
+    background: #1d4ed8;
+}
+
+.reset-password-page .note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* =====================================================
+   ADMIN UI (tuỳ biến) — dễ tìm & thay thế
+   ===================================================== */
+
+/* Tabs */
+.admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+.admin-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+    background: #f3f4f6;
+    color: #374151;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.admin-tab:hover {
+    background: #e5e7eb;
+}
+.admin-tab.is-active {
+    background: #2563eb;
+    color: #fff;
+}
+.admin-tab.is-active:hover {
+    background: #1d4ed8;
+}
+
+/* Cards */
+.card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1rem;
+}
+.card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+/* Tables */
+.table-wrap {
+    overflow: auto;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+}
+.tbl {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 720px;
+}
+.tbl thead th {
+    background: #f9fafb;
+    color: #4b5563;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+.tbl tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: top;
+}
+
+/* Chips & badges */
+.chips {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+.chip {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+}
+.badge {
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.35rem;
+    font-size: 0.75rem;
+    margin-left: 0.25rem;
+}
+.badge.ok {
+    background: #d1fae5;
+    color: #065f46;
+}
+.badge.warn {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Inputs & Buttons */
+.ipt {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 14px;
+    background: #fff;
+    width: 100%;
+}
+.ipt:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+.ipt-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    width: auto;
+}
+.sel {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    min-width: 160px;
+    font-size: 14px;
+    background: #fff;
+    cursor: pointer;
+}
+.sel:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+.btn {
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+.btn:not([disabled]):hover {
+    filter: brightness(0.95);
+}
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+.btn-primary:not([disabled]):hover {
+    background: #1d4ed8;
+}
+.btn-ghost {
+    background: #eef2ff;
+    color: #3730a3;
+}
+.btn-ghost:not([disabled]):hover {
+    background: #e0e7ff;
+}
+.btn-danger {
+    background: #ef4444;
+    color: #fff;
+}
+.btn-danger:not([disabled]):hover {
+    background: #dc2626;
+}
+.btn-sm {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.875rem;
+}
+
+/* Lists in taxonomies */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #fafafa;
+}
+.list-item .actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+.sub {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+/* Misc */
+.flash-success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+}
+.empty {
+    color: #6b7280;
+    padding: 1rem;
+}
+.pre {
+    white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+    background: #f9fafb;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+}
+.filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.text-center {
+    text-align: center;
+}
+.font-medium {
+    font-weight: 600;
+}
+
+/* Grid layout utilities */
+.grid {
+    display: grid;
+}
+.gap-6 {
+    gap: 1.5rem;
+}
+.md\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 768px) {
+    .md\:grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Flex utilities */
+.inline-flex {
+    display: inline-flex;
+}
+.gap-2 {
+    gap: 0.5rem;
+}
+.mb-3 {
+    margin-bottom: 0.75rem;
+}
+.mt-4 {
+    margin-top: 1rem;
+}
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Site Header & Footer Styles (from index.html)                             */
+/* -------------------------------------------------------------------------- */
+
+:root {
+    --brand-navy: #0a0f5a;
+    --brand-green: #0aa84f;
+    --brand-gray-50: #f5f7fb;
+    --brand-gray-100: #eef2f7;
+    --fs-menu: 15px;
+    --fs-submenu: 14px;
+    --border: #e5e7eb;
+    --shadow: 0 8px 24px rgba(2, 16, 43, 0.08);
+    --radius: 16px;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* ===== MASTHEAD ===== */
+.masthead {
+    background: var(--brand-navy);
+    color: #fff;
+}
+.masthead-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+}
+.school {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.school-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #fff;
+}
+.school-title {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+.school-title .name {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 0.3px;
+}
+.school-title .slogan {
+    font-weight: 600;
+    opacity: 0.95;
+    margin-top: 6px;
+}
+.mast-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.mast-right .link {
+    font-weight: 800;
+}
+.lang-switcher {
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+.lang-switcher:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+.login {
+    margin-left: 8px;
+}
+
+/* ===== MENU BAR ===== */
+.menubar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.menu-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 16px 0;
+    position: relative;
+}
+.menu a,
+.menu button {
+    font-weight: 700;
+    color: #0f172a;
+    opacity: 0.95;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: var(--fs-menu);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.menu a:hover,
+.menu button:hover {
+    background: var(--brand-gray-50);
+    color: var(--brand-navy);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: -6px;
+}
+.menu-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Avatar & menu người dùng */
+.userbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.userbox .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--brand-gray-100);
+}
+.userbox .chev {
+    border: 0;
+    background: transparent;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    color: #fff;
+}
+.userbox .chev:hover {
+    background: var(--brand-gray-50);
+}
+.user-menu {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    min-width: 220px;
+    padding: 8px;
+    display: none;
+}
+.user-menu a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #0f172a;
+}
+.user-menu a:hover {
+    background: var(--brand-gray-50);
+}
+
+/* Footer */
+footer {
+    background: var(--brand-navy);
+    color: #fff;
+    margin-top: 0;
+    padding-top: 32px;
+    padding-bottom: 16px;
+}
+footer .cols {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 24px;
+    padding: 24px 0;
+}
+footer h5 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 700;
+}
+footer a {
+    opacity: 0.9;
+    color: #d1d5db;
+    transition: color 0.2s ease;
+}
+footer a:hover {
+    color: #fff;
+}
+footer .legal {
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 12px 0;
+    font-size: 14px;
+    opacity: 0.9;
+    text-align: center;
+}
+
+/* Social Links */
+.social-links {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 95;
+}
+.social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease-out;
+    overflow: hidden;
+}
+.social-links a:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+.social-links img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+    .menu {
+        display: none;
+    }
+    .social-links {
+        bottom: 16px;
+        right: 16px;
+    }
+    .social-links a {
+        width: 48px;
+        height: 48px;
+    }
+    footer .cols {
+        grid-template-columns: 1fr;
+    }
+    .school-title .name {
+        font-size: 16px;
+    }
+    .school-title .slogan {
+        font-size: 13px;
+        margin-top: 4px;
+    }
+    .masthead-inner {
+        padding: 10px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-bar .ipt,
+    .filter-bar .sel,
+    .filter-bar .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    .admin-tabs {
+        overflow-x: auto;
+    }
+    .admin-tab {
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .table-wrap {
+        margin: 0 -1rem;
+        border-radius: 0;
+    }
+    .card {
+        padding: 0.75rem;
+    }
+}

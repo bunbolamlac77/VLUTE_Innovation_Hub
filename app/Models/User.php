@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
         // Các trường phục vụ phân quyền & duyệt
         'role',              // student|staff|enterprise|admin
         'approval_status',   // approved|pending|rejected
+        'is_active',         // true|false - khóa/mở khóa tài khoản
         'company',           // DN (tuỳ chọn)
         'position',          // DN (tuỳ chọn)
         'interest',          // DN (tuỳ chọn)
@@ -54,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'approved_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -112,5 +114,23 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getRoleLabelAttribute(): string
     {
         return self::roleLabel($this->role ?? '');
+    }
+
+    // Helper: Kiểm tra tài khoản có bị khóa không?
+    public function isActive(): bool
+    {
+        return $this->is_active ?? true;
+    }
+
+    // Helper: Khóa tài khoản
+    public function lock(): bool
+    {
+        return $this->update(['is_active' => false]);
+    }
+
+    // Helper: Mở khóa tài khoản
+    public function unlock(): bool
+    {
+        return $this->update(['is_active' => true]);
     }
 }
