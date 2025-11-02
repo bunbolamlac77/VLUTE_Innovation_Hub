@@ -100,20 +100,32 @@
 
           {{-- Enterprise fields (hiển thị khi email không phải @vlute.edu.vn hoặc @st.vlute.edu.vn) --}}
           <div id="enterprise-fields" class="hidden">
+            <div class="enterprise-fields-header">
+              <p class="enterprise-note">Vui lòng điền thông tin doanh nghiệp để được phê duyệt tài khoản.</p>
+            </div>
             <div class="group">
-              <label for="reg-company">Tên doanh nghiệp (tùy chọn)</label>
+              <label for="reg-company">Tên công ty/doanh nghiệp <span class="required">*</span></label>
               <div class="field"><input id="reg-company" name="company" type="text" value="{{ old('company') }}"
-                  placeholder="Nhập tên doanh nghiệp"></div>
+                  placeholder="Nhập tên công ty/doanh nghiệp" class="enterprise-field"></div>
             </div>
             <div class="group">
-              <label for="reg-position">Chức vụ (tùy chọn)</label>
+              <label for="reg-position">Vị trí công tác <span class="required">*</span></label>
               <div class="field"><input id="reg-position" name="position" type="text" value="{{ old('position') }}"
-                  placeholder="Nhập chức vụ"></div>
+                  placeholder="VD: Trưởng phòng nhân sự" class="enterprise-field"></div>
             </div>
             <div class="group">
-              <label for="reg-interest">Lĩnh vực quan tâm (tùy chọn)</label>
-              <div class="field"><input id="reg-interest" name="interest" type="text" value="{{ old('interest') }}"
-                  placeholder="Nhập lĩnh vực quan tâm"></div>
+              <label for="reg-interest">Lĩnh vực quan tâm <span class="required">*</span></label>
+              <div class="field">
+                <select id="reg-interest" name="interest" class="enterprise-field">
+                  <option value="">-- Chọn lĩnh vực --</option>
+                  <option value="it" {{ old('interest') === 'it' ? 'selected' : '' }}>Công nghệ thông tin</option>
+                  <option value="agritech" {{ old('interest') === 'agritech' ? 'selected' : '' }}>Nông nghiệp công nghệ
+                    cao</option>
+                  <option value="mechanics" {{ old('interest') === 'mechanics' ? 'selected' : '' }}>Cơ khí / Tự động hóa
+                  </option>
+                  <option value="other" {{ old('interest') === 'other' ? 'selected' : '' }}>Khác</option>
+                </select>
+              </div>
             </div>
           </div>
 

@@ -83,6 +83,15 @@
 
     {{-- Main Content --}}
     <main>
+        {{-- Flash Messages --}}
+        @if (session('status'))
+            <div class="container" style="margin-top: 20px; margin-bottom: -20px;">
+                <div class="flash-success"
+                    style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 0.75rem 1rem; border-radius: 0.75rem; font-weight: 600;">
+                    {{ session('status') }}
+                </div>
+            </div>
+        @endif
         @yield('content')
     </main>
 

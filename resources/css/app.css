@@ -475,6 +475,48 @@
     font-size: 14px;
 }
 
+/* Enterprise fields styling */
+.auth-page .enterprise-fields-header {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #eff6ff;
+    border-radius: 8px;
+    border-left: 3px solid #2563eb;
+}
+
+.auth-page .enterprise-note {
+    margin: 0;
+    font-size: 13px;
+    color: #1e40af;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.auth-page .required {
+    color: #ef4444;
+    font-weight: 800;
+}
+
+.auth-page .enterprise-field {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-page .enterprise-field.error-field {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.auth-page .enterprise-field:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.auth-page .enterprise-field.error-field:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
 /* Modal for auth page */
 .auth-page .modal {
     position: fixed;
@@ -1679,6 +1721,38 @@ body.bg-gray-50 .container {
 .empty {
     color: #6b7280;
     padding: 1rem;
+}
+
+/* Enterprise info in admin table */
+.enterprise-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.info-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    line-height: 1.5;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #4b5563;
+    min-width: 70px;
+    flex-shrink: 0;
+}
+
+.info-value {
+    color: #111827;
+    flex: 1;
+}
+
+.text-muted {
+    color: #9ca3af;
+    font-size: 0.875rem;
 }
 .pre {
     white-space: pre-wrap;

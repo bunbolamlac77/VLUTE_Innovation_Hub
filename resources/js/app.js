@@ -113,8 +113,11 @@ function initEnterpriseFieldsToggle() {
 
     const emailInput = document.getElementById("reg-email");
     const enterpriseBlock = document.getElementById("enterprise-fields");
+    const regForm = document.getElementById("reg-form");
+    const enterpriseFields =
+        enterpriseBlock?.querySelectorAll(".enterprise-field");
 
-    if (!emailInput || !enterpriseBlock) {
+    if (!emailInput || !enterpriseBlock || !regForm) {
         return;
     }
 
@@ -123,11 +126,71 @@ function initEnterpriseFieldsToggle() {
         const isVlute =
             value.endsWith("@st.vlute.edu.vn") ||
             value.endsWith("@vlute.edu.vn");
-        enterpriseBlock.classList.toggle(
-            "hidden",
-            isVlute || !value.includes("@")
-        );
+        const shouldShow = !isVlute && value.includes("@");
+
+        enterpriseBlock.classList.toggle("hidden", !shouldShow);
+
+        // Cập nhật required attribute
+        if (enterpriseFields) {
+            enterpriseFields.forEach((field) => {
+                if (shouldShow) {
+                    field.setAttribute("required", "required");
+                } else {
+                    field.removeAttribute("required");
+                }
+            });
+        }
     };
+
+    // Validate form submission
+    regForm.addEventListener("submit", (e) => {
+        const value = (emailInput.value || "").toLowerCase();
+        const isVlute =
+            value.endsWith("@st.vlute.edu.vn") ||
+            value.endsWith("@vlute.edu.vn");
+        const shouldRequire = !isVlute && value.includes("@");
+
+        if (shouldRequire && enterpriseFields) {
+            let isValid = true;
+            let firstError = null;
+
+            enterpriseFields.forEach((field) => {
+                if (!field.value || field.value.trim() === "") {
+                    isValid = false;
+                    field.classList.add("error-field");
+                    if (!firstError) {
+                        firstError = field;
+                    }
+                } else {
+                    field.classList.remove("error-field");
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                if (firstError) {
+                    firstError.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                    firstError.focus();
+                }
+                alert(
+                    "Vui lòng điền đầy đủ thông tin doanh nghiệp để tiếp tục đăng ký."
+                );
+                return false;
+            }
+        }
+    });
+
+    // Remove error class on input
+    if (enterpriseFields) {
+        enterpriseFields.forEach((field) => {
+            field.addEventListener("input", () => {
+                field.classList.remove("error-field");
+            });
+        });
+    }
 
     emailInput.addEventListener("input", toggle);
     toggle();

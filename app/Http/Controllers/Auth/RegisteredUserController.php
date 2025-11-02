@@ -29,19 +29,33 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        // Chuẩn hóa email và tách domain để xác định validation rules
+        $email = $request->string('email')->lower()->toString();
+        $domain = str($email)->after('@')->toString();
+
+        // Xác định xem có phải domain VLUTE không
+        $isVluteDomain = in_array($domain, ['vlute.edu.vn', 'st.vlute.edu.vn'], true);
+
+        // Validation rules cơ bản
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            // nếu form có các field DN, bạn có thể thêm rules nhẹ:
-            // 'company'            => ['nullable','string','max:255'],
-            // 'position'           => ['nullable','string','max:255'],
-            // 'interest'           => ['nullable','string','max:255'],
-        ]);
+        ];
 
-        // Chuẩn hóa email và tách domain
-        $email = $request->string('email')->lower()->toString();
-        $domain = str($email)->after('@')->toString();
+        // Nếu không phải domain VLUTE, các trường doanh nghiệp là bắt buộc
+        if (!$isVluteDomain) {
+            $rules['company'] = ['required', 'string', 'max:255'];
+            $rules['position'] = ['required', 'string', 'max:255'];
+            $rules['interest'] = ['required', 'string', 'in:it,agritech,mechanics,other'];
+        } else {
+            // Với domain VLUTE, các trường này là tùy chọn
+            $rules['company'] = ['nullable', 'string', 'max:255'];
+            $rules['position'] = ['nullable', 'string', 'max:255'];
+            $rules['interest'] = ['nullable', 'string', 'in:it,agritech,mechanics,other'];
+        }
+
+        $request->validate($rules);
 
         // Mặc định: sinh viên (auto approved)
         $role = 'student';
@@ -58,7 +72,7 @@ class RegisteredUserController extends Controller
             $approval = 'pending';
         }
 
-        // Lấy thông tin DN nếu có (không bắt buộc)
+        // Lấy thông tin DN (nếu có)
         $company = $request->string('company')->toString() ?: null;
         $position = $request->string('position')->toString() ?: null;
         $interest = $request->string('interest')->toString() ?: null;
