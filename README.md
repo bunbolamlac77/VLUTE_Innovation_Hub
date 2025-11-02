@@ -1,61 +1,319 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# VLUTE Innovation Hub
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📖 Giới thiệu
 
-## About Laravel
+**VLUTE Innovation Hub** là một nền tảng quản lý ý tưởng đổi mới sáng tạo được phát triển cho Trường Đại học Sư phạm Kỹ thuật Vĩnh Long (VLUTE). Hệ thống kết nối sinh viên – giảng viên – mentor – doanh nghiệp – đối tác để cùng giải quyết các bài toán thực tế, tổ chức đợt gọi ý tưởng, cohort ươm tạo và hỗ trợ truyền thông nghiên cứu.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Mục tiêu
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **Kết nối hệ sinh thái**: Kết nối các bên liên quan để cùng giải quyết bài toán thực tế
+-   **Ươm tạo & đồng hành**: Tổ chức gọi ý tưởng, cohort ươm tạo, workshop và cố vấn chuyên sâu
+-   **Lan toả nghiên cứu**: Hỗ trợ truyền thông, công bố bản tin nghiên cứu, giới thiệu giải pháp tiêu biểu
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🚀 Tính năng chính
 
-## Learning Laravel
+### Đối với người dùng công khai
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   Xem danh sách ý tưởng công khai (Ngân hàng Ý tưởng)
+-   Xem chi tiết ý tưởng theo slug
+-   Thích (like) ý tưởng (cần đăng nhập)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Đối với người dùng đã đăng nhập
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   Quản lý hồ sơ cá nhân
+-   Dashboard quản lý ý tưởng
+-   Tương tác với ý tưởng
 
-## Laravel Sponsors
+### Đối với Admin
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+-   Quản lý người dùng và phân quyền
+-   Duyệt/ từ chối tài khoản người dùng mới
+-   Quản lý phân loại: Khoa (Faculties), Danh mục (Categories), Thẻ (Tags)
+-   Quản lý ý tưởng: Cập nhật trạng thái, gán reviewer
 
-### Premium Partners
+## 🛠️ Công nghệ sử dụng
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Backend
 
-## Contributing
+-   **PHP**: ^8.2
+-   **Laravel**: ^12.0
+-   **Database**: SQLite (mặc định)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Frontend
 
-## Code of Conduct
+-   **TailwindCSS**: ^3.1.0
+-   **AlpineJS**: ^3.4.2
+-   **Vite**: ^7.0.7
+-   **Laravel Breeze**: ^2.3 (Authentication)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Development Tools
 
-## Security Vulnerabilities
+-   **PHPUnit**: ^11.5.3 (Testing)
+-   **Laravel Pint**: ^1.24 (Code formatting)
+-   **Laravel Sail**: ^1.41 (Docker development)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 📋 Yêu cầu hệ thống
 
-## License
+-   PHP >= 8.2
+-   Composer
+-   Node.js >= 18.x và npm
+-   SQLite (hoặc có thể cấu hình MySQL/PostgreSQL)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🔧 Cài đặt
+
+### Bước 1: Clone repository
+
+```bash
+git clone <repository-url>
+cd vlute-innovation-hub
+```
+
+### Bước 2: Cài đặt dependencies PHP
+
+```bash
+composer install
+```
+
+### Bước 3: Cấu hình môi trường
+
+Tạo file `.env` từ `.env.example` (nếu có) hoặc tạo mới:
+
+```bash
+cp .env.example .env
+# Hoặc tạo file .env mới
+```
+
+Cấu hình database trong file `.env`:
+
+```env
+DB_CONNECTION=sqlite
+# Hoặc sử dụng MySQL/PostgreSQL
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=vlute_innovation_hub
+# DB_USERNAME=root
+# DB_PASSWORD=
+```
+
+Nếu dùng SQLite, đảm bảo file database tồn tại:
+
+```bash
+touch database/database.sqlite
+```
+
+### Bước 4: Tạo application key
+
+```bash
+php artisan key:generate
+```
+
+### Bước 5: Chạy migrations và seeders
+
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+Seeder sẽ tạo:
+
+-   Các roles cơ bản
+-   Tài khoản Admin mặc định
+
+### Bước 6: Cài đặt dependencies Node.js
+
+```bash
+npm install
+```
+
+### Bước 7: Build assets (hoặc chạy dev server)
+
+**Để phát triển (development):**
+
+```bash
+npm run dev
+```
+
+**Để production:**
+
+```bash
+npm run build
+```
+
+## ▶️ Chạy dự án
+
+### Chạy development server
+
+Sử dụng script composer để chạy đồng thời nhiều services:
+
+```bash
+composer run dev
+```
+
+Script này sẽ chạy:
+
+-   Laravel development server
+-   Queue worker
+-   Log viewer (Pail)
+-   Vite dev server
+
+**Hoặc chạy riêng lẻ:**
+
+Terminal 1 - Laravel server:
+
+```bash
+php artisan serve
+```
+
+Terminal 2 - Vite dev server:
+
+```bash
+npm run dev
+```
+
+Truy cập ứng dụng tại: `http://localhost:8000`
+
+### Chạy tests
+
+```bash
+php artisan test
+```
+
+Hoặc:
+
+```bash
+composer run test
+```
+
+## 📁 Cấu trúc dự án
+
+```
+vlute-innovation-hub/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/          # Controllers xử lý logic
+│   │   ├── Middleware/           # Middleware (auth, approval, admin)
+│   │   └── Requests/             # Form requests validation
+│   ├── Models/                   # Eloquent models
+│   └── Providers/                # Service providers
+├── database/
+│   ├── migrations/               # Database migrations
+│   └── seeders/                  # Database seeders
+├── resources/
+│   ├── views/                    # Blade templates
+│   ├── css/                      # CSS files
+│   └── js/                       # JavaScript files
+├── routes/
+│   ├── web.php                   # Web routes
+│   └── auth.php                  # Authentication routes
+├── public/                       # Public assets
+└── tests/                        # Test files
+```
+
+## 👤 Tài khoản mặc định
+
+Sau khi chạy seeder, hệ thống sẽ tạo tài khoản Admin mặc định. Thông tin đăng nhập có thể được kiểm tra trong file seeder:
+
+-   `database/seeders/AdminUserSeeder.php`
+
+## 🔐 Xác thực và Phân quyền
+
+### Middleware
+
+-   `auth`: Yêu cầu đăng nhập
+-   `verified.to.login`: Yêu cầu email đã được xác thực
+-   `approved.to.login`: Yêu cầu tài khoản đã được admin duyệt
+-   `is.admin`: Chỉ admin mới truy cập được
+
+### Roles
+
+Hệ thống hỗ trợ phân quyền theo roles. Các roles mặc định được tạo trong `RolesSeeder`.
+
+## 🎨 Giao diện
+
+-   **Framework CSS**: TailwindCSS
+-   **JavaScript**: AlpineJS (lightweight framework)
+-   **Build tool**: Vite
+
+## 📝 Migrations
+
+Các bảng chính:
+
+-   `users`: Người dùng
+-   `roles`: Vai trò
+-   `ideas`: Ý tưởng
+-   `idea_members`: Thành viên ý tưởng
+-   `idea_invitations`: Lời mời tham gia ý tưởng
+-   `reviews`: Đánh giá
+-   `review_assignments`: Phân công đánh giá
+-   `categories`: Danh mục
+-   `faculties`: Khoa
+-   `tags`: Thẻ
+-   `attachments`: Tệp đính kèm
+-   `change_requests`: Yêu cầu thay đổi
+
+## 🧪 Testing
+
+```bash
+# Chạy tất cả tests
+php artisan test
+
+# Chạy test cụ thể
+php artisan test --filter TestName
+```
+
+## 🔄 Scripts hữu ích
+
+```bash
+# Setup toàn bộ dự án (install + migrate + seed + build)
+composer run setup
+
+# Chạy development với tất cả services
+composer run dev
+
+# Format code
+./vendor/bin/pint
+
+# Clear cache
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+```
+
+## 📧 Cấu hình Email
+
+Để sử dụng tính năng xác thực email, cần cấu hình mail server trong file `.env`:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@vlute.edu.vn
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+## 🤝 Đóng góp
+
+1. Fork repository
+2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Mở Pull Request
+
+## 📄 License
+
+Dự án này được phát triển cho mục đích học tập và nghiên cứu tại Trường Đại học Sư phạm Kỹ thuật Vĩnh Long.
+
+## 📞 Liên hệ
+
+-   **Email**: spktvl@vlute.edu.vn
+-   **Website**: vlute.edu.vn
+-   **Địa chỉ**: Số 73 Nguyễn Huệ, Phường Long Châu, tỉnh Vĩnh Long
+
+---
+
+**Phát triển bởi**: Sinh viên Khoa Khoa học Máy tính - VLUTE
+**Phiên bản**: 1.0.0
