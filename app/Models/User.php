@@ -137,4 +137,36 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->update(['is_active' => true]);
     }
+
+    /**
+     * User có nhiều ý tưởng (là chủ sở hữu)
+     */
+    public function ideas()
+    {
+        return $this->hasMany(Idea::class, 'owner_id');
+    }
+
+    /**
+     * User là thành viên của nhiều ý tưởng (qua idea_members)
+     */
+    public function ideaMemberships()
+    {
+        return $this->hasMany(IdeaMember::class);
+    }
+
+    /**
+     * User gửi nhiều lời mời
+     */
+    public function sentInvitations()
+    {
+        return $this->hasMany(IdeaInvitation::class, 'invited_by');
+    }
+
+    /**
+     * User được phân công duyệt nhiều ý tưởng
+     */
+    public function reviewAssignments()
+    {
+        return $this->hasMany(ReviewAssignment::class, 'reviewer_id');
+    }
 }
