@@ -10,8 +10,18 @@ class UserActionController extends Controller
 {
     public function updateRole(Request $request, User $user)
     {
+        // Chỉ cho phép đổi vai cho staff/center/board từ domain vlute.edu.vn
+        // Sinh viên (student) và doanh nghiệp (enterprise) không được đổi vai
         $domain = str($user->email)->after('@')->lower()->toString();
-        $allowed = $domain === 'vlute.edu.vn' ? ['staff', 'center'] : ['enterprise'];
+
+        // Kiểm tra user có được phép đổi vai không
+        $canChangeRole = $domain === 'vlute.edu.vn' && in_array($user->role, ['staff', 'center', 'board'], true);
+
+        if (!$canChangeRole) {
+            return to_route('admin.home', ['tab' => 'users'])->with('status', 'Không thể đổi vai trò cho ' . $user->role_label . '.');
+        }
+
+        $allowed = ['staff', 'center', 'board'];
         $role = $request->string('role')->toString();
 
         if (!in_array($role, $allowed, true)) {

@@ -84,7 +84,13 @@ function initAuthTabs() {
         return;
     }
 
-    const initial = document.body.dataset.activeTab || "login";
+    // Kiểm tra nếu có lỗi từ form đăng ký, tự động chuyển sang tab register
+    const hasRegisterErrors = document.querySelector(
+        "#panel-register .auth-alert--error"
+    );
+    const initial = hasRegisterErrors
+        ? "register"
+        : document.body.dataset.activeTab || "login";
 
     const show = (target) => {
         const isLogin = target === "login";
@@ -224,23 +230,36 @@ function initUnapprovedModal() {
         return;
     }
 
-    const shouldShow = document.body.dataset.unapproved === "1";
-    if (!shouldShow) {
+    const modal = document.getElementById("modal-login-block");
+    const modalBody = document.getElementById("modal-login-block-body");
+
+    if (!modal || !modalBody) {
         return;
     }
 
-    const modal = document.getElementById("modal-login-block");
-    const modalBody = document.getElementById("modal-login-block-body");
-    const email = document.body.dataset.unapprovedEmail || "";
-
-    if (modalBody) {
+    // Kiểm tra unapproved
+    const shouldShowUnapproved = document.body.dataset.unapproved === "1";
+    if (shouldShowUnapproved) {
+        const email = document.body.dataset.unapprovedEmail || "";
         modalBody.innerHTML = `
             <p>Tài khoản <strong>${email}</strong> đang chờ phê duyệt.</p>
             <p>Vui lòng đợi quản trị viên xác nhận. Bạn có thể quay lại sau.</p>
         `;
+        modal.classList.add("show");
+        return;
     }
 
-    modal?.classList.add("show");
+    // Kiểm tra unverified
+    const shouldShowUnverified = document.body.dataset.unverified === "1";
+    if (shouldShowUnverified) {
+        const email = document.body.dataset.unverifiedEmail || "";
+        modalBody.innerHTML = `
+            <p>Tài khoản <strong>${email}</strong> chưa xác thực email.</p>
+            <p>Vui lòng kiểm tra hộp thư và nhấn vào liên kết xác thực để kích hoạt tài khoản.</p>
+        `;
+        modal.classList.add("show");
+        return;
+    }
 }
 
 /* =====================================================

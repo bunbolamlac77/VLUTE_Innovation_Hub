@@ -84,9 +84,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasRole(string $slug): bool
     {
-        if ($this->role === $slug)
-            return true; // vai chính, để tương thích middleware cũ
-        return $this->roles->contains(fn($r) => $r->slug === $slug);
+        // Kiểm tra field role trước (nhanh hơn)
+        if ($this->role === $slug) {
+            return true;
+        }
+
+        // Kiểm tra relationship roles (nếu relationship chưa được load, Laravel sẽ tự động load)
+        return $this->roles()->where('slug', $slug)->exists();
     }
 
     public function syncRoles(array $slugs, ?int $by = null): void

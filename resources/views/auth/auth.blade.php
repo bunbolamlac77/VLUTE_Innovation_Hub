@@ -1,21 +1,22 @@
 {{-- resources/views/auth/auth.blade.php --}}
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đăng nhập & Đăng ký - VLUTE Innovation Hub</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body
-  class="auth-page"
-  data-active-tab="{{ $activeTab ?? 'login' }}"
+
+<body class="auth-page" data-active-tab="{{ $activeTab ?? 'login' }}"
   data-unapproved="{{ session('unapproved') ? '1' : '' }}"
   data-unapproved-email="{{ session('unapproved_email') ?? '' }}"
->
+  data-unverified="{{ session('unverified') ? '1' : '' }}"
+  data-unverified-email="{{ session('unverified_email') ?? '' }}">
   <div class="auth-wrap">
     <div class="card">
       <div class="auth-header">
@@ -32,16 +33,17 @@
       <div id="panel-login" class="{{ ($activeTab ?? 'login') === 'login' ? '' : 'hidden' }}">
         <form action="{{ route('login') }}" method="POST">
           @csrf
-          @if ($errors->any() && ($activeTab ?? 'login') === 'login')
+          @if ($errors->any() && old('_token') && !old('name'))
             <div class="auth-alert auth-alert--error">{{ $errors->first() }}</div>
           @endif
-          @if (session('status'))
+          @if (session('status') && ($activeTab ?? 'login') === 'login')
             <div class="auth-alert auth-alert--success">{{ session('status') }}</div>
           @endif
 
           <div class="group">
             <label for="login-email">E-mail</label>
-            <div class="field"><input id="login-email" name="email" type="email" placeholder="Nhập email" required autofocus></div>
+            <div class="field"><input id="login-email" name="email" type="email" value="{{ old('email') }}"
+                placeholder="Nhập email" required autofocus></div>
           </div>
 
           <div class="group">
@@ -49,7 +51,10 @@
             <div class="field has-eye">
               <input id="login-password" name="password" type="password" placeholder="Nhập mật khẩu" required>
               <button class="eye-toggle" type="button" aria-label="Hiện/ẩn mật khẩu" data-toggle="#login-password">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
               </button>
             </div>
           </div>
@@ -67,31 +72,60 @@
       </div>
 
       {{-- REGISTER --}}
-      <div id="panel-register" class="{{ ($activeTab ?? 'login') === 'register' ? '' : 'hidden' }}">
+      <div id="panel-register"
+        class="{{ ($activeTab ?? 'login') === 'register' || ($errors->any() && old('name')) ? '' : 'hidden' }}">
         <form id="reg-form" action="{{ route('register') }}" method="POST">
           @csrf
-          @if ($errors->any() && ($activeTab ?? 'login') === 'register')
-            <div class="auth-alert auth-alert--error">{{ $errors->first() }}</div>
+          @if ($errors->any() && old('name'))
+            <div class="auth-alert auth-alert--error">
+              <ul style="list-style: none; padding: 0; margin: 0;">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
           @endif
 
           <div class="group">
             <label for="reg-name">Họ và tên</label>
-            <div class="field"><input id="reg-name" name="name" type="text" placeholder="Nhập họ và tên" required></div>
+            <div class="field"><input id="reg-name" name="name" type="text" value="{{ old('name') }}"
+                placeholder="Nhập họ và tên" required></div>
           </div>
 
           <div class="group">
             <label for="reg-email">E-mail</label>
-            <div class="field"><input id="reg-email" name="email" type="email" placeholder="Nhập email của bạn" required></div>
+            <div class="field"><input id="reg-email" name="email" type="email" value="{{ old('email') }}"
+                placeholder="Nhập email của bạn" required></div>
           </div>
 
-          {{-- DN fields của bạn giữ nguyên nếu có --}}
+          {{-- Enterprise fields (hiển thị khi email không phải @vlute.edu.vn hoặc @st.vlute.edu.vn) --}}
+          <div id="enterprise-fields" class="hidden">
+            <div class="group">
+              <label for="reg-company">Tên doanh nghiệp (tùy chọn)</label>
+              <div class="field"><input id="reg-company" name="company" type="text" value="{{ old('company') }}"
+                  placeholder="Nhập tên doanh nghiệp"></div>
+            </div>
+            <div class="group">
+              <label for="reg-position">Chức vụ (tùy chọn)</label>
+              <div class="field"><input id="reg-position" name="position" type="text" value="{{ old('position') }}"
+                  placeholder="Nhập chức vụ"></div>
+            </div>
+            <div class="group">
+              <label for="reg-interest">Lĩnh vực quan tâm (tùy chọn)</label>
+              <div class="field"><input id="reg-interest" name="interest" type="text" value="{{ old('interest') }}"
+                  placeholder="Nhập lĩnh vực quan tâm"></div>
+            </div>
+          </div>
 
           <div class="group">
             <label for="reg-password">Mật khẩu</label>
             <div class="field has-eye">
               <input id="reg-password" name="password" type="password" placeholder="Tạo mật khẩu" required>
               <button class="eye-toggle" type="button" aria-label="Hiện/ẩn mật khẩu" data-toggle="#reg-password">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
               </button>
             </div>
 
@@ -110,9 +144,14 @@
           <div class="group">
             <label for="reg-password-confirm">Xác nhận mật khẩu</label>
             <div class="field has-eye">
-              <input id="reg-password-confirm" name="password_confirmation" type="password" placeholder="Nhập lại mật khẩu" required>
-              <button class="eye-toggle" type="button" aria-label="Hiện/ẩn mật khẩu" data-toggle="#reg-password-confirm">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              <input id="reg-password-confirm" name="password_confirmation" type="password"
+                placeholder="Nhập lại mật khẩu" required>
+              <button class="eye-toggle" type="button" aria-label="Hiện/ẩn mật khẩu"
+                data-toggle="#reg-password-confirm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
               </button>
             </div>
             <div id="match-note" class="match-note"></div>
@@ -127,5 +166,18 @@
       </div>
     </div>
   </div>
+
+  {{-- Modal cho unapproved/unverified users --}}
+  <div id="modal-login-block" class="modal">
+    <div class="modal__card">
+      <button class="modal__close" data-close="modal-login-block">&times;</button>
+      <h3 class="modal__title">Không thể truy cập</h3>
+      <div id="modal-login-block-body" class="modal__desc"></div>
+      <div class="modal__actions">
+        <button type="button" class="btn btn-primary" data-close="modal-login-block">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
 </body>
+
 </html>

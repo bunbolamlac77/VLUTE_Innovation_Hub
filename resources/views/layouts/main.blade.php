@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'VLUTE Innovation Hub')</title>
+    <meta name="description"
+        content="Cổng Đổi mới Sáng tạo VLUTE – Nơi không có ranh giới giữa Nhà trường và Thực tế." />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
+</head>
+
+<body>
+    {{-- Masthead (Top bar với logo trường) --}}
+    <div class="masthead" role="banner">
+        <div class="container masthead-inner">
+            <div class="school">
+                <img src="{{ asset('images/logotruong.jpg') }}" alt="Logo Trường ĐHSPKT Vĩnh Long"
+                    class="school-logo" />
+                <div class="school-title">
+                    <div class="name">TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT VĨNH LONG</div>
+                    <div class="slogan">
+                        Nơi không có ranh giới giữa Nhà trường và Thực tế
+                    </div>
+                </div>
+            </div>
+            <div class="mast-right">
+                <div class="link">BỘ GIÁO DỤC VÀ ĐÀO TẠO</div>
+                <a href="javascript:void(0)" onclick="changeLanguage('en')" class="lang-switcher"
+                    title="Switch to English">🇬🇧</a>
+                @auth
+                    {{-- Khi đã đăng nhập: hiển thị avatar + menu --}}
+                    <div class="userbox" id="userBox" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ asset('images/avatar-default.jpg') }}" alt="Ảnh đại diện" class="avatar"
+                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2740%27 fill=%27%230a0f5a%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2740%27 fill=%27white%27 text-anchor=%27middle%27%3E{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}%3C/text%3E%3C/svg%3E'" />
+                        <button class="chev" id="btnUserMenu" aria-label="Mở menu người dùng">
+                            ▾
+                        </button>
+                        <div class="user-menu" id="userMenu" role="menu" aria-label="Menu người dùng">
+                            <a href="{{ route('dashboard') }}">Bảng điều khiển</a>
+                            <a href="{{ route('profile.edit') }}">Hồ sơ cá nhân</a>
+                            <a href="/ideas/my">Ý tưởng của tôi</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit">Đăng xuất</button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    {{-- Khi chưa đăng nhập: hiển thị nút đăng nhập --}}
+                    <a class="btn btn-primary login" id="btnLogin" href="{{ route('login') }}">Đăng nhập</a>
+                @endauth
+            </div>
+        </div>
+    </div>
+
+    {{-- Menu Bar --}}
+    <header class="menubar" role="navigation" aria-label="Thanh menu">
+        <div class="container menu-inner">
+            <nav class="menu" id="menuMain" aria-label="Menu chính">
+                <a href="/" data-key="home">Trang chủ</a>
+                <a href="/about" data-key="about">Giới thiệu</a>
+                <a href="/ideas" data-key="ideas">Ý tưởng</a>
+                <a href="/events" data-key="events">Cuộc thi &amp; Sự kiện</a>
+                <a href="/news" data-key="news">Bản tin Nghiên cứu</a>
+            </nav>
+            <div class="menu-right">
+                <input type="search" placeholder="Tìm ý tưởng, cuộc thi, mentor…" style="
+              padding: 10px 12px;
+              border: 1px solid var(--border);
+              border-radius: 999px;
+              width: 260px;
+            " aria-label="Ô tìm kiếm" />
+            </div>
+            <div id="dropdown" class="dropdown hidden" role="menu" aria-label="Danh mục con"></div>
+        </div>
+    </header>
+
+    {{-- Main Content --}}
+    <main>
+        @yield('content')
+    </main>
+
+    {{-- Footer --}}
+    <footer role="contentinfo">
+        <div class="container cols">
+            <div>
+                <h5>TRƯỜNG ĐẠI HỌC SPKT VĨNH LONG</h5>
+                <div>Địa chỉ: Số 73, Nguyễn Huệ, P. Long Châu, TP. Vĩnh Long</div>
+                <div>Email: spktvl@vlute.edu.vn · Fax: 02703 821 003</div>
+            </div>
+            <div>
+                <h5>DỊCH VỤ TIỆN ÍCH</h5>
+                <div><a href="#">My VLUTE</a></div>
+                <div><a href="#">Thông tin tuyển sinh</a></div>
+                <div><a href="#">Công tác sinh viên</a></div>
+                <div><a href="#">Phòng Đào tạo</a></div>
+            </div>
+            <div>
+                <h5>TRUY CẬP NHANH</h5>
+                <div><a href="#">Đăng ký học phần</a></div>
+                <div><a href="#">EMS</a></div>
+                <div><a href="#">Học trực tuyến (E-Learning)</a></div>
+                <div><a href="#">Cổng thanh toán Trực tuyến</a></div>
+            </div>
+        </div>
+        <div class="container legal">
+            Bản quyền thuộc về Trường Đại học Sư phạm Kỹ thuật Vĩnh Long (VLUTE)
+        </div>
+    </footer>
+
+    {{-- Social Links --}}
+    <div class="social-links">
+        <a href="https://www.facebook.com/vlute.edu.vn" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <img src="{{ asset('images/facebook.jpg') }}" alt="Facebook" />
+        </a>
+        <a href="https://zalo.me/0788977419" target="_blank" rel="noopener noreferrer" aria-label="Zalo">
+            <img src="{{ asset('images/zalo.jpg') }}" alt="Zalo" />
+        </a>
+        <a href="https://www.youtube.com/@tivivlute5460" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+            <img src="{{ asset('images/youtube.jpg') }}" alt="YouTube" />
+        </a>
+        <a href="https://www.tiktok.com/@_vlute" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+            <img src="{{ asset('images/tiktok.jpg') }}" alt="TikTok" />
+        </a>
+    </div>
+
+    {{-- Scripts --}}
+    <script>
+        // Language switcher
+        function changeLanguage(lang) {
+            alert(
+                "Chức năng chuyển sang ngôn ngữ " +
+                lang.toUpperCase() +
+                " đang được phát triển."
+            );
+        }
+
+        // User menu toggle
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnUserMenu = document.getElementById('btnUserMenu');
+            const userMenu = document.getElementById('userMenu');
+            const userBox = document.getElementById('userBox');
+
+            if (btnUserMenu && userMenu && userBox) {
+                btnUserMenu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = userMenu.classList.contains('show');
+                    if (isOpen) {
+                        userMenu.classList.remove('show');
+                        userBox.setAttribute('aria-expanded', 'false');
+                    } else {
+                        userMenu.classList.add('show');
+                        userBox.setAttribute('aria-expanded', 'true');
+                    }
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!userBox.contains(e.target)) {
+                        userMenu.classList.remove('show');
+                        userBox.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Prevent menu from closing when clicking inside it
+                userMenu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
+    @stack('scripts')
+</body>
+
+</html>

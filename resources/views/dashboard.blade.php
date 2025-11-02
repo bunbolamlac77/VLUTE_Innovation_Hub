@@ -1,22 +1,19 @@
-@if (auth()->user()?->role === 'admin')
-    {{-- Admin users see the full admin interface --}}
-    @extends('layouts.admin-shell')
-    @section('main')
-    {{-- Redirect to admin home --}}
+@if (auth()->user()?->hasRole('admin'))
+    {{-- Admin users: redirect to admin panel --}}
     <script>window.location.href = '{{ route('admin.home', ['tab' => 'approvals']) }}';</script>
-    @endsection
 @else
-    {{-- Regular users see their dashboard --}}
-    <x-app-layout>
-        <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Dashboard') }}
-            </h2>
-        </x-slot>
+{{-- Regular users: use main layout with empty content --}}
+@extends('layouts.main')
 
-        {{-- Nội dung dashboard khác của bạn --}}
-        <div class="mx-auto max-w-5xl sm:px-6 lg:px-8 py-6">
-            <p>Vai trò: <strong>{{ auth()->user()->role_label }}</strong></p>
+@section('title', 'Bảng điều khiển - VLUTE Innovation Hub')
+
+@section('content')
+    {{-- Phần main content để trống để sau này có thể cấu trúc lại và thêm các chức năng --}}
+    <section style="min-height: 400px; padding: 64px 0;">
+        <div class="container">
+            {{-- Placeholder cho nội dung tương lai --}}
+            {{-- Có thể thêm các chức năng dashboard ở đây --}}
         </div>
-    </x-app-layout>
+    </section>
+@endsection
 @endif

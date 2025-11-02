@@ -9,9 +9,17 @@ class EnsureAdmin
 {
     public function handle(Request $request, Closure $next)
     {
-        if ($request->user()?->role !== 'admin') {
-            abort(403);
+        $user = $request->user();
+
+        if (!$user) {
+            abort(403, 'Bạn cần đăng nhập để truy cập trang này.');
         }
+
+        // Kiểm tra cả field role và relationship roles
+        if (!$user->hasRole('admin')) {
+            abort(403, 'Bạn không có quyền truy cập trang quản trị. Vui lòng liên hệ quản trị viên để được cấp quyền.');
+        }
+
         return $next($request);
     }
 }
