@@ -7,6 +7,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/about', function () {
+    return view('about');
+});
+
 // ---- Khu nội bộ (đã đăng nhập + đã verify + đã approved) ----
 Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(function () {
 
