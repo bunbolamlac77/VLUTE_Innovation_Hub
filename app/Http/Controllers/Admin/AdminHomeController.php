@@ -21,7 +21,7 @@ class AdminHomeController extends Controller
                 ->map(function ($u) {
                     $domain = str($u->email)->after('@')->lower()->toString();
                     $suggested = $domain === 'vlute.edu.vn'
-                        ? ['staff', 'center']  // chỉ 2 lựa chọn như yêu cầu mới
+                        ? ['staff', 'center', 'board']  // 3 lựa chọn cho domain vlute.edu.vn
                         : ['enterprise'];     // còn lại là DN
                     return ['model' => $u, 'suggested' => $suggested];
                 });

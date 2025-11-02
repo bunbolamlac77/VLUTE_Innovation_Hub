@@ -11,7 +11,7 @@ class ApprovalActionController extends Controller
     public function approve(Request $request, User $user)
     {
         $domain = str($user->email)->after('@')->lower()->toString();
-        $allowed = $domain === 'vlute.edu.vn' ? ['staff', 'center'] : ['enterprise'];
+        $allowed = $domain === 'vlute.edu.vn' ? ['staff', 'center', 'board'] : ['enterprise'];
         $role = $request->string('role')->toString();
 
         if (!in_array($role, $allowed, true)) {
