@@ -10,6 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        // Skip nếu bảng đã tồn tại
+        if (Schema::hasTable('ideas')) {
+            return;
+        }
+
         Schema::create('ideas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade')->comment('Người tạo ý tưởng');
@@ -30,7 +35,7 @@ return new class extends Migration {
                 'needs_change_board',
                 'approved_final',
                 'rejected'
-            ])->default('draft')->index()->comment('Trạng thái trong luồng duyệt');
+            ])->default('draft')->comment('Trạng thái trong luồng duyệt');
             $table->enum('visibility', ['private', 'team_only', 'public'])->default('private')->comment('Chế độ công khai');
             // Lưu ý: faculty_id và category_id sẽ thêm foreign key sau khi tạo bảng organizations và categories
             $table->unsignedBigInteger('faculty_id')->nullable()->comment('Khoa/Đơn vị (FK -> organizations)');

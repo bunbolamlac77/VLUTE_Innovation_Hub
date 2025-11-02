@@ -12,6 +12,129 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* Flash Toast Notification Styles */
+        .flash-toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 320px;
+            max-width: 500px;
+            animation: slideInRight 0.3s ease-out, fadeIn 0.3s ease-out;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .flash-toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            border: 1px solid #d1fae5;
+            border-left: 4px solid #10b981;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .flash-toast-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #10b981;
+            background: #d1fae5;
+            border-radius: 50%;
+            padding: 4px;
+        }
+
+        .flash-toast-message {
+            flex: 1;
+            color: #065f46;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .flash-toast-close {
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .flash-toast-close:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .flash-toast.hiding {
+            animation: slideOutRight 0.3s ease-out, fadeOut 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .flash-toast {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+                max-width: none;
+            }
+        }
+    </style>
     @stack('styles')
 </head>
 
@@ -65,7 +188,7 @@
             <nav class="menu" id="menuMain" aria-label="Menu chính">
                 <a href="/" data-key="home">Trang chủ</a>
                 <a href="/about" data-key="about">Giới thiệu</a>
-                <a href="/ideas" data-key="ideas">Ý tưởng</a>
+                <a href="{{ route('ideas.index') }}" data-key="ideas">Ý tưởng</a>
                 <a href="/events" data-key="events">Cuộc thi &amp; Sự kiện</a>
                 <a href="/news" data-key="news">Bản tin Nghiên cứu</a>
             </nav>
@@ -81,17 +204,31 @@
         </div>
     </header>
 
+    {{-- Flash Messages Toast --}}
+    @if (session('status'))
+        <div id="flash-toast" class="flash-toast" role="alert" aria-live="polite">
+            <div class="flash-toast-content">
+                <div class="flash-toast-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="flash-toast-message">{{ session('status') }}</div>
+                <button class="flash-toast-close" onclick="closeFlashToast()" aria-label="Đóng thông báo">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     {{-- Main Content --}}
     <main>
-        {{-- Flash Messages --}}
-        @if (session('status'))
-            <div class="container" style="margin-top: 20px; margin-bottom: -20px;">
-                <div class="flash-success"
-                    style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 0.75rem 1rem; border-radius: 0.75rem; font-weight: 600;">
-                    {{ session('status') }}
-                </div>
-            </div>
-        @endif
         @yield('content')
     </main>
 
@@ -182,7 +319,26 @@
                     e.stopPropagation();
                 });
             }
+
+            // Auto-hide flash toast after 5 seconds
+            const flashToast = document.getElementById('flash-toast');
+            if (flashToast) {
+                setTimeout(() => {
+                    closeFlashToast();
+                }, 5000);
+            }
         });
+
+        // Function to close flash toast
+        function closeFlashToast() {
+            const toast = document.getElementById('flash-toast');
+            if (toast) {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }
+        }
     </script>
     @stack('scripts')
 </body>

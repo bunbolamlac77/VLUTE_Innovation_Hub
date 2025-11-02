@@ -1242,6 +1242,7 @@ section {
     gap: 16px;
     overflow: auto;
     padding-bottom: 8px;
+    padding-right: 100px; /* Tránh bị che bởi social links ở góc phải */
     scroll-snap-type: x mandatory;
 }
 
@@ -2132,6 +2133,9 @@ footer .legal {
     .social-links a {
         width: 48px;
         height: 48px;
+    }
+    .scroll-row {
+        padding-right: 70px; /* Giảm padding trên mobile */
     }
     footer .cols {
         grid-template-columns: 1fr;

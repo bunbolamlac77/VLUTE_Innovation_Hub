@@ -26,6 +26,7 @@ class Idea extends Model
         'visibility',
         'faculty_id',
         'category_id',
+        'like_count',
     ];
 
     /**
@@ -87,6 +88,67 @@ class Idea extends Model
     public function reviews()
     {
         return $this->hasManyThrough(Review::class, ReviewAssignment::class);
+    }
+
+    /**
+     * Ý tưởng thuộc về một khoa
+     */
+    public function faculty()
+    {
+        return $this->belongsTo(Faculty::class);
+    }
+
+    /**
+     * Ý tưởng thuộc về một danh mục
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Ý tưởng có nhiều tags (many-to-many)
+     */
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'idea_tag');
+    }
+
+    /**
+     * Ý tưởng có nhiều attachments (polymorphic)
+     */
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    /**
+     * Ý tưởng có nhiều lượt like (many-to-many với users)
+     */
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'idea_likes')->withTimestamps();
+    }
+
+    /**
+     * Kiểm tra user đã like ý tưởng này chưa
+     */
+    public function isLikedBy(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Scope: Chỉ lấy ý tưởng đã được duyệt cuối và công khai
+     */
+    public function scopePublicApproved($query)
+    {
+        return $query->where('status', 'approved_final')
+            ->where('visibility', 'public');
     }
 
     /**

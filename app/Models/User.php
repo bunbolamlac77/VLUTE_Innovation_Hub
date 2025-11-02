@@ -169,4 +169,20 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(ReviewAssignment::class, 'reviewer_id');
     }
+
+    /**
+     * User có một Profile
+     */
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    /**
+     * User đã upload nhiều attachments
+     */
+    public function uploadedAttachments()
+    {
+        return $this->hasMany(Attachment::class, 'uploaded_by');
+    }
 }

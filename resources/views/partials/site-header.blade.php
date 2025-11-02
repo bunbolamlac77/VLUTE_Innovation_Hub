@@ -44,7 +44,7 @@
         <nav class="menu" id="menuMain" aria-label="Menu chính">
             <a href="/" data-key="home">Trang chủ</a>
             <a href="/about" data-key="about">Giới thiệu</a>
-            <a href="/ideas" data-key="ideas">Ý tưởng</a>
+            <a href="{{ route('ideas.index') }}" data-key="ideas">Ý tưởng</a>
             <a href="/events" data-key="events">Cuộc thi &amp; Sự kiện</a>
             <a href="/news" data-key="news">Bản tin Nghiên cứu</a>
         </nav>

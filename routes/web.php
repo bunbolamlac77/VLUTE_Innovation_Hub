@@ -3,25 +3,28 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 
 Route::get('/about', function () {
     return view('about');
 });
+
+// Public Ideas (Ngân hàng Ý tưởng) - Trang công khai
+Route::get('/ideas', [\App\Http\Controllers\PublicIdeaController::class, 'index'])->name('ideas.index');
+Route::get('/ideas/{slug}', [\App\Http\Controllers\PublicIdeaController::class, 'show'])->name('ideas.show');
+Route::middleware('auth')->post('/ideas/{id}/like', [\App\Http\Controllers\PublicIdeaController::class, 'like'])->name('ideas.like');
 
 // ---- Khu nội bộ (đã đăng nhập + đã verify + đã approved) ----
 Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(function () {
 
     Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
 
-    // Ví dụ các module nội bộ
-    Route::prefix('ideas')->group(function () {
-        Route::get('/', fn() => 'Ideas index');
-        Route::get('/create', fn() => 'Create idea');
-        // ...
-    });
+    // TODO: Thêm các route nội bộ cho ý tưởng ở đây khi cần
+    // Route::prefix('my-ideas')->group(function () {
+    //     Route::get('/', [IdeaController::class, 'myIdeas'])->name('my-ideas.index');
+    //     Route::get('/create', [IdeaController::class, 'create'])->name('my-ideas.create');
+    //     // ...
+    // });
 });
 
 // --- Nhóm Admin: 1 trang duy nhất + các action --- //

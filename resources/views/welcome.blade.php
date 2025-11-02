@@ -116,9 +116,54 @@
     <section id="ideas" class="container">
         <div class="section-header">
             <h2 class="section-title">Ý tưởng nổi bật / Portfolio ươm tạo</h2>
-            <a class="muted-link" href="#">Khám phá ý tưởng →</a>
+            <a class="muted-link" href="{{ route('ideas.index') }}">Khám phá ý tưởng →</a>
         </div>
-        <div class="scroll-row" id="featuredRow"></div>
+        <div class="grid-4" id="featuredGrid">
+            @forelse($featuredIdeas as $idea)
+                <article class="item" onclick="window.location.href='{{ route('ideas.show', $idea->slug) }}'" style="cursor: pointer;">
+                    <div class="thumb" style="background: linear-gradient(135deg, #93c5fd, #a7f3d0); height: 180px;"></div>
+                    <div class="meta">
+                        <div class="row">
+                            @if($idea->faculty)
+                                <span class="tag">{{ $idea->faculty->name }}</span>
+                            @else
+                                <span class="tag">Chưa phân loại</span>
+                            @endif
+                            @if($idea->category)
+                                <span class="tag" style="background: rgba(10, 168, 79, 0.1); color: var(--brand-green);">
+                                    {{ $idea->category->name }}
+                                </span>
+                            @endif
+                        </div>
+                        <h5>{{ $idea->title }}</h5>
+                        @if($idea->summary)
+                            <p style="color: #6b7280; font-size: 14px; margin: 8px 0 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ $idea->summary }}
+                            </p>
+                        @endif
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                @php
+                                    $isLiked = auth()->check() && $idea->isLikedBy(auth()->user());
+                                    $likeCount = $idea->likes_count ?? $idea->like_count ?? 0;
+                                @endphp
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="{{ $isLiked ? '#ef4444' : 'none' }}" stroke="{{ $isLiked ? '#ef4444' : '#9ca3af' }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                <span style="font-size: 14px; color: #6b7280;">{{ $likeCount }}</span>
+                            </div>
+                            <span style="font-size: 12px; color: #6b7280;">
+                                {{ $idea->created_at->format('d/m/Y') }}
+                            </span>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: #6b7280;">
+                    <p>Chưa có ý tưởng nổi bật nào.</p>
+                </div>
+            @endforelse
+        </div>
     </section>
 
     <br />
@@ -354,15 +399,7 @@
             ],
         };
 
-        const ideas = [
-            {
-                title: 'Hệ thống tưới thông minh tiết kiệm 40% nước',
-                dept: 'Khoa Điện – Điện tử',
-            },
-            { title: 'Ứng dụng AR cho xưởng thực hành', dept: 'Khoa CNTT' },
-            { title: 'Gạch sinh học từ phế phẩm nông nghiệp', dept: 'Khoa CNHH' },
-            { title: 'Robot hỗ trợ kho thông minh', dept: 'Khoa Cơ khí' },
-        ];
+        // Ideas data is now loaded from database via $featuredIdeas variable in Blade template
 
         const news = [
             {
@@ -387,19 +424,19 @@
 
         function cardHTML(data) {
             return `
-                          <article class="item" tabindex="0">
-                            <div class="thumb" aria-hidden="true"></div>
-                            <div class="meta">
-                              <div class="row"><span class="tag">${data.track || data.dept || 'General'
+                                  <article class="item" tabindex="0">
+                                    <div class="thumb" aria-hidden="true"></div>
+                                    <div class="meta">
+                                      <div class="row"><span class="tag">${data.track || data.dept || 'General'
                 }</span><span style="font-size:12px;color:#6b7280">${data.deadline || ''
                 }</span></div>
-                              <h5>${data.title}</h5>
-                              <div class="actions">${data.btn
+                                      <h5>${data.title}</h5>
+                                      <div class="actions">${data.btn
                     ? `<a class="btn btn-ghost" style="border-color:var(--brand-navy);color:var(--brand-navy)" href="#">${data.btn}</a>`
                     : ''
                 }</div>
-                            </div>
-                          </article>`;
+                                    </div>
+                                  </article>`;
         }
 
         function renderComps(type = 'open') {
@@ -418,33 +455,43 @@
             });
         });
 
-        document.getElementById('featuredRow').innerHTML = ideas
-            .map(cardHTML)
+        document.getElementById('featuredGrid').innerHTML = ideas
+            .map(
+                (idea) =>
+                    `
+                                <article class="item">
+                                  <div class="thumb"></div>
+                                  <div class="meta">
+                                    <div class="row"><span class="tag">${idea.dept || 'General'}</span></div>
+                                    <h5>${idea.title}</h5>
+                                  </div>
+                                </article>`
+            )
             .join('');
         document.getElementById('newsGrid').innerHTML = news
             .map(
                 (n) =>
                     `
-                        <article class="item">
-                          <div class="thumb"></div>
-                          <div class="meta">
-                            <div class="row"><span class="tag">Bản tin</span><span style="font-size:12px;color:#6b7280">${n.date}</span></div>
-                            <h5>${n.title}</h5>
-                          </div>
-                        </article>`
+                                <article class="item">
+                                  <div class="thumb"></div>
+                                  <div class="meta">
+                                    <div class="row"><span class="tag">Bản tin</span><span style="font-size:12px;color:#6b7280">${n.date}</span></div>
+                                    <h5>${n.title}</h5>
+                                  </div>
+                                </article>`
             )
             .join('');
         document.getElementById('successGrid').innerHTML = success
             .map(
                 (s) =>
                     `
-                        <article class="item">
-                          <div class="thumb" style="background:linear-gradient(135deg,#fde68a,#86efac)"></div>
-                          <div class="meta">
-                            <h5>${s.title}</h5>
-                            <p style="color:#6b7280;margin:0">${s.brief}</p>
-                          </div>
-                        </article>`
+                                <article class="item">
+                                  <div class="thumb" style="background:linear-gradient(135deg,#fde68a,#86efac)"></div>
+                                  <div class="meta">
+                                    <h5>${s.title}</h5>
+                                    <p style="color:#6b7280;margin:0">${s.brief}</p>
+                                  </div>
+                                </article>`
             )
             .join('');
 

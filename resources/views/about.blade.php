@@ -7,11 +7,18 @@
     <section class="hero"
         style="background: linear-gradient(120deg, rgba(7, 26, 82, 0.9), rgba(10, 168, 79, 0.85)), url('{{ asset('images/panel-truong.jpg') }}') center/cover no-repeat;">
         <div class="container" style="padding: 56px 0">
-            <h1 style="color: #fff; margin: 0 0 8px">Giới thiệu</h1>
-            <p class="sub" style="max-width: 820px; color: rgba(255, 255, 255, 0.92)">
-                Cổng Đổi mới Sáng tạo VLUTE kết nối ý tưởng – cố vấn – doanh nghiệp – ươm tạo, phục vụ sinh viên, giảng viên
-                và đối tác.
-            </p>
+            <div style="display: flex; align-items: center; gap: 24px; margin-bottom: 16px;">
+                <img src="{{ asset('images/logotruong.jpg') }}" alt="Logo Trường ĐHSPKT Vĩnh Long"
+                    style="height: 80px; width: auto; object-fit: contain; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);" />
+                <div>
+                    <h1 style="color: #fff; margin: 0 0 8px">Giới thiệu</h1>
+                    <p class="sub" style="max-width: 820px; color: rgba(255, 255, 255, 0.92); margin: 0;">
+                        Cổng Đổi mới Sáng tạo VLUTE kết nối ý tưởng – cố vấn – doanh nghiệp – ươm tạo, phục vụ sinh viên,
+                        giảng viên
+                        và đối tác.
+                    </p>
+                </div>
+            </div>
         </div>
     </section>
 
