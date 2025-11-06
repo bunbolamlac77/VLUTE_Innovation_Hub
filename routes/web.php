@@ -19,12 +19,24 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
 
     Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
 
-    // TODO: Thêm các route nội bộ cho ý tưởng ở đây khi cần
-    // Route::prefix('my-ideas')->group(function () {
-    //     Route::get('/', [IdeaController::class, 'myIdeas'])->name('my-ideas.index');
-    //     Route::get('/create', [IdeaController::class, 'create'])->name('my-ideas.create');
-    //     // ...
-    // });
+    // My Ideas - Ý tưởng của tôi
+    Route::prefix('my-ideas')->name('my-ideas.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\MyIdeasController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\MyIdeasController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\MyIdeasController::class, 'store'])->name('store');
+        Route::get('/{id}', [\App\Http\Controllers\MyIdeasController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [\App\Http\Controllers\MyIdeasController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\MyIdeasController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\MyIdeasController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/submit', [\App\Http\Controllers\MyIdeasController::class, 'submit'])->name('submit');
+        Route::post('/{id}/invite', [\App\Http\Controllers\MyIdeasController::class, 'invite'])->name('invite');
+    });
+});
+
+// Invitation routes (có thể truy cập khi chưa đăng nhập)
+Route::prefix('invitations')->name('invitations.')->group(function () {
+    Route::get('/accept/{token}', [\App\Http\Controllers\IdeaInvitationController::class, 'accept'])->name('accept');
+    Route::get('/decline/{token}', [\App\Http\Controllers\IdeaInvitationController::class, 'decline'])->name('decline');
 });
 
 // --- Nhóm Admin: 1 trang duy nhất + các action --- //

@@ -1,0 +1,369 @@
+@extends('layouts.main')
+
+@section('title', $idea->title . ' - Ý tưởng của tôi')
+
+@section('content')
+    {{-- Breadcrumb --}}
+    <section class="container" style="padding: 24px 0 16px;">
+        <nav style="display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px;">
+            <a href="/" style="color: var(--brand-navy);">Trang chủ</a>
+            <span>/</span>
+            <a href="{{ route('my-ideas.index') }}" style="color: var(--brand-navy);">Ý tưởng của tôi</a>
+            <span>/</span>
+            <span>{{ Str::limit($idea->title, 50) }}</span>
+        </nav>
+    </section>
+
+    {{-- Idea Detail --}}
+    <section class="container" style="padding: 16px 0 64px;">
+        {{-- Status Badge & Actions --}}
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                @php
+                    $statusLabels = [
+                        'draft' => ['label' => 'Nháp', 'color' => '#6b7280'],
+                        'submitted_gv' => ['label' => 'Đã nộp (GV)', 'color' => '#3b82f6'],
+                        'needs_change_gv' => ['label' => 'Cần chỉnh sửa (GV)', 'color' => '#f59e0b'],
+                        'approved_gv' => ['label' => 'Đã duyệt (GV)', 'color' => '#10b981'],
+                        'submitted_center' => ['label' => 'Đã nộp (TTĐMST)', 'color' => '#3b82f6'],
+                        'needs_change_center' => ['label' => 'Cần chỉnh sửa (TTĐMST)', 'color' => '#f59e0b'],
+                        'approved_center' => ['label' => 'Đã duyệt (TTĐMST)', 'color' => '#10b981'],
+                        'submitted_board' => ['label' => 'Đã nộp (BGH)', 'color' => '#3b82f6'],
+                        'needs_change_board' => ['label' => 'Cần chỉnh sửa (BGH)', 'color' => '#f59e0b'],
+                        'approved_final' => ['label' => 'Đã duyệt (BGH)', 'color' => '#10b981'],
+                        'rejected' => ['label' => 'Từ chối', 'color' => '#ef4444'],
+                    ];
+                    $statusInfo = $statusLabels[$idea->status] ?? ['label' => $idea->status, 'color' => '#6b7280'];
+                @endphp
+                <span class="tag"
+                    style="background: {{ $statusInfo['color'] }}15; color: {{ $statusInfo['color'] }}; border-color: {{ $statusInfo['color'] }}30; font-size: 16px; padding: 8px 16px; font-weight: 600;">
+                    {{ $statusInfo['label'] }}
+                </span>
+                @if ($idea->visibility === 'public')
+                    <span class="tag" style="background: rgba(10, 168, 79, 0.1); color: var(--brand-green);">
+                        Công khai
+                    </span>
+                @elseif ($idea->visibility === 'team_only')
+                    <span class="tag" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        Chỉ nhóm
+                    </span>
+                @else
+                    <span class="tag" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">
+                        Riêng tư
+                    </span>
+                @endif
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                @if ($canEdit)
+                    <a href="{{ route('my-ideas.edit', $idea->id) }}" class="btn btn-ghost"
+                        style="padding: 10px 20px; font-weight: 600;">
+                        ✏️ Chỉnh sửa
+                    </a>
+                @endif
+                @if ($canDelete)
+                    <form method="POST" action="{{ route('my-ideas.destroy', $idea->id) }}" style="margin: 0;"
+                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa ý tưởng này?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-ghost"
+                            style="padding: 10px 20px; font-weight: 600; color: #ef4444; border-color: #ef4444;">
+                            🗑️ Xóa
+                        </button>
+                    </form>
+                @endif
+                @if ($idea->isDraft() || $idea->needsChange())
+                    <form method="POST" action="{{ route('my-ideas.submit', $idea->id) }}" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-weight: 600;">
+                            📤 Nộp ý tưởng
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+            {{-- Main Content --}}
+            <div>
+                {{-- Idea Info --}}
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body" style="padding: 32px;">
+                        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                            @if ($idea->faculty)
+                                <span class="tag">{{ $idea->faculty->name }}</span>
+                            @endif
+                            @if ($idea->category)
+                                <span class="tag" style="background: rgba(10, 168, 79, 0.1); color: var(--brand-green);">
+                                    {{ $idea->category->name }}
+                                </span>
+                            @endif
+                        </div>
+
+                        <h1 style="margin: 0 0 16px; font-size: 32px; line-height: 1.3; color: #0f172a;">
+                            {{ $idea->title }}
+                        </h1>
+
+                        @if ($idea->description)
+                            <div style="margin-bottom: 24px;">
+                                <h3 style="margin: 0 0 12px; font-size: 18px; color: #0f172a; font-weight: 700;">
+                                    Mô tả ý tưởng
+                                </h3>
+                                <div style="color: #374151; line-height: 1.8; white-space: pre-wrap;">
+                                    {{ $idea->description }}
+                                </div>
+                            </div>
+                        @endif
+
+                        @if ($idea->content)
+                            <div>
+                                <h3 style="margin: 0 0 12px; font-size: 18px; color: #0f172a; font-weight: 700;">
+                                    Nội dung chi tiết
+                                </h3>
+                                <div style="color: #374151; line-height: 1.8; white-space: pre-wrap;">
+                                    {!! nl2br(e($idea->content)) !!}
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Members --}}
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body" style="padding: 24px;">
+                        <h3 style="margin: 0 0 20px; font-size: 20px; color: #0f172a; font-weight: 700;">
+                            Thành viên nhóm
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div
+                                style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--brand-gray-50); border-radius: 8px;">
+                                <div
+                                    style="width: 40px; height: 40px; border-radius: 50%; background: var(--brand-navy); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                    {{ strtoupper(substr($idea->owner->name, 0, 1)) }}
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; color: #0f172a;">{{ $idea->owner->name }}</div>
+                                    <div style="font-size: 14px; color: var(--muted);">{{ $idea->owner->email }}</div>
+                                </div>
+                                <span class="tag" style="background: rgba(7, 26, 82, 0.1); color: var(--brand-navy);">
+                                    Người tạo
+                                </span>
+                            </div>
+                            @foreach ($idea->members as $member)
+                                @if ($member->user)
+                                    <div
+                                        style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--brand-gray-50); border-radius: 8px;">
+                                        <div
+                                            style="width: 40px; height: 40px; border-radius: 50%; background: var(--brand-green); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                            {{ strtoupper(substr($member->user->name, 0, 1)) }}
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: #0f172a;">{{ $member->user->name }}</div>
+                                            <div style="font-size: 14px; color: var(--muted);">{{ $member->user->email }}</div>
+                                        </div>
+                                        <span class="tag" style="background: rgba(10, 168, 79, 0.1); color: var(--brand-green);">
+                                            Thành viên
+                                        </span>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+
+                        @if ($canInvite)
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                                <h4 style="margin: 0 0 12px; font-size: 16px; color: #0f172a; font-weight: 600;">
+                                    Mời thành viên
+                                </h4>
+                                <form method="POST" action="{{ route('my-ideas.invite', $idea->id) }}"
+                                    style="display: flex; gap: 8px;">
+                                    @csrf
+                                    <input type="email" name="email" placeholder="Nhập email người được mời..." required
+                                        style="flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px;">
+                                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-weight: 600;">
+                                        Mời
+                                    </button>
+                                </form>
+                                @error('email')
+                                    <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Pending Invitations --}}
+                @if ($idea->invitations->where('status', 'pending')->count() > 0)
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div class="card-body" style="padding: 24px;">
+                            <h3 style="margin: 0 0 20px; font-size: 20px; color: #0f172a; font-weight: 700;">
+                                Lời mời đang chờ ({{ $idea->invitations->where('status', 'pending')->count() }})
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                @foreach ($idea->invitations->where('status', 'pending') as $invitation)
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--brand-gray-50); border-radius: 8px;">
+                                        <div>
+                                            <div style="font-weight: 600; color: #0f172a;">{{ $invitation->email }}</div>
+                                            <div style="font-size: 12px; color: var(--muted);">
+                                                Đã gửi: {{ $invitation->created_at->format('d/m/Y H:i') }}
+                                            </div>
+                                        </div>
+                                        <span class="tag" style="background: rgba(251, 191, 36, 0.1); color: #f59e0b;">
+                                            Đang chờ
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Reviews & Comments --}}
+                @if ($idea->reviewAssignments->count() > 0)
+                    <div class="card">
+                        <div class="card-body" style="padding: 24px;">
+                            <h3 style="margin: 0 0 20px; font-size: 20px; color: #0f172a; font-weight: 700;">
+                                Lịch sử duyệt và nhận xét
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 20px;">
+                                @foreach ($idea->reviewAssignments as $assignment)
+                                    <div style="padding: 16px; background: var(--brand-gray-50); border-radius: 8px;">
+                                        <div
+                                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                            <div>
+                                                <div style="font-weight: 600; color: #0f172a;">
+                                                    {{ $assignment->reviewer->name ?? 'Chưa được gán' }}
+                                                </div>
+                                                <div style="font-size: 12px; color: var(--muted);">
+                                                    Cấp duyệt: {{ $assignment->review_level }}
+                                                    @if ($assignment->review)
+                                                        · {{ $assignment->review->created_at->format('d/m/Y H:i') }}
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            @if ($assignment->review)
+                                                @php
+                                                    $decisionColors = [
+                                                        'approved' => ['bg' => 'rgba(16, 185, 129, 0.1)', 'color' => '#10b981', 'label' => 'Đã duyệt'],
+                                                        'needs_change' => ['bg' => 'rgba(245, 158, 11, 0.1)', 'color' => '#f59e0b', 'label' => 'Cần chỉnh sửa'],
+                                                        'rejected' => ['bg' => 'rgba(239, 68, 68, 0.1)', 'color' => '#ef4444', 'label' => 'Từ chối'],
+                                                    ];
+                                                    $decisionInfo = $decisionColors[$assignment->review->decision] ?? ['bg' => 'rgba(107, 114, 128, 0.1)', 'color' => '#6b7280', 'label' => $assignment->review->decision];
+                                                @endphp
+                                                <span class="tag"
+                                                    style="background: {{ $decisionInfo['bg'] }}; color: {{ $decisionInfo['color'] }};">
+                                                    {{ $decisionInfo['label'] }}
+                                                </span>
+                                            @else
+                                                <span class="tag" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">
+                                                    Đang chờ
+                                                </span>
+                                            @endif
+                                        </div>
+                                        @if ($assignment->review && $assignment->review->overall_comment)
+                                            <div
+                                                style="margin-top: 12px; padding: 12px; background: #fff; border-radius: 6px; border-left: 3px solid var(--brand-navy);">
+                                                <div style="font-size: 14px; color: #374151; line-height: 1.6; white-space: pre-wrap;">
+                                                    {{ $assignment->review->overall_comment }}
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if ($assignment->review && $assignment->review->changeRequests && $assignment->review->changeRequests->count() > 0)
+                                            <div style="margin-top: 12px;">
+                                                <div style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">
+                                                    Yêu cầu chỉnh sửa:
+                                                </div>
+                                                @foreach ($assignment->review->changeRequests as $changeRequest)
+                                                    <div
+                                                        style="padding: 10px; background: #fff; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #f59e0b;">
+                                                        <div style="font-size: 14px; color: #374151; line-height: 1.6;">
+                                                            {{ $changeRequest->request_message }}
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Sidebar --}}
+            <aside>
+                <div class="card" style="position: sticky; top: 100px; margin-bottom: 24px;">
+                    <div class="card-body" style="padding: 24px;">
+                        <h3 style="margin: 0 0 20px; font-size: 18px; color: #0f172a; font-weight: 700;">
+                            Thông tin
+                        </h3>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600;">
+                                Người tạo
+                            </h4>
+                            <div style="color: #0f172a; font-weight: 600;">
+                                {{ $idea->owner->name }}
+                            </div>
+                            <div style="font-size: 14px; color: var(--muted);">
+                                {{ $idea->owner->email }}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                            <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600;">
+                                Ngày tạo
+                            </h4>
+                            <div style="color: #0f172a;">
+                                {{ $idea->created_at->format('d/m/Y H:i') }}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                            <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600;">
+                                Cập nhật lần cuối
+                            </h4>
+                            <div style="color: #0f172a;">
+                                {{ $idea->updated_at->format('d/m/Y H:i') }}
+                            </div>
+                        </div>
+
+                        @if ($idea->faculty || $idea->category)
+                            <div>
+                                @if ($idea->faculty)
+                                    <div style="margin-bottom: 12px;">
+                                        <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600;">
+                                            Khoa
+                                        </h4>
+                                        <div style="color: #0f172a;">{{ $idea->faculty->name }}</div>
+                                    </div>
+                                @endif
+                                @if ($idea->category)
+                                    <div>
+                                        <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 600;">
+                                            Danh mục
+                                        </h4>
+                                        <div style="color: #0f172a;">{{ $idea->category->name }}</div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+@endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Đánh dấu menu active nếu có
+            const myIdeasLink = document.querySelector('a[href="/ideas/my"]');
+            if (myIdeasLink) {
+                myIdeasLink.classList.add('active');
+            }
+        });
+    </script>
+@endpush

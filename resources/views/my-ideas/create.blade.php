@@ -1,0 +1,168 @@
+@extends('layouts.main')
+
+@section('title', 'Tạo ý tưởng mới - VLUTE Innovation Hub')
+
+@section('content')
+    {{-- Breadcrumb --}}
+    <section class="container" style="padding: 24px 0 16px;">
+        <nav style="display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px;">
+            <a href="/" style="color: var(--brand-navy);">Trang chủ</a>
+            <span>/</span>
+            <a href="{{ route('my-ideas.index') }}" style="color: var(--brand-navy);">Ý tưởng của tôi</a>
+            <span>/</span>
+            <span>Tạo mới</span>
+        </nav>
+    </section>
+
+    {{-- Form --}}
+    <section class="container" style="padding: 16px 0 64px;">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div class="card">
+                <div class="card-body" style="padding: 32px;">
+                    <h2 style="margin: 0 0 24px; font-size: 28px; color: #0f172a;">Tạo ý tưởng mới</h2>
+
+                    <form method="POST" action="{{ route('my-ideas.store') }}">
+                        @csrf
+
+                        {{-- Title --}}
+                        <div style="margin-bottom: 24px;">
+                            <label for="title" style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
+                                Tiêu đề <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="text" name="title" id="title" value="{{ old('title') }}" required
+                                placeholder="Nhập tiêu đề ý tưởng..."
+                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px;">
+                            @error('title')
+                                <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Description --}}
+                        <div style="margin-bottom: 24px;">
+                            <label for="description"
+                                style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
+                                Mô tả ý tưởng <span style="color: #ef4444;">*</span>
+                                <span style="font-weight: 400; color: var(--muted); font-size: 14px;">(Tối thiểu 50 ký tự)</span>
+                            </label>
+                            <textarea name="description" id="description" rows="6" required
+                                placeholder="Mô tả chi tiết về ý tưởng của bạn..."
+                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;">{{ old('description') }}</textarea>
+                            @error('description')
+                                <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Content --}}
+                        <div style="margin-bottom: 24px;">
+                            <label for="content" style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
+                                Nội dung chi tiết <span style="font-weight: 400; color: var(--muted); font-size: 14px;">(Tùy chọn)</span>
+                            </label>
+                            <textarea name="content" id="content" rows="10"
+                                placeholder="Thêm nội dung chi tiết về ý tưởng..."
+                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;">{{ old('content') }}</textarea>
+                            @error('content')
+                                <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Visibility --}}
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
+                                Chế độ công khai <span style="color: #ef4444;">*</span>
+                            </label>
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                                    onmouseover="this.style.borderColor='var(--brand-navy)';"
+                                    onmouseout="this.style.borderColor='var(--border)';">
+                                    <input type="radio" name="visibility" value="private"
+                                        {{ old('visibility', 'private') === 'private' ? 'checked' : '' }} required>
+                                    <div>
+                                        <div style="font-weight: 600; color: #0f172a;">Riêng tư</div>
+                                        <div style="font-size: 12px; color: var(--muted);">Chỉ bạn và thành viên nhóm</div>
+                                    </div>
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                                    onmouseover="this.style.borderColor='var(--brand-navy)';"
+                                    onmouseout="this.style.borderColor='var(--border)';">
+                                    <input type="radio" name="visibility" value="team_only"
+                                        {{ old('visibility') === 'team_only' ? 'checked' : '' }}>
+                                    <div>
+                                        <div style="font-weight: 600; color: #0f172a;">Chỉ nhóm</div>
+                                        <div style="font-size: 12px; color: var(--muted);">Thành viên nhóm và người được mời</div>
+                                    </div>
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                                    onmouseover="this.style.borderColor='var(--brand-navy)';"
+                                    onmouseout="this.style.borderColor='var(--border)';">
+                                    <input type="radio" name="visibility" value="public"
+                                        {{ old('visibility') === 'public' ? 'checked' : '' }}>
+                                    <div>
+                                        <div style="font-weight: 600; color: #0f172a;">Công khai</div>
+                                        <div style="font-size: 12px; color: var(--muted);">Mọi người có thể xem (sau khi duyệt)</div>
+                                    </div>
+                                </label>
+                            </div>
+                            @error('visibility')
+                                <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Faculty & Category --}}
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                            <div>
+                                <label for="faculty_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
+                                    Khoa/Đơn vị
+                                </label>
+                                <select name="faculty_id" id="faculty_id"
+                                    style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: #fff;">
+                                    <option value="">-- Chọn khoa --</option>
+                                    @foreach ($faculties as $faculty)
+                                        <option value="{{ $faculty->id }}" {{ old('faculty_id') == $faculty->id ? 'selected' : '' }}>
+                                            {{ $faculty->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('faculty_id')
+                                    <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="category_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
+                                    Danh mục
+                                </label>
+                                <select name="category_id" id="category_id"
+                                    style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: #fff;">
+                                    <option value="">-- Chọn danh mục --</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('category_id')
+                                    <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- Buttons --}}
+                        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
+                            <a href="{{ route('my-ideas.index') }}" class="btn btn-ghost"
+                                style="padding: 12px 24px; font-weight: 600;">
+                                Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary" style="padding: 12px 24px; font-weight: 600;">
+                                Tạo ý tưởng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+

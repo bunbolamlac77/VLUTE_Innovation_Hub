@@ -167,7 +167,7 @@
                         <div class="user-menu" id="userMenu" role="menu" aria-label="Menu người dùng">
                             <a href="{{ route('dashboard') }}">Bảng điều khiển</a>
                             <a href="{{ route('profile.edit') }}">Hồ sơ cá nhân</a>
-                            <a href="/ideas/my">Ý tưởng của tôi</a>
+                            <a href="{{ route('my-ideas.index') }}">Ý tưởng của tôi</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit">Đăng xuất</button>
