@@ -73,12 +73,14 @@
                     </form>
                 @endif
                 @if ($idea->isDraft() || $idea->needsChange())
-                    <form method="POST" action="{{ route('my-ideas.submit', $idea->id) }}" style="margin: 0;">
-                        @csrf
-                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-weight: 600;">
-                            📤 Nộp ý tưởng
-                        </button>
-                    </form>
+                    @can('submit', $idea)
+                        <form method="POST" action="{{ route('my-ideas.submit', $idea->id) }}" style="margin: 0;">
+                            @csrf
+                            <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-weight: 600;">
+                                📤 Nộp ý tưởng
+                            </button>
+                        </form>
+                    @endcan
                 @endif
             </div>
         </div>
@@ -190,6 +192,61 @@
                         @endif
                     </div>
                 </div>
+
+                {{-- Attachments --}}
+                @if ($idea->attachments && $idea->attachments->count() > 0)
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div class="card-body" style="padding: 24px;">
+                            <h3 style="margin: 0 0 20px; font-size: 20px; color: #0f172a; font-weight: 700;">
+                                File đính kèm ({{ $idea->attachments->count() }})
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                @foreach ($idea->attachments as $attachment)
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--brand-gray-50); border-radius: 8px;">
+                                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                                            @php
+                                                $fileIcon = '📄';
+                                                if (str_contains($attachment->mime_type ?? '', 'image')) {
+                                                    $fileIcon = '🖼️';
+                                                } elseif (str_contains($attachment->mime_type ?? '', 'pdf')) {
+                                                    $fileIcon = '📕';
+                                                } elseif (str_contains($attachment->mime_type ?? '', 'word') || str_contains($attachment->mime_type ?? '', 'document')) {
+                                                    $fileIcon = '📘';
+                                                } elseif (str_contains($attachment->mime_type ?? '', 'zip') || str_contains($attachment->mime_type ?? '', 'archive')) {
+                                                    $fileIcon = '📦';
+                                                }
+                                            @endphp
+                                            <span style="font-size: 24px;">{{ $fileIcon }}</span>
+                                            <div style="flex: 1;">
+                                                <div style="font-weight: 600; color: #0f172a; font-size: 14px;">
+                                                    {{ $attachment->filename }}
+                                                </div>
+                                                <div style="font-size: 12px; color: var(--muted);">
+                                                    @if ($attachment->mime_type)
+                                                        {{ $attachment->mime_type }} •
+                                                    @endif
+                                                    @if ($attachment->size)
+                                                        {{ number_format($attachment->size / 1024, 2) }} KB
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                    @if ($attachment->uploader)
+                                                        • Upload bởi: {{ $attachment->uploader->name }}
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="{{ route('attachments.download', $attachment->id) }}" class="btn btn-primary"
+                                            style="padding: 8px 16px; font-size: 14px; font-weight: 600;" target="_blank">
+                                            📥 Tải xuống
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 {{-- Pending Invitations --}}
                 @if ($idea->invitations->where('status', 'pending')->count() > 0)

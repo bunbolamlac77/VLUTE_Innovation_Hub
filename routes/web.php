@@ -31,6 +31,16 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::post('/{id}/submit', [\App\Http\Controllers\MyIdeasController::class, 'submit'])->name('submit');
         Route::post('/{id}/invite', [\App\Http\Controllers\MyIdeasController::class, 'invite'])->name('invite');
     });
+
+    // Review Queue - Hàng chờ phản biện (cho Giảng viên, Trung tâm ĐMST, BGH)
+    Route::prefix('manage')->name('manage.')->group(function () {
+        Route::get('/review-queue', [\App\Http\Controllers\Review\ReviewQueueController::class, 'index'])
+            ->name('review-queue.index');
+    });
+
+    // Attachments Download
+    Route::get('/attachments/{id}/download', [\App\Http\Controllers\AttachmentController::class, 'download'])
+        ->name('attachments.download');
 });
 
 // Invitation routes (có thể truy cập khi chưa đăng nhập)

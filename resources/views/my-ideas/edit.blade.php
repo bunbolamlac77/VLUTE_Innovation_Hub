@@ -18,12 +18,12 @@
 
     {{-- Form --}}
     <section class="container" style="padding: 16px 0 64px;">
-        <div style="max-width: 800px; margin: 0 auto;">
-            <div class="card">
-                <div class="card-body" style="padding: 32px;">
-                    <h2 style="margin: 0 0 24px; font-size: 28px; color: #0f172a;">Chỉnh sửa ý tưởng</h2>
+        <div style="max-width: 1100px; margin: 0 auto;">
+            <div class="card" style="box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+                <div class="card-body" style="padding: 48px;">
+                    <h2 style="margin: 0 0 32px; font-size: 32px; color: #0f172a; font-weight: 800; letter-spacing: -0.01em;">Chỉnh sửa ý tưởng</h2>
 
-                    <form method="POST" action="{{ route('my-ideas.update', $idea->id) }}">
+                    <form method="POST" action="{{ route('my-ideas.update', $idea->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -154,6 +154,27 @@
                             </div>
                         </div>
 
+                        {{-- File Attachments (Add New) --}}
+                        <div style="margin-bottom: 24px;">
+                            <label for="attachments" style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
+                                Thêm file đính kèm mới <span style="font-weight: 400; color: var(--muted); font-size: 14px;">(Tùy chọn, tối đa 10MB/file)</span>
+                            </label>
+                            <input type="file" name="attachments[]" id="attachments" multiple
+                                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: #fff;">
+                            <div style="margin-top: 8px; font-size: 13px; color: var(--muted);">
+                                <p style="margin: 4px 0;">Định dạng cho phép: JPG, PNG, PDF, DOC, DOCX, ZIP</p>
+                                <p style="margin: 4px 0;">Bạn có thể chọn nhiều file cùng lúc (nhấn Ctrl/Cmd + Click)</p>
+                            </div>
+                            @error('attachments.*')
+                                <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                            @enderror
+                            @error('attachments')
+                                <div style="color: #ef4444; font-size: 14px; margin-top: 4px;">{{ $message }}</div>
+                            @enderror
+                            <div id="file-list" style="margin-top: 12px;"></div>
+                        </div>
+
                         {{-- Buttons --}}
                         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
                             <a href="{{ route('my-ideas.show', $idea->id) }}" class="btn btn-ghost"
@@ -170,4 +191,43 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        // Hiển thị danh sách file đã chọn
+        document.getElementById('attachments').addEventListener('change', function(e) {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            
+            if (e.target.files.length > 0) {
+                const list = document.createElement('div');
+                list.style.cssText = 'display: flex; flex-direction: column; gap: 8px; margin-top: 8px;';
+                
+                Array.from(e.target.files).forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f3f4f6; border-radius: 6px;';
+                    
+                    const fileInfo = document.createElement('div');
+                    fileInfo.style.cssText = 'flex: 1;';
+                    
+                    const fileName = document.createElement('div');
+                    fileName.style.cssText = 'font-weight: 600; color: #0f172a; font-size: 14px;';
+                    fileName.textContent = file.name;
+                    
+                    const fileSize = document.createElement('div');
+                    fileSize.style.cssText = 'font-size: 12px; color: #6b7280; margin-top: 2px;';
+                    fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+                    
+                    fileInfo.appendChild(fileName);
+                    fileInfo.appendChild(fileSize);
+                    
+                    fileItem.appendChild(fileInfo);
+                    list.appendChild(fileItem);
+                });
+                
+                fileList.appendChild(list);
+            }
+        });
+    </script>
+@endpush
 
