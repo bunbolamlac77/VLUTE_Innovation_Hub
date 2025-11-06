@@ -229,6 +229,25 @@
                 .cell-right {
                     text-align: right;
                 }
+
+                /* Ensure the review action renders as a button here */
+                .btn-review {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 9px 14px;
+                    border-radius: 12px;
+                    background: #2563eb;
+                    color: #fff !important;
+                    font-weight: 800;
+                    text-decoration: none;
+                    border: 1px solid #1e40af12;
+                    box-shadow: 0 6px 16px rgba(30, 64, 175, 0.18);
+                }
+
+                .btn-review:hover {
+                    background: #1d4ed8;
+                }
             </style>
             @if ($isReviewer)
                 <div class="dash-card">
