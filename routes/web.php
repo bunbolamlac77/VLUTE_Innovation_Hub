@@ -24,12 +24,24 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::get('/', [\App\Http\Controllers\MyIdeasController::class, 'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\MyIdeasController::class, 'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\MyIdeasController::class, 'store'])->name('store');
-        Route::get('/{id}', [\App\Http\Controllers\MyIdeasController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [\App\Http\Controllers\MyIdeasController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [\App\Http\Controllers\MyIdeasController::class, 'update'])->name('update');
-        Route::delete('/{id}', [\App\Http\Controllers\MyIdeasController::class, 'destroy'])->name('destroy');
-        Route::post('/{id}/submit', [\App\Http\Controllers\MyIdeasController::class, 'submit'])->name('submit');
-        Route::post('/{id}/invite', [\App\Http\Controllers\MyIdeasController::class, 'invite'])->name('invite');
+        Route::get('/{idea}', [\App\Http\Controllers\MyIdeasController::class, 'show'])
+            ->middleware('can:view,idea')
+            ->name('show');
+        Route::get('/{idea}/edit', [\App\Http\Controllers\MyIdeasController::class, 'edit'])
+            ->middleware('can:update,idea')
+            ->name('edit');
+        Route::put('/{idea}', [\App\Http\Controllers\MyIdeasController::class, 'update'])
+            ->middleware('can:update,idea')
+            ->name('update');
+        Route::delete('/{idea}', [\App\Http\Controllers\MyIdeasController::class, 'destroy'])
+            ->middleware('can:delete,idea')
+            ->name('destroy');
+        Route::post('/{idea}/submit', [\App\Http\Controllers\MyIdeasController::class, 'submit'])
+            ->middleware('can:submit,idea')
+            ->name('submit');
+        Route::post('/{idea}/invite', [\App\Http\Controllers\MyIdeasController::class, 'invite'])
+            ->middleware('can:invite,idea')
+            ->name('invite');
     });
 
     // Review Queue - Hàng chờ phản biện (cho Giảng viên, Trung tâm ĐMST, BGH)

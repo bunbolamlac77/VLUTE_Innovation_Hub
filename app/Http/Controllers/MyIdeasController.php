@@ -118,9 +118,9 @@ class MyIdeasController extends Controller
     /**
      * Hiển thị chi tiết ý tưởng
      */
-    public function show($id)
+    public function show(Idea $idea)
     {
-        $idea = Idea::with([
+        $idea->load([
             'owner',
             'faculty',
             'category',
@@ -131,10 +131,7 @@ class MyIdeasController extends Controller
             },
             'changeRequests',
             'attachments.uploader'
-        ])->findOrFail($id);
-
-        // Kiểm tra quyền xem
-        $this->authorize('view', $idea);
+        ]);
 
         $user = Auth::user();
 
@@ -153,12 +150,8 @@ class MyIdeasController extends Controller
     /**
      * Hiển thị form chỉnh sửa ý tưởng
      */
-    public function edit($id)
+    public function edit(Idea $idea)
     {
-        $idea = Idea::findOrFail($id);
-
-        // Kiểm tra quyền cập nhật
-        $this->authorize('update', $idea);
 
         $faculties = Faculty::orderBy('sort_order')->orderBy('name')->get();
         $categories = Category::orderBy('sort_order')->orderBy('name')->get();
@@ -169,12 +162,8 @@ class MyIdeasController extends Controller
     /**
      * Cập nhật ý tưởng
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Idea $idea)
     {
-        $idea = Idea::findOrFail($id);
-
-        // Kiểm tra quyền cập nhật
-        $this->authorize('update', $idea);
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -232,12 +221,8 @@ class MyIdeasController extends Controller
     /**
      * Xóa ý tưởng (chỉ khi là Draft)
      */
-    public function destroy($id)
+    public function destroy(Idea $idea)
     {
-        $idea = Idea::findOrFail($id);
-
-        // Kiểm tra quyền xóa
-        $this->authorize('delete', $idea);
 
         $idea->delete();
 
@@ -248,12 +233,8 @@ class MyIdeasController extends Controller
     /**
      * Nộp ý tưởng (chuyển từ Draft sang Submitted)
      */
-    public function submit($id)
+    public function submit(Idea $idea)
     {
-        $idea = Idea::findOrFail($id);
-
-        // Kiểm tra quyền nộp
-        $this->authorize('submit', $idea);
 
         // Nếu đang ở trạng thái needs_change, cần xác định cấp nào yêu cầu chỉnh sửa
         if ($idea->needsChange()) {
@@ -279,12 +260,8 @@ class MyIdeasController extends Controller
     /**
      * Mời thành viên vào ý tưởng
      */
-    public function invite(Request $request, $id)
+    public function invite(Request $request, Idea $idea)
     {
-        $idea = Idea::findOrFail($id);
-
-        // Kiểm tra quyền mời
-        $this->authorize('invite', $idea);
 
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],

@@ -1,3 +1,54 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Hàng chờ Phản biện Ý tưởng
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tiêu đề</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chủ sở hữu</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Khoa</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày nộp</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse ($ideas as $idea)
+                                    <tr>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $idea->title }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">{{ $idea->owner->name }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">{{ $idea->faculty->name ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">{{ $idea->updated_at->format('d/m/Y H:i') }}</td>
+                                        <td class="px-6 py-4 text-sm font-medium">
+                                            <a href="{{ route('my-ideas.show', $idea) }}" class="text-indigo-600 hover:text-indigo-900">Chi tiết</a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-sm text-gray-500 text-center">Không có ý tưởng nào cần phản biện.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4">
+                        {{ $ideas->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
+
 @extends('layouts.main')
 
 @section('title', 'Hàng chờ Phản biện - VLUTE Innovation Hub')
