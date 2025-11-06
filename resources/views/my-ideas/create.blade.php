@@ -213,13 +213,19 @@
 
 @push('scripts')
     <script>
+        // Lưu trữ danh sách file đã chọn
+        let selectedFiles = [];
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
         // Hiển thị danh sách file đã chọn
-        document.getElementById('attachments').addEventListener('change', function(e) {
+        function renderFileList() {
             const fileList = document.getElementById('file-list');
             const uploadArea = document.getElementById('file-upload-area');
+            const fileInput = document.getElementById('attachments');
+            
             fileList.innerHTML = '';
             
-            if (e.target.files.length > 0) {
+            if (selectedFiles.length > 0) {
                 uploadArea.style.borderColor = 'var(--brand-green)';
                 uploadArea.style.borderStyle = 'solid';
                 uploadArea.style.background = '#f0fdf4';
@@ -227,7 +233,7 @@
                 const list = document.createElement('div');
                 list.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 16px;';
                 
-                Array.from(e.target.files).forEach((file, index) => {
+                selectedFiles.forEach((file, index) => {
                     const fileItem = document.createElement('div');
                     fileItem.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s ease;';
                     
@@ -259,16 +265,45 @@
                     fileName.textContent = file.name;
                     
                     const fileSize = document.createElement('div');
-                    fileSize.style.cssText = 'font-size: 12px; color: #6b7280; margin-top: 4px;';
+                    fileSize.style.cssText = 'font-size: 12px; margin-top: 4px;';
                     const sizeKB = (file.size / 1024).toFixed(2);
                     const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-                    fileSize.textContent = file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB';
+                    
+                    // Kiểm tra kích thước file
+                    if (file.size > MAX_FILE_SIZE) {
+                        fileSize.style.color = '#ef4444';
+                        fileSize.textContent = (file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB') + ' (Vượt quá 10MB)';
+                        fileItem.style.borderColor = '#ef4444';
+                    } else {
+                        fileSize.style.color = '#6b7280';
+                        fileSize.textContent = file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB';
+                    }
+                    
+                    // Nút xóa file
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.style.cssText = 'background: #ef4444; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; flex-shrink: 0;';
+                    removeBtn.textContent = '✕ Xóa';
+                    removeBtn.onmouseover = function() {
+                        this.style.background = '#dc2626';
+                        this.style.transform = 'scale(1.05)';
+                    };
+                    removeBtn.onmouseout = function() {
+                        this.style.background = '#ef4444';
+                        this.style.transform = 'scale(1)';
+                    };
+                    removeBtn.onclick = function() {
+                        selectedFiles.splice(index, 1);
+                        updateFileInput();
+                        renderFileList();
+                    };
                     
                     fileInfo.appendChild(fileName);
                     fileInfo.appendChild(fileSize);
                     
                     fileItem.appendChild(iconDiv);
                     fileItem.appendChild(fileInfo);
+                    fileItem.appendChild(removeBtn);
                     list.appendChild(fileItem);
                 });
                 
@@ -278,6 +313,44 @@
                 uploadArea.style.borderStyle = 'dashed';
                 uploadArea.style.background = '#f9fafb';
             }
+        }
+
+        // Cập nhật file input với danh sách file mới
+        function updateFileInput() {
+            const fileInput = document.getElementById('attachments');
+            const dataTransfer = new DataTransfer();
+            
+            selectedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+            
+            fileInput.files = dataTransfer.files;
+        }
+
+        // Xử lý khi chọn file
+        document.getElementById('attachments').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const validFiles = [];
+            const invalidFiles = [];
+            
+            files.forEach(file => {
+                // Kiểm tra kích thước
+                if (file.size > MAX_FILE_SIZE) {
+                    invalidFiles.push(file);
+                    alert(`File "${file.name}" (${(file.size / 1024 / 1024).toFixed(2)} MB) vượt quá giới hạn 10MB. File này sẽ không được thêm.`);
+                } else {
+                    // Kiểm tra xem file đã tồn tại chưa
+                    const exists = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+                    if (!exists) {
+                        validFiles.push(file);
+                    }
+                }
+            });
+            
+            // Thêm các file hợp lệ vào danh sách
+            selectedFiles = [...selectedFiles, ...validFiles];
+            updateFileInput();
+            renderFileList();
         });
         
         // Style cho radio buttons khi được chọn

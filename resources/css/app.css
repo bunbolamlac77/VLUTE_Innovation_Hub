@@ -1666,6 +1666,20 @@ body.bg-gray-50 .container {
 .btn-primary:not([disabled]):hover {
     background: #1d4ed8;
 }
+.btn-review {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+}
+.btn-review:hover {
+    background: #1d4ed8;
+}
 .btn-ghost {
     background: #eef2ff;
     color: #3730a3;

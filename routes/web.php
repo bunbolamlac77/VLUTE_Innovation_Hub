@@ -48,6 +48,14 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
     Route::prefix('manage')->name('manage.')->group(function () {
         Route::get('/review-queue', [\App\Http\Controllers\Review\ReviewQueueController::class, 'index'])
             ->name('review-queue.index');
+
+        // Trang hiển thị form để phản biện (GET)
+        Route::get('/review/{idea}', [\App\Http\Controllers\Review\ReviewFormController::class, 'show'])
+            ->name('review.form');
+
+        // Nơi nhận dữ liệu khi GV bấm nút "Duyệt" / "Yêu cầu sửa" (POST)
+        Route::post('/review/{idea}', [\App\Http\Controllers\Review\ReviewFormController::class, 'store'])
+            ->name('review.store');
     });
 
     // Attachments Download

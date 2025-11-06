@@ -28,7 +28,7 @@
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ $idea->faculty->name ?? 'N/A' }}</td>
                                         <td class="px-6 py-4 text-sm text-gray-500">{{ $idea->updated_at->format('d/m/Y H:i') }}</td>
                                         <td class="px-6 py-4 text-sm font-medium">
-                                            <a href="{{ route('my-ideas.show', $idea) }}" class="text-indigo-600 hover:text-indigo-900">Chi tiết</a>
+                                            <a href="{{ route('manage.review.form', $idea) }}" class="text-indigo-600 hover:text-indigo-900">Xem</a>
                                         </td>
                                     </tr>
                                 @empty

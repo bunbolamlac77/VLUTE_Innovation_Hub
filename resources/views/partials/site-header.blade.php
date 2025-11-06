@@ -14,26 +14,33 @@
             <a href="javascript:void(0)" onclick="changeLanguage('en')" class="lang-switcher"
                 title="Switch to English">🇬🇧</a>
             @auth
-                <!-- Khi đã đăng nhập: hiện avatar + nút sổ xuống -->
-                <div class="userbox" id="userBox" aria-haspopup="true" aria-expanded="false">
-                    <img src="{{ asset('assets/avatar-default.jpg') }}" alt="Ảnh đại diện" class="avatar" />
-                    <button class="chev" id="btnUserMenu" aria-label="Mở menu người dùng">
-                        ▾
-                    </button>
-                    <div class="user-menu" id="userMenu" role="menu" aria-label="Menu người dùng">
-                        <a href="{{ route('dashboard') }}">Bảng điều khiển</a>
-                        <a href="/profile">Hồ sơ cá nhân</a>
-                        <a href="/ideas/my">Ý tưởng của tôi</a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit"
-                                style="width: 100%; text-align: left; padding: 10px 12px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #0f172a;">Đăng
-                                xuất</button>
-                        </form>
-                    </div>
-                </div>
-            @else
-                <a class="btn btn-primary login" id="btnLogin" href="{{ route('login') }}">Đăng nhập</a>
+            <!-- Khi đã đăng nhập: hiện avatar + nút sổ xuống -->
+            <div class="userbox" id="userBox" aria-haspopup="true" aria-expanded="false">
+                <img src="{{ asset('assets/avatar-default.jpg') }}" alt="Ảnh đại diện" class="avatar" />
+                <button class="chev" id="btnUserMenu" aria-label="Mở menu người dùng">
+                    ▾
+                </button>
+                <div class="user-menu" id="userMenu" role="menu" aria-label="Menu người dùng">
+                    <a href="{{ route('dashboard') }}">Bảng điều khiển</a>
+                    <a href="/profile">Hồ sơ cá nhân</a>
+                    @php($u = auth()->user())
+                                @if ($u && ($u->hasRole('student') || (!$u->hasRole('staff') && !$u->hasRole('center') && !$u->hasRole('board') && !$u->hasRole('admin'))))
+                                    <a href="{{ route('my-ideas.index') }}">Ý tưởng của tôi</a>
+                                @elseif ($u && ($u->hasRole('staff') || $u->hasRole('center') || $u->hasRole('board') || $u->hasRole('reviewer')))
+                                    <a href="{{ route('manage.review-queue.index') }}">Hàng chờ phản biện</a>
+                                @elseif ($u && $u->hasRole('admin'))
+                                    <a href="{{ route('admin.home') }}">Bảng quản trị</a>
+                                @endif
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        style="width: 100%; text-align: left; padding: 10px 12px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #0f172a;">Đăng
+                                        xuất</button>
+                                </form>
+                            </div>
+                        </div>
+                    @else
+            <a class="btn btn-primary login" id="btnLogin" href="{{ route('login') }}">Đăng nhập</a>
             @endauth
         </div>
     </div>

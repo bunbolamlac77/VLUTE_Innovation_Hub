@@ -64,6 +64,8 @@ class MyIdeasController extends Controller
             'visibility' => ['required', Rule::in(['private', 'team_only', 'public'])],
             'faculty_id' => ['nullable', 'exists:faculties,id'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,doc,docx,zip', 'max:10240'], // 10MB = 10240 KB
         ]);
 
         // Tạo slug từ title
@@ -92,22 +94,34 @@ class MyIdeasController extends Controller
         // Xử lý upload file đính kèm
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                // Tạo tên file duy nhất
-                $filename = time() . '_' . Str::random(10) . '_' . $file->getClientOriginalName();
+                try {
+                    // Kiểm tra lại kích thước file (đảm bảo an toàn)
+                    $maxSize = 10 * 1024 * 1024; // 10MB
+                    if ($file->getSize() > $maxSize) {
+                        continue; // Bỏ qua file vượt quá kích thước
+                    }
 
-                // Lưu file vào storage/app/private/attachments
-                $path = $file->storeAs('private/attachments', $filename, 'local');
+                    // Tạo tên file duy nhất
+                    $filename = time() . '_' . Str::random(10) . '_' . $file->getClientOriginalName();
 
-                // Tạo bản ghi attachment
-                Attachment::create([
-                    'attachable_type' => Idea::class,
-                    'attachable_id' => $idea->id,
-                    'uploaded_by' => Auth::id(),
-                    'filename' => $file->getClientOriginalName(),
-                    'path' => $path,
-                    'mime_type' => $file->getMimeType(),
-                    'size' => $file->getSize(),
-                ]);
+                    // Lưu file vào storage/app/private/attachments
+                    $path = $file->storeAs('private/attachments', $filename, 'local');
+
+                    // Tạo bản ghi attachment
+                    Attachment::create([
+                        'attachable_type' => Idea::class,
+                        'attachable_id' => $idea->id,
+                        'uploaded_by' => Auth::id(),
+                        'filename' => $file->getClientOriginalName(),
+                        'path' => $path,
+                        'mime_type' => $file->getMimeType(),
+                        'size' => $file->getSize(),
+                    ]);
+                } catch (\Exception $e) {
+                    // Log lỗi nhưng không dừng quá trình tạo ý tưởng
+                    \Log::error('Failed to upload attachment: ' . $e->getMessage());
+                    continue;
+                }
             }
         }
 
