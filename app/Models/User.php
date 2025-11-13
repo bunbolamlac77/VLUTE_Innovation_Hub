@@ -185,4 +185,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Attachment::class, 'uploaded_by');
     }
+
+    /**
+     * User đã đăng ký nhiều cuộc thi
+     */
+    public function competitionRegistrations()
+    {
+        return $this->hasMany(CompetitionRegistration::class);
+    }
 }

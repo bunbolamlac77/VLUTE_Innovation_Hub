@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\CompetitionRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
@@ -133,6 +134,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Route để xử lý đăng ký cuộc thi (cần đăng nhập và verified)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/competitions/{competition}/register', [CompetitionRegistrationController::class, 'store'])
+        ->name('competitions.register');
 });
 
 // Routes Breeze (login / register / verify / forgot ...)

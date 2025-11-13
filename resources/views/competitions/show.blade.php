@@ -34,10 +34,49 @@
                         <span>{{ $competition->end_date->format('d/m/Y H:i') }}</span>
                     </div>
 
-                    <a href="#" class="btn btn-primary"
-                        style="display: block; width: 100%; text-align: center; padding: 12px; font-size: 16px; font-weight: 600; text-decoration: none;">
-                        Đăng ký tham gia
-                    </a>
+                    @auth
+                        @php
+                            // Kiểm tra xem user đã đăng ký cuộc thi này chưa
+                            $isRegistered = Auth::user()->competitionRegistrations()
+                                                ->where('competition_id', $competition->id)
+                                                ->exists();
+                        @endphp
+
+                        @if ($isRegistered)
+                            <div style="padding: 12px; background-color: #e0fdf4; border: 1px solid #34d399; border-radius: 8px; text-align: center; font-weight: 600; color: #06764e;">
+                                ✅ Bạn đã đăng ký
+                            </div>
+                        @elseif ($competition->status === 'open' && $competition->end_date > now())
+                            <form method="POST" action="{{ route('competitions.register', $competition) }}">
+                                @csrf
+                                
+                                <button type="submit" class="btn btn-primary"
+                                        style="display: block; width: 100%; text-align: center; padding: 12px; font-size: 16px; font-weight: 600; text-decoration: none; border: none; cursor: pointer;">
+                                    Đăng ký tham gia
+                                </button>
+                            </form>
+                        @else
+                            <div style="padding: 12px; background-color: #f3f4f6; border: 1px solid #d1d5db; border-radius: 8px; text-align: center; font-weight: 600; color: #4b5563;">
+                                Cuộc thi đã đóng
+                            </div>
+                        @endif
+
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-primary"
+                           style="display: block; width: 100%; text-align: center; padding: 12px; font-size: 16px; font-weight: 600; text-decoration: none;">
+                            Đăng nhập để đăng ký
+                        </a>
+                    @endauth
+
+                    @if (session('success'))
+                        <div style="color: green; margin-top: 10px; font-weight: 600;">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div style="color: red; margin-top: 10px; font-weight: 600;">{{ session('error') }}</div>
+                    @endif
+                    @if (session('info'))
+                        <div style="color: blue; margin-top: 10px; font-weight: 600;">{{ session('info') }}</div>
+                    @endif
                 </div>
             </aside>
         </div>
