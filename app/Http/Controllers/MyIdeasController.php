@@ -143,7 +143,9 @@ class MyIdeasController extends Controller
             'reviewAssignments' => function ($query) {
                 $query->with(['reviewer', 'review.changeRequests']);
             },
-            'changeRequests',
+            'changeRequests' => function ($query) {
+                $query->with(['review.assignment.reviewer'])->latest();
+            },
             'attachments.uploader'
         ]);
 

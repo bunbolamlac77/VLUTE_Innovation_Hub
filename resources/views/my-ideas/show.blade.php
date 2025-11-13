@@ -16,6 +16,66 @@
 
     {{-- Idea Detail --}}
     <section class="container" style="padding: 16px 0 64px;">
+        {{-- Yêu cầu Chỉnh sửa Alert --}}
+        @if ($idea->needsChange())
+            <div class="my-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700" role="alert"
+                style="margin-bottom: 24px; border-radius: 8px;">
+                <h3 class="font-bold text-lg" style="margin: 0 0 12px; font-size: 20px; font-weight: 700;">
+                    ⚠️ Yêu cầu Chỉnh sửa
+                </h3>
+                <p class="mb-2" style="margin-bottom: 12px; line-height: 1.6;">
+                    Ý tưởng của bạn đã bị trả về với các yêu cầu chỉnh sửa sau. Vui lòng cập nhật và nộp lại.
+                </p>
+
+                @php
+                    // Lấy change request mới nhất chưa được giải quyết
+                    $latestChangeRequest = $idea->changeRequests()->where('is_resolved', false)->latest()->first();
+                @endphp
+
+                @if ($latestChangeRequest)
+                    <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-md"
+                        style="margin-top: 12px; padding: 16px; background: rgba(254, 242, 242, 0.8); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px;">
+                        <p class="text-sm font-semibold"
+                            style="margin: 0 0 8px; font-size: 14px; font-weight: 600; color: #991b1b;">
+                            Nội dung yêu cầu:
+                        </p>
+                        <p class="text-gray-800 italic"
+                            style="margin: 0; color: #1f2937; font-style: italic; line-height: 1.6; white-space: pre-wrap;">
+                            "{{ $latestChangeRequest->request_message }}"
+                        </p>
+                        @if ($latestChangeRequest->review && $latestChangeRequest->review->assignment && $latestChangeRequest->review->assignment->reviewer)
+                            <p class="text-xs text-gray-600 mt-2" style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+                                Yêu cầu từ: {{ $latestChangeRequest->review->assignment->reviewer->name }}
+                                ({{ $latestChangeRequest->created_at->format('d/m/Y H:i') }})
+                            </p>
+                        @endif
+                    </div>
+                @endif
+
+                @if ($idea->isDraft() || $idea->needsChange())
+                    <div class="mt-4" style="margin-top: 16px;">
+                        <form method="POST" action="{{ route('my-ideas.submit', $idea) }}" style="display: inline-block;">
+                            @csrf
+                            <button type="submit" class="btn btn-primary"
+                                style="padding: 12px 24px; font-weight: 600; background: var(--brand-navy); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                                @if ($idea->isDraft())
+                                    📤 Nộp để duyệt
+                                @else
+                                    📤 Nộp lại để duyệt (Sau khi đã sửa)
+                                @endif
+                            </button>
+                        </form>
+                        @if ($canEdit)
+                            <a href="{{ route('my-ideas.edit', $idea->id) }}" class="btn btn-ghost"
+                                style="margin-left: 12px; padding: 12px 24px; font-weight: 600; border: 1px solid var(--border); border-radius: 8px; text-decoration: none; display: inline-block;">
+                                ✏️ Chỉnh sửa ngay
+                            </a>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        @endif
+
         {{-- Status Badge & Actions --}}
         <div
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
