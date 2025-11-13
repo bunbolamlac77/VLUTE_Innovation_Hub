@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CompetitionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
@@ -8,6 +9,10 @@ Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name
 Route::get('/about', function () {
     return view('about');
 });
+
+// Cuộc thi & Sự kiện - Trang công khai
+Route::get('/competitions', [CompetitionController::class, 'index'])->name('competitions.index');
+Route::get('/competitions/{competition:slug}', [CompetitionController::class, 'show'])->name('competitions.show');
 
 // Public Ideas (Ngân hàng Ý tưởng) - Trang công khai
 Route::get('/ideas', [\App\Http\Controllers\PublicIdeaController::class, 'index'])->name('ideas.index');
