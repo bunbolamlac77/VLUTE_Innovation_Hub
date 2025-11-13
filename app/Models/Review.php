@@ -41,6 +41,15 @@ class Review extends Model
     }
 
     /**
+     * Lấy reviewer thông qua assignment (sử dụng accessor)
+     * Có thể truy cập: $review->reviewer
+     */
+    public function getReviewerAttribute()
+    {
+        return $this->assignment?->reviewer;
+    }
+
+    /**
      * Review có nhiều change requests
      */
     public function changeRequests()

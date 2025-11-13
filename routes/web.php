@@ -51,10 +51,12 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
 
         // Trang hiển thị form để phản biện (GET)
         Route::get('/review/{idea}', [\App\Http\Controllers\Review\ReviewFormController::class, 'show'])
+            ->middleware('can:review,idea')
             ->name('review.form');
 
         // Nơi nhận dữ liệu khi GV bấm nút "Duyệt" / "Yêu cầu sửa" (POST)
         Route::post('/review/{idea}', [\App\Http\Controllers\Review\ReviewFormController::class, 'store'])
+            ->middleware('can:review,idea')
             ->name('review.store');
     });
 

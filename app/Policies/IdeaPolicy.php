@@ -100,4 +100,30 @@ class IdeaPolicy
             $user->hasRole('board') ||
             $user->hasRole('reviewer');
     }
+
+    /**
+     * Quyết định xem user có thể phản biện ý tưởng không.
+     */
+    public function review(User $user, Idea $idea): bool
+    {
+        // 1. User phải là GV, TTDMST hoặc BGH (hoặc Admin - đã xử lý ở 'before')
+        if (!$user->hasRole('staff') && !$user->hasRole('center') && !$user->hasRole('board') && !$user->hasRole('reviewer')) {
+            return false;
+        }
+
+        // 2. Cho phép review nếu ý tưởng đang ở trạng thái chờ phản biện
+        $reviewableStatuses = [
+            'submitted_gv',
+            'needs_change_gv',
+            'submitted_center',
+            'needs_change_center',
+            'submitted_board',
+            'needs_change_board'
+        ];
+
+        return in_array($idea->status, $reviewableStatuses);
+
+        // (Nâng cao: Kiểm tra xem user này có được gán (assigned)
+        // cho ý tưởng này trong bảng 'review_assignments' hay không)
+    }
 }
