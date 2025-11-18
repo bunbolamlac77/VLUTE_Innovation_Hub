@@ -11,6 +11,7 @@ Route::get('/db-check', function () {
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\CompetitionRegistrationController;
+use App\Http\Controllers\MyCompetitionsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
@@ -151,6 +152,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/competitions/{competition}/register', [CompetitionRegistrationController::class, 'store'])
         ->name('competitions.register');
+    
+    // Trang danh sách các cuộc thi SV đã đăng ký
+    Route::get('/my-competitions', [MyCompetitionsController::class, 'index'])
+         ->name('my-competitions.index');
 });
 
 // Routes Breeze (login / register / verify / forgot ...)

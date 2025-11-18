@@ -34,6 +34,16 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @php($u = Auth::user())
+                        @if ($u && ($u->hasRole('student') || (!$u->hasRole('staff') && !$u->hasRole('center') && !$u->hasRole('board') && !$u->hasRole('admin'))))
+                            <x-dropdown-link :href="route('my-ideas.index')">
+                                {{ __('Ý tưởng của tôi') }}
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('my-competitions.index')">
+                                {{ __('Cuộc thi của tôi') }}
+                            </x-dropdown-link>
+                        @endif
+                        
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
@@ -80,6 +90,16 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @php($u = Auth::user())
+                @if ($u && ($u->hasRole('student') || (!$u->hasRole('staff') && !$u->hasRole('center') && !$u->hasRole('board') && !$u->hasRole('admin'))))
+                    <x-responsive-nav-link :href="route('my-ideas.index')">
+                        {{ __('Ý tưởng của tôi') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('my-competitions.index')">
+                        {{ __('Cuộc thi của tôi') }}
+                    </x-responsive-nav-link>
+                @endif
+                
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>

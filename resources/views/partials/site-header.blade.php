@@ -26,6 +26,7 @@
                     @php($u = auth()->user())
                                 @if ($u && ($u->hasRole('student') || (!$u->hasRole('staff') && !$u->hasRole('center') && !$u->hasRole('board') && !$u->hasRole('admin'))))
                                     <a href="{{ route('my-ideas.index') }}">Ý tưởng của tôi</a>
+                                    <a href="{{ route('my-competitions.index') }}">Cuộc thi của tôi</a>
                                 @elseif ($u && ($u->hasRole('staff') || $u->hasRole('center') || $u->hasRole('board') || $u->hasRole('reviewer')))
                                     <a href="{{ route('manage.review-queue.index') }}">Hàng chờ phản biện</a>
                                 @elseif ($u && $u->hasRole('admin'))
