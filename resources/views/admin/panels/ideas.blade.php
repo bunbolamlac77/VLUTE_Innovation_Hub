@@ -1,6 +1,26 @@
+@php
+$statusMap = [
+    'draft' => 'Bản nháp',
+    'submitted_for_review' => 'Chờ duyệt',
+    'needs_change_by_staff' => 'GV yêu cầu sửa',
+    'approved_by_staff' => 'GV đã duyệt',
+    'submitted_for_approval' => 'Chờ TTDV duyệt',
+    'needs_change_by_center' => 'TTDV yêu cầu sửa',
+    'approved_by_center' => 'TTDV đã duyệt',
+    'approved_final' => 'Đã duyệt (công khai)',
+    'rejected' => 'Bị từ chối',
+];
+
+// For the admin status change dropdown, we use a simpler set
+$adminStatusOptions = [
+    'submitted_for_review' => 'Chờ duyệt',
+    'approved_final' => 'Duyệt (công khai)',
+    'rejected' => 'Từ chối',
+];
+@endphp
+
 <div class="card">
   <div class="card-title">Ý tưởng (MVP)</div>
-  <div class="empty">Bạn sẽ kết nối bảng <code>ideas</code> sau. Hiện panel này hiển thị khung thao tác:</div>
 
   <div class="table-wrap mt-4">
     <table class="tbl">
@@ -17,15 +37,21 @@
         @forelse ($ideas as $idea)
           <tr>
             <td class="font-medium">{{ $idea->title }}</td>
-            <td><span class="chip">{{ $idea->status }}</span></td>
+            <td><span class="chip">{{ $statusMap[$idea->status] ?? $idea->status }}</span></td>
             <td>{{ $idea->owner?->name ?? '—' }}</td>
-            <td>{{ $idea->reviewer?->name ?? '—' }}</td>
+            <td>
+              @if ($idea->reviewAssignments->isNotEmpty())
+                {{ $idea->reviewAssignments->map(fn($as) => $as->reviewer->name)->join(', ') }}
+              @else
+                —
+              @endif
+            </td>
             <td class="text-center">
               <form class="inline-flex gap-2" method="POST" action="{{ route('admin.ideas.status', $idea) }}">
                 @csrf
                 <select class="sel" name="status">
-                  @foreach (['submitted','under_review','approved','rejected'] as $s)
-                    <option value="{{ $s }}" @selected($idea->status===$s)>{{ $s }}</option>
+                  @foreach ($adminStatusOptions as $value => $label)
+                    <option value="{{ $value }}" @selected($idea->status === $value)>{{ $label }}</option>
                   @endforeach
                 </select>
                 <button class="btn btn-ghost" type="submit">Đổi trạng thái</button>
@@ -47,5 +73,9 @@
         @endforelse
       </tbody>
     </table>
+
+    <div class="mt-4">
+        {{ $ideas->links() }}
+    </div>
   </div>
 </div>

@@ -1,5 +1,13 @@
 <?php
 
+Route::get('/db-check', function () {
+    return response()->json([
+        'database_path' => config('database.connections.sqlite.database'),
+        'default_connection' => config('database.default'),
+    ]);
+});
+
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\CompetitionRegistrationController;
@@ -10,6 +18,9 @@ Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name
 Route::get('/about', function () {
     return view('about');
 });
+
+// Bản tin khoa học - Trang công khai
+Route::get('/scientific-news', [\App\Http\Controllers\ScientificNewsController::class, 'index'])->name('scientific-news.index');
 
 // Cuộc thi & Sự kiện - Trang công khai
 Route::get('/competitions', [CompetitionController::class, 'index'])->name('competitions.index');
@@ -124,9 +135,9 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin']
         Route::post('/taxonomies/tags/{tag}', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'updateTag'])->name('tax.tags.update');
         Route::post('/taxonomies/tags/{tag}/del', [\App\Http\Controllers\Admin\TaxonomyActionController::class, 'destroyTag'])->name('tax.tags.destroy');
 
-        // Ideas (MVP: đổi trạng thái + gán reviewer) - TODO: Uncomment when IdeaActionController is created
-        // Route::post('/ideas/{idea}/status', [\App\Http\Controllers\Admin\IdeaActionController::class, 'updateStatus'])->name('ideas.status');
-        // Route::post('/ideas/{idea}/reviewer', [\App\Http\Controllers\Admin\IdeaActionController::class, 'assignReviewer'])->name('ideas.reviewer');
+        // Ideas (MVP: đổi trạng thái + gán reviewer)
+        Route::post('/ideas/{idea}/status', [\App\Http\Controllers\Admin\IdeaActionController::class, 'updateStatus'])->name('ideas.status');
+        Route::post('/ideas/{idea}/reviewer', [\App\Http\Controllers\Admin\IdeaActionController::class, 'assignReviewer'])->name('ideas.reviewer');
     });
 
 // ---- Khu người dùng (chỉ cần đăng nhập) ----

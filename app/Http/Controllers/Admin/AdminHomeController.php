@@ -52,8 +52,9 @@ class AdminHomeController extends Controller
         $ideaFilters = [];
         $reviewers = collect();
         if ($tab === 'ideas') {
-            // TODO: thay bằng models thực tế khi bạn tạo bảng ideas
-            // $ideas = Idea::with(['faculty','category','owner'])->latest()->paginate(10);
+            $ideas = \App\Models\Idea::with(['owner', 'reviewAssignments.reviewer'])
+                ->latest()
+                ->paginate(15);
             // Reviewer lấy những user nội bộ:
             $reviewers = User::whereIn('role', ['staff', 'center'])->get(['id', 'name', 'email']);
         }
