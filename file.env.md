@@ -1,8 +1,11 @@
+# Application
+
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=base64:AetDCMjJjLnUBJT+M1kZFDp3mh0dLaudVYKPSsolU9M=
 APP_DEBUG=true
-APP_URL=http://127.0.0.1:8000
+APP_URL=http://localhost:8080
+APP_PORT=8080
 
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
@@ -13,20 +16,27 @@ APP_MAINTENANCE_DRIVER=file
 # APP_MAINTENANCE_STORE=database
 
 PHP_CLI_SERVER_WORKERS=4
-
 BCRYPT_ROUNDS=12
+
+# Logging
 
 LOG_CHANNEL=stack
 LOG_STACK=single
 LOG_DEPRECATIONS_CHANNEL=null
 LOG_LEVEL=debug
 
-DB_CONNECTION=sqlite
-DB_HOST=127.0.0.1
-DB_PORT=3306
+# Database (Laravel Sail)
 
-DB_USERNAME=app
-DB_PASSWORD=apppass
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3307 # container internal port
+DB_DATABASE=vlute_innovation_hub
+DB_USERNAME=sail
+DB_PASSWORD=password
+FORWARD_DB_PORT=3307 # host port that maps to 3306 in container
+MYSQL_EXTRA_OPTIONS=
+
+# Session / Queue / Cache / Filesystem
 
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
@@ -42,12 +52,16 @@ CACHE_STORE=file
 
 # CACHE_PREFIX=
 
+# Memcached / Redis
+
 MEMCACHED_HOST=127.0.0.1
 
 REDIS_CLIENT=phpredis
 REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
+
+# Mail
 
 MAIL_MAILER=smtp
 MAIL_HOST=127.0.0.1
@@ -58,13 +72,20 @@ MAIL_ENCRYPTION=null
 MAIL_FROM_ADDRESS="no-reply@vlute.edu.vn"
 MAIL_FROM_NAME="VLUTE Innovation Hub"
 
+# AWS (optional)
+
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
 
+# Vite
+
 VITE_APP_NAME="${APP_NAME}"
+VITE_PORT=5173
+
+# Seed / Admin default (app-specific)
 
 ADMIN_EMAIL=admin@vlute.edu.vn
 ADMIN_PASSWORD=Admin@123

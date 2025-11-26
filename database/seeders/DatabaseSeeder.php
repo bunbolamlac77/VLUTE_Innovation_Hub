@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
         // Gọi seeder tạo Admin
         $this->call(RolesSeeder::class);
         $this->call(AdminUserSeeder::class);
+        $this->call(ApprovedUsersSeeder::class);
+        $this->call(FeaturedIdeasSeeder::class);
 
         // (Tuỳ chọn) tạo user mẫu bằng factory
         // User::factory(10)->create();

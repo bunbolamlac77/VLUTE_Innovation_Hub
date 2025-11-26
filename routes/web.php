@@ -1,13 +1,5 @@
 <?php
 
-Route::get('/db-check', function () {
-    return response()->json([
-        'database_path' => config('database.connections.sqlite.database'),
-        'default_connection' => config('database.default'),
-    ]);
-});
-
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\CompetitionRegistrationController;
