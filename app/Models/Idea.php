@@ -87,7 +87,14 @@ class Idea extends Model
      */
     public function reviews()
     {
-        return $this->hasManyThrough(Review::class, ReviewAssignment::class);
+        return $this->hasManyThrough(
+            Review::class,
+            ReviewAssignment::class,
+            'idea_id',        // Foreign key on review_assignments table
+            'assignment_id',  // Foreign key on reviews table
+            'id',             // Local key on ideas table
+            'id'              // Local key on review_assignments table
+        );
     }
 
     /**

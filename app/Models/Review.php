@@ -37,7 +37,7 @@ class Review extends Model
      */
     public function assignment()
     {
-        return $this->belongsTo(ReviewAssignment::class);
+        return $this->belongsTo(ReviewAssignment::class, 'assignment_id');
     }
 
     /**
