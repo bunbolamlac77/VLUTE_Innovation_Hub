@@ -17,11 +17,13 @@ class ReviewQueueController extends Controller
     {
         $user = Auth::user();
 
-        // Tạm thời: Lấy tất cả ý tưởng đã nộp
-        // Nâng cao: Chỉ lấy ý tưởng được gán cho GV này (dùng bảng review_assignments)
+        // Chỉ cho phép Trung tâm/BGH/Reviewer truy cập hàng chờ
+        if (!$user->hasRole('center') && !$user->hasRole('board') && !$user->hasRole('reviewer')) {
+            abort(403);
+        }
+
+        // Tạm thời: Lấy tất cả ý tưởng đã nộp (cấp Trung tâm trở lên)
         $query = Idea::whereIn('status', [
-            'submitted_gv',
-            'needs_change_gv',
             'submitted_center',
             'needs_change_center',
             'submitted_board',

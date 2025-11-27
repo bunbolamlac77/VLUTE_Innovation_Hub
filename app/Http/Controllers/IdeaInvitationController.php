@@ -52,11 +52,19 @@ class IdeaInvitationController extends Controller
                 ->with('status', 'Bạn đã là thành viên của ý tưởng này.');
         }
 
-        // Tạo IdeaMember
+        // Nếu lời mời là Mentor, đảm bảo user là giảng viên (staff)
+        if (($invitation->role ?? 'member') === 'mentor') {
+            if (!$user->hasRole('staff')) {
+                return redirect()->route('welcome')
+                    ->with('error', 'Tài khoản của bạn không có quyền trở thành Cố vấn (Mentor). Vui lòng liên hệ quản trị.');
+            }
+        }
+
+        // Tạo IdeaMember với đúng vai trò
         IdeaMember::create([
             'idea_id' => $invitation->idea_id,
             'user_id' => $user->id,
-            'role_in_team' => 'member',
+            'role_in_team' => $invitation->role ?? 'member',
         ]);
 
         // Đánh dấu invitation là accepted

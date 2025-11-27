@@ -32,7 +32,7 @@ Hệ thống có **7 vai trò người dùng**, mỗi vai trò có một mục �
 
 ### 1.3. Giảng viên (Lecturer)
 
--   Hướng dẫn, phản biện, và duyệt ý tưởng cấp khoa
+-   Đóng vai trò Cố vấn (Mentor): tham gia nhóm, góp ý nội bộ; không duyệt/chặn luồng
 -   Đăng ký với email `@vlute.edu.vn`, cần Admin duyệt
 
 ### 1.4. Trung tâm ĐMST (Innovation Center)
@@ -100,6 +100,21 @@ Hệ thống có **7 vai trò người dùng**, mỗi vai trò có một mục �
 
 ### 2.2. Luồng 2: Nộp & Duyệt Ý tưởng (Luồng cốt lõi)
 
+Cập nhật 2025-11 — Luồng mới (Mentor, bỏ tầng duyệt GV):
+
+1. SV tạo ý tưởng (status = 'draft').
+2. SV mời Giảng viên làm Cố vấn (Mentor) vào nhóm; Mentor có quyền xem và góp ý nội bộ (comment team_only), không có quyền chặn/duyệt.
+3. Nhóm hoàn thiện nội dung theo góp ý Mentor.
+4. SV bấm Nộp: hệ thống chuyển thẳng sang 'submitted_center'.
+5. Trung tâm ĐMST xử lý:
+    - Nếu yêu cầu chỉnh sửa: 'needs_change_center' → SV chỉnh sửa rồi nộp lại.
+    - Nếu duyệt: chuyển lên 'submitted_board'.
+6. BGH xử lý:
+    - Nếu yêu cầu chỉnh sửa: 'needs_change_board'.
+    - Nếu duyệt công khai: 'approved_final' (xuất hiện trên ngân hàng ý tưởng).
+
+Lưu ý: Có thể bật ràng buộc “phải có ≥1 Mentor để nộp” qua IDEAS_REQUIRE_MENTOR=true.
+
 Đây là luồng quan trọng nhất của dự án, đi từ SV đến BGH.
 
 #### Các bước:
@@ -132,14 +147,9 @@ Hệ thống có **7 vai trò người dùng**, mỗi vai trò có một mục �
 7. **SV nộp ý tưởng:**
 
     - Bấm "Nộp ý tưởng"
-    - `ideas.status` = 'submitted_gv'
+    - `ideas.status` = 'submitted_center'
 
-8. **GV (Giảng viên) nhận thông báo:**
-
-    - Được Admin/Trung tâm ĐMST gán phản biện qua `ReviewAssignment`
-    - GV vào "Hàng chờ phản biện", mở ý tưởng và điền biểu mẫu `Review`
-
-9. **GV xử lý:**
+8. **GV xử lý:**
 
     - **Nếu GV "Yêu cầu chỉnh sửa":**
         - `ideas.status` = 'needs_change_gv'
@@ -148,7 +158,7 @@ Hệ thống có **7 vai trò người dùng**, mỗi vai trò có một mục �
         - `ideas.status` = 'approved_gv'
         - `ideas.status` = 'submitted_center' (tự động chuyển sang cấp Trung tâm)
 
-10. **Trung tâm ĐMST xử lý:**
+9. **Trung tâm ĐMST xử lý:**
 
     - Thấy ý tưởng trong hàng chờ "Duyệt cấp Trung tâm"
     - **Nếu TTD MST "Yêu cầu chỉnh sửa":**
@@ -158,7 +168,7 @@ Hệ thống có **7 vai trò người dùng**, mỗi vai trò có một mục �
         - `ideas.status` = 'approved_center'
         - `ideas.status` = 'submitted_board' (tự động chuyển sang cấp BGH)
 
-11. **BGH (Ban giám hiệu) xử lý:**
+10. **BGH (Ban giám hiệu) xử lý:**
     - Thấy ý tưởng trong hàng chờ "Duyệt cuối cùng"
     - **Nếu BGH "Duyệt công khai":**
         - `ideas.status` = 'approved_final'
@@ -182,8 +192,8 @@ Hệ thống có **7 vai trò người dùng**, mỗi vai trò có một mục �
 | `/my-ideas/edit/{id}`                | Form chỉnh sửa ý tưởng (chỉ chủ sở hữu, trước khi duyệt cuối)                | ❌                 | ✅ Tương tác                  | ❌                 | ❌                         | ❌                         | ❌                  | ❌                 |
 | `/my-ideas/invite/{id}`              | Gửi và quản lý lời mời thành viên                                            | ❌                 | ✅ Tương tác (Chỉ chủ sở hữu) | ❌                 | ❌                         | ❌                         | ❌                  | ❌                 |
 | **C. Phản biện & Duyệt**             |                                                                              |                    |                               |                    |                            |                            |                     |                    |
-| `/review-queue` (Hàng chờ phản biện) | Danh sách ý tưởng được gán để GV phản biện                                   | ❌                 | ❌                            | ✅ Xem, Tương tác  | ✅ Xem (Toàn bộ)           | ✅ Xem (Toàn bộ)           | ❌                  | ✅ Xem (Toàn bộ)   |
-| `/review/form/{id}`                  | Biểu mẫu chấm điểm, nhận xét, duyệt/từ chối                                  | ❌                 | ❌                            | ✅ Tương tác       | ✅ Tương tác (Duyệt cấp 2) | ✅ Tương tác (Duyệt cấp 3) | ❌                  | ✅ Tương tác       |
+| `/review-queue` (Hàng chờ phản biện) | Danh sách ý tưởng chờ phản biện (cấp Trung tâm/BGH)                          | ❌                 | ❌                            | ❌                 | ✅ Xem, Tương tác          | ✅ Xem, Tương tác          | ❌                  | ✅ Xem (Toàn bộ)   |
+| `/review/form/{id}`                  | Biểu mẫu chấm điểm, nhận xét, duyệt/từ chối                                  | ❌                 | ❌                            | ❌                 | ✅ Tương tác (Duyệt cấp 2) | ✅ Tương tác (Duyệt cấp 3) | ❌                  | ✅ Tương tác       |
 | **D. Cuộc thi & Challenge**          |                                                                              |                    |                               |                    |                            |                            |                     |                    |
 | `/competitions`                      | Danh sách cuộc thi (cấp trường)                                              | ✅ Xem             | ✅ Xem, Đăng ký               | ✅ Xem             | ✅ Tạo, Sửa, Xóa           | ✅ Xem                     | ✅ Xem              | ✅ Quản lý         |
 | `/challenges`                        | Danh sách challenge (từ DN)                                                  | ✅ Xem             | ✅ Xem, Nộp bài               | ✅ Xem             | ✅ Xem                     | ✅ Xem                     | ✅ Tạo, Sửa, Xóa    | ✅ Quản lý         |
@@ -708,11 +718,11 @@ MAIL_FROM_NAME="${APP_NAME}"
 ### 7.2. Cấu trúc Status của Ý tưởng
 
 ```
-draft → submitted_gv → approved_gv → submitted_center → approved_center → submitted_board → approved_final
-                  ↓                        ↓                         ↓
-          needs_change_gv          needs_change_center        needs_change_board
-                  ↓                        ↓                         ↓
-            (Quay lại draft)         (Quay lại draft)          (Quay lại draft)
+draft → submitted_center → approved_center → submitted_board → approved_final
+             ↓                    ↓
+     needs_change_center   needs_change_board
+             ↓                    ↓
+        (Quay lại draft)     (Quay lại draft)
 ```
 
 ### 7.3. Các trạng thái Visibility

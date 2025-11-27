@@ -59,6 +59,22 @@ class Idea extends Model
     }
 
     /**
+     * Thành viên thường (không bao gồm mentor)
+     */
+    public function teamMembers()
+    {
+        return $this->members()->where('role_in_team', 'member');
+    }
+
+    /**
+     * Danh sách cố vấn (mentor)
+     */
+    public function mentors()
+    {
+        return $this->members()->where('role_in_team', 'mentor');
+    }
+
+    /**
      * Ý tưởng có nhiều lời mời
      */
     public function invitations()
@@ -130,6 +146,14 @@ class Idea extends Model
     }
 
     /**
+     * Bình luận nội bộ (team_only) và công khai
+     */
+    public function comments()
+    {
+        return $this->hasMany(IdeaComment::class);
+    }
+
+    /**
      * Ý tưởng có nhiều lượt like (many-to-many với users)
      */
     public function likes()
@@ -173,7 +197,7 @@ class Idea extends Model
 
     public function isApproved(): bool
     {
-        return str_ends_with($this->status, '_final') || str_ends_with($this->status, '_gv') || str_ends_with($this->status, '_center');
+        return $this->status === 'approved_final' || $this->status === 'approved_center';
     }
 
     public function needsChange(): bool

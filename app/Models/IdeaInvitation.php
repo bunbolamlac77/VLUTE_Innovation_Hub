@@ -22,6 +22,7 @@ class IdeaInvitation extends Model
         'token',
         'status',
         'expires_at',
+        'role',
     ];
 
     /**

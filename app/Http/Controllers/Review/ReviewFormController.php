@@ -63,10 +63,9 @@ class ReviewFormController extends Controller
         }
 
         // Xác định review_level dựa trên role của user
-        $reviewLevel = 'gv'; // Mặc định là giảng viên
-        if ($user->hasRole('center')) {
-            $reviewLevel = 'center';
-        } elseif ($user->hasRole('board')) {
+        // Mặc định: phản biện ở cấp Trung tâm (không còn cấp GV)
+        $reviewLevel = 'center';
+        if ($user->hasRole('board')) {
             $reviewLevel = 'board';
         }
 
@@ -96,12 +95,13 @@ class ReviewFormController extends Controller
             // 4. Xử lý hành động
             if ($validated['action'] === 'approve') {
                 // Nếu Duyệt: Cập nhật status của Idea để chuyển lên cấp tiếp theo
-                if ($reviewLevel === 'gv') {
-                    $idea->update(['status' => 'submitted_center']);
-                } elseif ($reviewLevel === 'center') {
+                if ($reviewLevel === 'center') {
                     $idea->update(['status' => 'submitted_board']);
                 } elseif ($reviewLevel === 'board') {
                     $idea->update(['status' => 'approved_final']);
+                } else {
+                    // Fallback: treat as center level in case of legacy/unknown level
+                    $idea->update(['status' => 'submitted_center']);
                 }
 
                 // Đánh dấu assignment là completed
@@ -120,12 +120,13 @@ class ReviewFormController extends Controller
                 ]);
 
                 // Cập nhật status của Idea để trả về cho SV
-                if ($reviewLevel === 'gv') {
-                    $idea->update(['status' => 'needs_change_gv']);
-                } elseif ($reviewLevel === 'center') {
+                if ($reviewLevel === 'center') {
                     $idea->update(['status' => 'needs_change_center']);
                 } elseif ($reviewLevel === 'board') {
                     $idea->update(['status' => 'needs_change_board']);
+                } else {
+                    // Fallback: treat as center level in case of legacy data
+                    $idea->update(['status' => 'needs_change_center']);
                 }
 
                 // Đánh dấu assignment là completed

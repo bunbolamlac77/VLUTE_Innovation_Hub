@@ -10,12 +10,10 @@
 @section('content')
     @php
         $user = auth()->user();
-        $isReviewer = $user && ($user->hasRole('staff') || $user->hasRole('center') || $user->hasRole('board') || $user->hasRole('reviewer'));
+        $isReviewer = $user && ($user->hasRole('center') || $user->hasRole('board') || $user->hasRole('reviewer'));
         $reviewQueue = collect();
         if ($isReviewer) {
             $reviewQueue = \App\Models\Idea::whereIn('status', [
-                'submitted_gv',
-                'needs_change_gv',
                 'submitted_center',
                 'needs_change_center',
                 'submitted_board',
@@ -26,10 +24,9 @@
         if ($user && $user->hasRole('student')) {
             $myDrafts = \App\Models\Idea::where('owner_id', $user->id)->whereIn('status', [
                 'draft',
-                'needs_change_gv',
+                
                 'needs_change_center',
                 'needs_change_board',
-                'submitted_gv',
                 'submitted_center',
                 'submitted_board',
                 'approved_final',
@@ -282,8 +279,8 @@
                                             <td style="text-align:center;">
                                                 @php
                                                     $map = [
-                                                        'submitted_gv' => ['label' => 'Đã nộp (GV)', 'class' => 'badge-blue'],
-                                                        'needs_change_gv' => ['label' => 'Cần chỉnh sửa (GV)', 'class' => 'badge-amber'],
+                                                        
+                                                        
                                                         'submitted_center' => ['label' => 'Đã nộp (TTĐMST)', 'class' => 'badge-blue'],
                                                         'needs_change_center' => ['label' => 'Cần chỉnh sửa (TTĐMST)', 'class' => 'badge-amber'],
                                                         'submitted_board' => ['label' => 'Đã nộp (BGH)', 'class' => 'badge-blue'],
@@ -340,10 +337,8 @@
                                                 @php
                                                     $map = [
                                                         'draft' => ['label' => 'Nháp', 'class' => 'badge-amber'],
-                                                        'needs_change_gv' => ['label' => 'Cần chỉnh sửa (GV)', 'class' => 'badge-amber'],
                                                         'needs_change_center' => ['label' => 'Cần chỉnh sửa (TTĐMST)', 'class' => 'badge-amber'],
                                                         'needs_change_board' => ['label' => 'Cần chỉnh sửa (BGH)', 'class' => 'badge-amber'],
-                                                        'submitted_gv' => ['label' => 'Đã nộp (GV)', 'class' => 'badge-blue'],
                                                         'submitted_center' => ['label' => 'Đã nộp (TTĐMST)', 'class' => 'badge-blue'],
                                                         'submitted_board' => ['label' => 'Đã nộp (BGH)', 'class' => 'badge-blue'],
                                                         'approved_final' => ['label' => 'Đã duyệt (BGH)', 'class' => 'badge-green'],

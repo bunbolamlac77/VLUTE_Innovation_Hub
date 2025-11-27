@@ -33,12 +33,7 @@
                     <select name="status" id="status"
                         style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; background: #fff;">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="submitted_gv" {{ request('status') == 'submitted_gv' ? 'selected' : '' }}>
-                            Đã nộp (GV)
-                        </option>
-                        <option value="needs_change_gv" {{ request('status') == 'needs_change_gv' ? 'selected' : '' }}>
-                            Cần chỉnh sửa (GV)
-                        </option>
+
                         <option value="submitted_center" {{ request('status') == 'submitted_center' ? 'selected' : '' }}>
                             Đã nộp (TTĐMST)
                         </option>
@@ -104,8 +99,8 @@
                                 <td style="padding: 16px 12px;">
                                     @php
                                         $statusLabels = [
-                                            'submitted_gv' => ['label' => 'Chờ duyệt (GV)', 'color' => '#3b82f6'],
-                                            'needs_change_gv' => ['label' => 'Cần sửa (GV)', 'color' => '#f59e0b'],
+                                            
+                                            
                                             'submitted_center' => ['label' => 'Chờ duyệt (TT)', 'color' => '#3b82f6'],
                                             'needs_change_center' => ['label' => 'Cần sửa (TT)', 'color' => '#f59e0b'],
                                             'submitted_board' => ['label' => 'Chờ duyệt (BGH)', 'color' => '#3b82f6'],

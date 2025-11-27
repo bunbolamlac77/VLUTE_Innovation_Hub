@@ -154,7 +154,8 @@
 
             <div class="inviter-info">
                 <strong>Người mời:</strong> {{ $inviter->name }}<br>
-                <strong>Email:</strong> {{ $inviter->email }}
+                <strong>Email:</strong> {{ $inviter->email }}<br>
+                <strong>Vai trò mời:</strong> {{ $invitation->role === 'mentor' ? 'Cố vấn (Mentor)' : 'Thành viên' }}
             </div>
 
             <div class="actions">

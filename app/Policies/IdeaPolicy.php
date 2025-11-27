@@ -25,15 +25,12 @@ class IdeaPolicy
      */
     public function view(User $user, Idea $idea): bool
     {
-        // 1. User là chủ sở hữu
+        // Chủ sở hữu luôn xem được
         if ($user->id === $idea->owner_id) {
             return true;
         }
-
-        // 2. User là thành viên trong nhóm
-        return $idea->members->contains(function ($member) use ($user) {
-            return $member->user_id === $user->id;
-        });
+        // Thành viên bất kỳ trong nhóm (member, owner, mentor)
+        return $idea->members()->where('user_id', $user->id)->exists();
     }
 
     /**
@@ -41,13 +38,18 @@ class IdeaPolicy
      */
     public function update(User $user, Idea $idea): bool
     {
-        // Chỉ chủ sở hữu mới được cập nhật
-        if ($user->id !== $idea->owner_id) {
-            return false;
+        // Chủ sở hữu có thể cập nhật khi draft hoặc cần chỉnh sửa
+        if ($user->id === $idea->owner_id && ($idea->isDraft() || $idea->needsChange())) {
+            return true;
         }
-
-        // Chỉ cho phép cập nhật khi status là draft hoặc needs_change
-        return $idea->isDraft() || $idea->needsChange();
+        // Mentor có thể chỉnh sửa nếu bật flag
+        if (config('ideas.mentors_can_edit')) {
+            return $idea->members()
+                ->where('user_id', $user->id)
+                ->where('role_in_team', 'mentor')
+                ->exists();
+        }
+        return false;
     }
 
     /**
@@ -85,8 +87,16 @@ class IdeaPolicy
             return false;
         }
 
-        // Chỉ cho phép nộp khi status là draft hoặc needs_change
-        return $idea->isDraft() || $idea->needsChange();
+        if (!($idea->isDraft() || $idea->needsChange())) {
+            return false;
+        }
+
+        // Nếu bật yêu cầu mentor, bắt buộc phải có ít nhất 1 mentor
+        if (config('ideas.require_mentor_to_submit')) {
+            return $idea->members()->where('role_in_team', 'mentor')->exists();
+        }
+
+        return true;
     }
 
     /**
@@ -94,11 +104,8 @@ class IdeaPolicy
      */
     public function approve(User $user, Idea $idea): bool
     {
-        // Chỉ Giảng viên, Trung tâm ĐMST, hoặc BGH
-        return $user->hasRole('staff') ||
-            $user->hasRole('center') ||
-            $user->hasRole('board') ||
-            $user->hasRole('reviewer');
+        // Giảng viên KHÔNG còn quyền duyệt. Chỉ Trung tâm ĐMST, BGH (Admin đã cho phép ở before)
+        return $user->hasRole('center') || $user->hasRole('board');
     }
 
     /**
@@ -106,24 +113,19 @@ class IdeaPolicy
      */
     public function review(User $user, Idea $idea): bool
     {
-        // 1. User phải là GV, TTDMST hoặc BGH (hoặc Admin - đã xử lý ở 'before')
-        if (!$user->hasRole('staff') && !$user->hasRole('center') && !$user->hasRole('board') && !$user->hasRole('reviewer')) {
+        // Chỉ Trung tâm ĐMST, BGH hoặc role reviewer (nếu có) mới được review
+        if (!$user->hasRole('center') && !$user->hasRole('board') && !$user->hasRole('reviewer')) {
             return false;
         }
 
-        // 2. Cho phép review nếu ý tưởng đang ở trạng thái chờ phản biện
+        // Cho phép review khi ở các trạng thái cấp trên
         $reviewableStatuses = [
-            'submitted_gv',
-            'needs_change_gv',
             'submitted_center',
             'needs_change_center',
             'submitted_board',
-            'needs_change_board'
+            'needs_change_board',
         ];
 
-        return in_array($idea->status, $reviewableStatuses);
-
-        // (Nâng cao: Kiểm tra xem user này có được gán (assigned)
-        // cho ý tưởng này trong bảng 'review_assignments' hay không)
+        return in_array($idea->status, $reviewableStatuses, true);
     }
 }

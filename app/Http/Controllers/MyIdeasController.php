@@ -146,7 +146,8 @@ class MyIdeasController extends Controller
             'changeRequests' => function ($query) {
                 $query->with(['review.assignment.reviewer'])->latest();
             },
-            'attachments.uploader'
+            'attachments.uploader',
+            'comments.user'
         ]);
 
         $user = Auth::user();
@@ -251,26 +252,31 @@ class MyIdeasController extends Controller
      */
     public function submit(Idea $idea)
     {
+        // Optional: require at least 1 mentor to submit
+        if (config('ideas.require_mentor_to_submit')) {
+            if (!$idea->members()->where('role_in_team', 'mentor')->exists()) {
+                return redirect()->route('my-ideas.show', $idea->id)
+                    ->with('error', 'Vui lòng mời ít nhất 1 Giảng viên làm Cố vấn (Mentor) trước khi nộp.');
+            }
+        }
 
-        // Nếu đang ở trạng thái needs_change, cần xác định cấp nào yêu cầu chỉnh sửa
+        // Map all submissions to center directly
         if ($idea->needsChange()) {
-            // Nếu là needs_change_gv, nộp lại lên GV
-            if ($idea->status === 'needs_change_gv') {
-                $idea->status = 'submitted_gv';
-            } elseif ($idea->status === 'needs_change_center') {
+            if (in_array($idea->status, ['needs_change_center', 'needs_change_board'], true)) {
+                $idea->status = $idea->status === 'needs_change_board' ? 'submitted_board' : 'submitted_center';
+            } else {
+                // includes legacy needs_change_gv
                 $idea->status = 'submitted_center';
-            } elseif ($idea->status === 'needs_change_board') {
-                $idea->status = 'submitted_board';
             }
         } else {
-            // Nếu đang là Draft, nộp lên cấp đầu tiên (GV)
-            $idea->status = 'submitted_gv';
+            // Draft -> Center directly
+            $idea->status = 'submitted_center';
         }
 
         $idea->save();
 
         return redirect()->route('my-ideas.show', $idea->id)
-            ->with('status', 'Ý tưởng đã được nộp thành công!');
+            ->with('status', 'Nộp ý tưởng thành công! Hồ sơ đã được gửi đến Trung tâm ĐMST.');
     }
 
     /**
@@ -281,32 +287,64 @@ class MyIdeasController extends Controller
 
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
+            'role'  => ['nullable', 'in:member,mentor'],
         ]);
 
-        $email = $validated['email'];
+        $email = strtolower($validated['email']);
+        $role = $validated['role'] ?? 'member';
+
+        // Nếu mời mentor: chỉ chủ sở hữu mới được mời (an toàn nghiệp vụ)
+        if ($role === 'mentor' && Auth::id() !== $idea->owner_id) {
+            return redirect()->route('my-ideas.show', $idea->id)
+                ->with('error', 'Chỉ chủ sở hữu ý tưởng mới được mời Giảng viên làm Cố vấn.');
+        }
+
+        // Nếu mời mentor: ràng buộc domain và số lượng tối đa
+        if ($role === 'mentor') {
+            if (!str_ends_with($email, '@vlute.edu.vn')) {
+                return redirect()->route('my-ideas.show', $idea->id)
+                    ->with('error', 'Chỉ mời Mentor với email @vlute.edu.vn.');
+            }
+            // Giới hạn số mentor
+            $maxMentors = (int) config('ideas.max_mentors', 3);
+            $mentorCount = $idea->members()->where('role_in_team', 'mentor')->count();
+            if ($mentorCount >= $maxMentors) {
+                return redirect()->route('my-ideas.show', $idea->id)
+                    ->with('error', 'Số lượng Mentor đã đạt giới hạn (' . $maxMentors . ').');
+            }
+        }
 
         // Kiểm tra user có tồn tại không
         $invitedUser = User::where('email', $email)->first();
 
-        // Kiểm tra user đã là member chưa
+        // Nếu có user và role=mentor: kiểm tra vai trò hợp lệ
+        if ($role === 'mentor' && $invitedUser) {
+            if (!$invitedUser->hasRole('staff')) {
+                return redirect()->route('my-ideas.show', $idea->id)
+                    ->with('error', 'Tài khoản này không phải Giảng viên.');
+            }
+        }
+
+        // Kiểm tra đã là member chưa
         if (
             $invitedUser && $idea->members->contains(function ($member) use ($invitedUser) {
                 return $member->user_id === $invitedUser->id;
             })
         ) {
             return redirect()->route('my-ideas.show', $idea->id)
-                ->with('error', 'Người dùng này đã là thành viên của ý tưởng.');
+                ->with('error', 'Người dùng này đã thuộc nhóm.');
         }
 
-        // Kiểm tra đã có lời mời pending chưa
+        // Kiểm tra đã có lời mời pending cùng role chưa
         $existingInvitation = IdeaInvitation::where('idea_id', $idea->id)
             ->where('email', $email)
+            ->where('role', $role)
             ->where('status', 'pending')
             ->first();
 
         if ($existingInvitation && $existingInvitation->isValid()) {
             return redirect()->route('my-ideas.show', $idea->id)
-                ->with('error', 'Đã có lời mời đang chờ phản hồi cho email này.');
+                ->with('error', 'Đã có lời mời đang chờ cho email này (' . ($role === 'mentor' ? 'Mentor' : 'Thành viên') . ').');
         }
 
         // Tạo invitation mới
@@ -314,20 +352,20 @@ class MyIdeasController extends Controller
             'idea_id' => $idea->id,
             'invited_by' => Auth::id(),
             'email' => $email,
+            'role' => $role,
             'status' => 'pending',
-            'expires_at' => now()->addDays(7), // Hết hạn sau 7 ngày
+            'expires_at' => now()->addDays(7),
         ]);
 
         // Gửi email mời
         try {
             Mail::to($email)->send(new IdeaInvitationMail($invitation));
         } catch (\Exception $e) {
-            // Log lỗi nhưng vẫn lưu invitation
             \Log::error('Failed to send invitation email: ' . $e->getMessage());
         }
 
         return redirect()->route('my-ideas.show', $idea->id)
-            ->with('status', 'Lời mời đã được gửi đến ' . $email);
+            ->with('status', 'Đã gửi lời mời ' . ($role === 'mentor' ? 'Mentor' : 'Thành viên') . ' đến ' . $email);
     }
 }
 

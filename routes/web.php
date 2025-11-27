@@ -52,6 +52,12 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::post('/{idea}/invite', [\App\Http\Controllers\MyIdeasController::class, 'invite'])
             ->middleware('can:invite,idea')
             ->name('invite');
+
+        // Team-only comments for mentors and members
+        Route::post('/{idea}/comments', [\App\Http\Controllers\IdeaCommentController::class, 'store'])
+            ->name('comments.store');
+        Route::delete('/{idea}/comments/{comment}', [\App\Http\Controllers\IdeaCommentController::class, 'destroy'])
+            ->name('comments.destroy');
     });
 
     // Review Queue - Hàng chờ phản biện (cho Giảng viên, Trung tâm ĐMST, BGH)

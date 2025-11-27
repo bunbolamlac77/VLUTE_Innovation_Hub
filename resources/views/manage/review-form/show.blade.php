@@ -23,9 +23,7 @@
                 @php
                     $statusLabels = [
                         'draft' => ['label' => 'Nháp', 'color' => '#6b7280'],
-                        'submitted_gv' => ['label' => 'Đã nộp (GV)', 'color' => '#3b82f6'],
-                        'needs_change_gv' => ['label' => 'Cần chỉnh sửa (GV)', 'color' => '#f59e0b'],
-                        'approved_gv' => ['label' => 'Đã duyệt (GV)', 'color' => '#10b981'],
+                        
                         'submitted_center' => ['label' => 'Đã nộp (TTĐMST)', 'color' => '#3b82f6'],
                         'needs_change_center' => ['label' => 'Cần chỉnh sửa (TTĐMST)', 'color' => '#f59e0b'],
                         'approved_center' => ['label' => 'Đã duyệt (TTĐMST)', 'color' => '#10b981'],
