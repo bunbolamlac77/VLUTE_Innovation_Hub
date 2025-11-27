@@ -159,7 +159,7 @@
                 @auth
                     {{-- Khi đã đăng nhập: hiển thị avatar + menu --}}
                     <div class="userbox" id="userBox" aria-haspopup="true" aria-expanded="false">
-                        <img src="{{ asset('images/avatar-default.jpg') }}" alt="Ảnh đại diện" class="avatar"
+                        <img src="{{ Auth::user()->avatar_url ? asset(Auth::user()->avatar_url) : asset('images/avatar-default.jpg') }}" alt="Ảnh đại diện" class="avatar"
                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2740%27 fill=%27%230a0f5a%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2740%27 fill=%27white%27 text-anchor=%27middle%27%3E{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}%3C/text%3E%3C/svg%3E'" />
                         <button class="chev" id="btnUserMenu" aria-label="Mở menu người dùng">
                             ▾
@@ -226,6 +226,26 @@
             </div>
         </div>
     @endif
+
+    {{-- Profile Incomplete Toast (nhẹ, không gây phiền) --}}
+    @auth
+        @if (!Auth::user()->isProfileComplete() && request()->routeIs('profile.edit') === false)
+            <div id="profile-toast" class="flash-toast" role="alert" aria-live="polite"
+                 style="top: 130px;">
+                <div class="flash-toast-content" style="border-left-color:#f59e0b;border-color:#fef3c7;background:#fffbeb;">
+                    <div class="flash-toast-icon" style="background:#fef3c7;color:#f59e0b;">
+                        ⚠️
+                    </div>
+                    <div class="flash-toast-message" style="color:#92400e;">
+                        Hồ sơ của bạn chưa đầy đủ. <a href="{{ route('profile.edit') }}" class="underline font-medium">Cập nhật ngay</a>.
+                    </div>
+                    <button class="flash-toast-close" onclick="closeProfileToast()" aria-label="Đóng thông báo">
+                        ✕
+                    </button>
+                </div>
+            </div>
+        @endif
+    @endauth
 
     {{-- Main Content --}}
     <main>
@@ -327,6 +347,14 @@
                     closeFlashToast();
                 }, 5000);
             }
+
+            // Auto-hide profile toast after 8 seconds
+            const profileToast = document.getElementById('profile-toast');
+            if (profileToast) {
+                setTimeout(() => {
+                    closeProfileToast();
+                }, 8000);
+            }
         });
 
         // Function to close flash toast
@@ -337,6 +365,15 @@
                 setTimeout(() => {
                     toast.remove();
                 }, 300);
+            }
+        }
+
+        // Function to close profile toast
+        function closeProfileToast() {
+            const toast = document.getElementById('profile-toast');
+            if (toast) {
+                toast.classList.add('hiding');
+                setTimeout(() => { toast.remove(); }, 300);
             }
         }
     </script>

@@ -737,3 +737,34 @@ draft → submitted_gv → approved_gv → submitted_center → approved_center 
 **Phiên bản:** 1.0
 
 **Cập nhật lần cuối:** 2025-01-XX
+
+Password@123
+
+gv.cntt@vlute.edu.vn — Khoa CNTT
+gv.ddt@vlute.edu.vn — Khoa Điện – Điện tử
+gv.ckd@vlute.edu.vn — Khoa Cơ khí – Động lực
+gv.kt@vlute.edu.vn — Khoa Kinh tế
+gv.nn@vlute.edu.vn — Khoa Ngoại ngữ
+
+1. Sinh viên
+   Email: student1@st.vlute.edu.vn
+   Role: student
+   Approved: yes, Email verified: yes
+2. Giảng viên (đã gán khoa CNTT)
+   Email: gv.cntt@vlute.edu.vn
+   Role: staff
+   Faculty: Khoa Công nghệ thông tin (CNTT) — nếu chưa có, seeder tự tạo
+   Approved: yes, Email verified: yes
+3. Trung tâm ĐMST
+   Email: center@vlute.edu.vn
+   Role: center
+   Approved: yes, Email verified: yes
+4. Ban giám hiệu
+   Email: board@vlute.edu.vn
+   Role: board
+   Approved: yes, Email verified: yes
+5. Doanh nghiệp
+   Email: hr@acme.example
+   Role: enterprise
+   Approved: yes, Email verified: yes
+   Company: ACME Corp

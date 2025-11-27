@@ -179,6 +179,23 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Hồ sơ đã đủ thông tin cơ bản chưa?
+     */
+    public function isProfileComplete(): bool
+    {
+        $required = [
+            trim((string) $this->name) !== '',
+        ];
+
+        $p = $this->profile; // may be null
+        $required[] = (bool) $p && trim((string) $p->phone) !== '';
+        $required[] = (bool) $p && trim((string) $p->address) !== '';
+        $required[] = trim((string) $this->avatar_url) !== '';
+
+        return !in_array(false, $required, true);
+    }
+
+    /**
      * User đã upload nhiều attachments
      */
     public function uploadedAttachments()

@@ -19,6 +19,11 @@ class Profile extends Model
         'interest_field',
         'phone',
         'bio',
+        'address',
+        'department',
+        'company_address',
+        'class_name',
+        'school_year',
     ];
 
     /**
