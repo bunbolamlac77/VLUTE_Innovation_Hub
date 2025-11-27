@@ -200,22 +200,22 @@
                 </div>
 
                 {{-- Mentors --}}
-                <div class="card" style="margin-bottom: 24px; border-left: 4px solid #8b5cf6;">
+                <div class="card" style="margin-bottom: 24px;">
                     <div class="card-body" style="padding: 24px;">
                         <h3 style="margin: 0 0 20px; font-size: 20px; color: #0f172a; font-weight: 700;">
-                            👨‍🏫 Ban cố vấn / Giảng viên hướng dẫn
+                            🧑‍🏫 Ban cố vấn / Giảng viên hướng dẫn
                         </h3>
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             @forelse ($idea->members->where('role_in_team', 'mentor') as $member)
-                                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f5f3ff; border-radius: 8px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #8b5cf6; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--brand-gray-50); border-radius: 8px;">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--brand-navy); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
                                         {{ strtoupper(substr($member->user->name, 0, 1)) }}
                                     </div>
                                     <div style="flex: 1;">
                                         <div style="font-weight: 600; color: #0f172a;">{{ $member->user->name }}</div>
                                         <div style="font-size: 14px; color: var(--muted);">{{ $member->user->email }}</div>
                                     </div>
-                                    <span class="tag" style="background: #8b5cf620; color: #8b5cf6;">Mentor</span>
+                                    <span class="tag" style="background: rgba(7, 26, 82, 0.1); color: var(--brand-navy);">Mentor</span>
                                 </div>
                             @empty
                                 <p class="text-sm text-gray-500">Chưa có cố vấn nào.</p>
@@ -232,8 +232,8 @@
                                     <input type="hidden" name="role" value="mentor">
                                     <input type="email" name="email" placeholder="Nhập email giảng viên (@vlute.edu.vn)..." required
                                         style="flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px;">
-                                    <button type="submit" class="btn btn-secondary" style="padding: 10px 20px; font-weight: 600;">
-                                        Mời Mentor
+                                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-weight: 600;">
+                                        Mời
                                     </button>
                                 </form>
                                 @error('email')

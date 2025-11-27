@@ -40,6 +40,9 @@
                         <option value="needs_change_center" {{ request('status') == 'needs_change_center' ? 'selected' : '' }}>
                             Cần chỉnh sửa (TTĐMST)
                         </option>
+                        <option value="approved_center" {{ request('status') == 'approved_center' ? 'selected' : '' }}>
+                            Đã duyệt (TTĐMST)
+                        </option>
                         <option value="submitted_board" {{ request('status') == 'submitted_board' ? 'selected' : '' }}>
                             Đã nộp (BGH)
                         </option>

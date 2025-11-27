@@ -22,25 +22,26 @@ class ReviewQueueController extends Controller
             abort(403);
         }
 
-        // Tạm thời: Lấy tất cả ý tưởng đã nộp (cấp Trung tâm trở lên)
-        $query = Idea::whereIn('status', [
-            'submitted_center',
-            'needs_change_center',
-            'submitted_board',
-            'needs_change_board'
-        ])
-            ->with(['owner', 'faculty', 'category', 'members.user'])
-            ->orderBy('updated_at', 'asc'); // Ưu tiên cái cũ
+        // Xây dựng query theo vai trò
+        $query = Idea::query()->with(['owner', 'faculty', 'category', 'members.user']);
 
-        // Lọc theo trạng thái
+        if ($user->hasRole('center') && !$user->hasRole('board')) {
+            // Trung tâm: mặc định chỉ xem hàng chờ submitted_center
+            $query->where('status', 'submitted_center');
+        } elseif ($user->hasRole('board') && !$user->hasRole('center')) {
+            // BGH: xem các hồ sơ đã được TT duyệt (approved_center) hoặc cần sửa ở cấp BGH
+            $query->whereIn('status', ['approved_center', 'submitted_board', 'needs_change_board']);
+        } else {
+            // Reviewer generic: xem các trạng thái cấp trên (an toàn)
+            $query->whereIn('status', ['submitted_center', 'needs_change_center', 'approved_center', 'needs_change_board']);
+        }
+
+        // Lọc theo trạng thái nếu có chọn
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Lọc theo khoa (nếu user là GV thuộc khoa cụ thể)
-        // TODO: Thêm logic lọc theo khoa của GV
-
-        $ideas = $query->paginate(20)->withQueryString();
+        $ideas = $query->orderBy('updated_at', 'asc')->paginate(20)->withQueryString();
 
         return view('manage.review-queue.index', [
             'ideas' => $ideas,

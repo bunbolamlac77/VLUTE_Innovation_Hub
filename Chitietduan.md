@@ -756,6 +756,11 @@ gv.ckd@vlute.edu.vn — Khoa Cơ khí – Động lực
 gv.kt@vlute.edu.vn — Khoa Kinh tế
 gv.nn@vlute.edu.vn — Khoa Ngoại ngữ
 
+student2@st.vlute.edu.vn — tên: Student Two
+student3@st.vlute.edu.vn — tên: Student Three
+student4@st.vlute.edu.vn — tên: Student Four
+student5@st.vlute.edu.vn — tên: Student Five
+
 1. Sinh viên
    Email: student1@st.vlute.edu.vn
    Role: student

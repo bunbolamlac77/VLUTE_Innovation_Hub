@@ -69,17 +69,21 @@
                         </div>
 
                         {{-- Visibility --}}
+                        @php
+                            $vis = old('visibility', $idea->visibility);
+                            if ($vis === 'team_only') { $vis = 'private'; }
+                        @endphp
                         <div style="margin-bottom: 24px;">
                             <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #0f172a;">
                                 Chế độ công khai <span style="color: #ef4444;">*</span>
                             </label>
-                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                                 <label
                                     style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;"
                                     onmouseover="this.style.borderColor='var(--brand-navy)';"
                                     onmouseout="this.style.borderColor='var(--border)';">
                                     <input type="radio" name="visibility" value="private"
-                                        {{ old('visibility', $idea->visibility) === 'private' ? 'checked' : '' }} required>
+                                        {{ $vis === 'private' ? 'checked' : '' }} required>
                                     <div>
                                         <div style="font-weight: 600; color: #0f172a;">Riêng tư</div>
                                         <div style="font-size: 12px; color: var(--muted);">Chỉ bạn và thành viên nhóm</div>
@@ -89,19 +93,8 @@
                                     style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;"
                                     onmouseover="this.style.borderColor='var(--brand-navy)';"
                                     onmouseout="this.style.borderColor='var(--border)';">
-                                    <input type="radio" name="visibility" value="team_only"
-                                        {{ old('visibility', $idea->visibility) === 'team_only' ? 'checked' : '' }}>
-                                    <div>
-                                        <div style="font-weight: 600; color: #0f172a;">Chỉ nhóm</div>
-                                        <div style="font-size: 12px; color: var(--muted);">Thành viên nhóm và người được mời</div>
-                                    </div>
-                                </label>
-                                <label
-                                    style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;"
-                                    onmouseover="this.style.borderColor='var(--brand-navy)';"
-                                    onmouseout="this.style.borderColor='var(--border)';">
                                     <input type="radio" name="visibility" value="public"
-                                        {{ old('visibility', $idea->visibility) === 'public' ? 'checked' : '' }}>
+                                        {{ $vis === 'public' ? 'checked' : '' }}>
                                     <div>
                                         <div style="font-weight: 600; color: #0f172a;">Công khai</div>
                                         <div style="font-size: 12px; color: var(--muted);">Mọi người có thể xem (sau khi duyệt)</div>

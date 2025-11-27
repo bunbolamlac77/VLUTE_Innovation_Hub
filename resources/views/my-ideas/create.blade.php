@@ -76,7 +76,7 @@
                             <label style="display: block; margin-bottom: 12px; font-weight: 600; color: #0f172a; font-size: 15px;">
                                 Chế độ công khai <span style="color: #ef4444;">*</span>
                             </label>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                                 <label
                                     style="display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; background: #fff;"
                                     onmouseover="if(!this.querySelector('input[type=radio]:checked')) { this.style.borderColor='var(--brand-navy)'; this.style.boxShadow='0 4px 12px rgba(10, 15, 90, 0.1)'; this.style.transform='translateY(-2px)'; }"
@@ -89,18 +89,7 @@
                                         <div style="font-size: 13px; color: var(--muted); line-height: 1.5;">Chỉ bạn và thành viên nhóm</div>
                                     </div>
                                 </label>
-                                <label
-                                    style="display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; background: #fff;"
-                                    onmouseover="if(!this.querySelector('input[type=radio]:checked')) { this.style.borderColor='var(--brand-navy)'; this.style.boxShadow='0 4px 12px rgba(10, 15, 90, 0.1)'; this.style.transform='translateY(-2px)'; }"
-                                    onmouseout="if(!this.querySelector('input[type=radio]:checked')) { this.style.borderColor='var(--border)'; this.style.boxShadow='none'; this.style.transform='translateY(0)'; }">
-                                    <input type="radio" name="visibility" value="team_only"
-                                        {{ old('visibility') === 'team_only' ? 'checked' : '' }}
-                                        onchange="document.querySelectorAll('label[for^=visibility]').forEach(l => { if(l.querySelector('input[type=radio]:checked')) { l.style.borderColor='var(--brand-navy)'; l.style.background='rgba(10, 15, 90, 0.05)'; l.style.boxShadow='0 4px 12px rgba(10, 15, 90, 0.15)'; } else { l.style.borderColor='var(--border)'; l.style.background='#fff'; l.style.boxShadow='none'; } });">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 700; color: #0f172a; font-size: 15px; margin-bottom: 6px;">Chỉ nhóm</div>
-                                        <div style="font-size: 13px; color: var(--muted); line-height: 1.5;">Thành viên nhóm và người được mời</div>
-                                    </div>
-                                </label>
+
                                 <label
                                     style="display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; background: #fff;"
                                     onmouseover="if(!this.querySelector('input[type=radio]:checked')) { this.style.borderColor='var(--brand-navy)'; this.style.boxShadow='0 4px 12px rgba(10, 15, 90, 0.1)'; this.style.transform='translateY(-2px)'; }"

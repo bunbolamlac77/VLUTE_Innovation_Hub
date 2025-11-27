@@ -8,5 +8,8 @@ return [
 
     // Giới hạn số mentor tối đa cho mỗi ý tưởng
     'max_mentors' => env('IDEAS_MAX_MENTORS', 3),
+
+    // Nếu true: sau khi Trung tâm duyệt, chuyển lên BGH; nếu false: duyệt cuối luôn tại Trung tâm
+    'require_board_approval' => env('IDEAS_REQUIRE_BOARD_APPROVAL', true),
 ];
 

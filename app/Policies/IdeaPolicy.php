@@ -113,19 +113,21 @@ class IdeaPolicy
      */
     public function review(User $user, Idea $idea): bool
     {
-        // Chỉ Trung tâm ĐMST, BGH hoặc role reviewer (nếu có) mới được review
+        // Chỉ Trung tâm ĐMST, BGH hoặc reviewer (nếu có) mới được review
         if (!$user->hasRole('center') && !$user->hasRole('board') && !$user->hasRole('reviewer')) {
             return false;
         }
 
-        // Cho phép review khi ở các trạng thái cấp trên
-        $reviewableStatuses = [
-            'submitted_center',
-            'needs_change_center',
-            'submitted_board',
-            'needs_change_board',
-        ];
+        // Ràng buộc theo trạng thái và vai trò
+        $centerStatuses = ['submitted_center', 'needs_change_center'];
+        $boardStatuses  = ['approved_center', 'submitted_board', 'needs_change_board'];
 
-        return in_array($idea->status, $reviewableStatuses, true);
+        if (in_array($idea->status, $centerStatuses, true)) {
+            return $user->hasRole('center') || $user->hasRole('reviewer');
+        }
+        if (in_array($idea->status, $boardStatuses, true)) {
+            return $user->hasRole('board') || $user->hasRole('reviewer');
+        }
+        return false;
     }
 }

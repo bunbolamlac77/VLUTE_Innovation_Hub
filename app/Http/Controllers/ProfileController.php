@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -55,26 +56,28 @@ class ProfileController extends Controller
             // Cập nhật PROFILE: phone, address, faculty_id, company_name, position
             $profile = $user->profile ?: new \App\Models\Profile(['user_id' => $user->id]);
             $profile->phone = $data['phone'] ?? $profile->phone;
-            $profile->address = $data['address'] ?? $profile->address;
-            if (array_key_exists('faculty_id', $data)) {
+            if (Schema::hasColumn('profiles', 'address') && array_key_exists('address', $data)) {
+                $profile->address = $data['address'] ?: null;
+            }
+            if (Schema::hasColumn('profiles', 'faculty_id') && array_key_exists('faculty_id', $data)) {
                 $profile->faculty_id = $data['faculty_id'] ?: null;
             }
-            if (array_key_exists('company_name', $data)) {
+            if (Schema::hasColumn('profiles', 'company_name') && array_key_exists('company_name', $data)) {
                 $profile->company_name = $data['company_name'] ?: null;
             }
-            if (array_key_exists('position', $data)) {
+            if (Schema::hasColumn('profiles', 'position') && array_key_exists('position', $data)) {
                 $profile->position = $data['position'] ?: null;
             }
-            if (array_key_exists('company_address', $data)) {
+            if (Schema::hasColumn('profiles', 'company_address') && array_key_exists('company_address', $data)) {
                 $profile->company_address = $data['company_address'] ?: null;
             }
-            if (array_key_exists('department', $data)) {
+            if (Schema::hasColumn('profiles', 'department') && array_key_exists('department', $data)) {
                 $profile->department = $data['department'] ?: null;
             }
-            if (array_key_exists('class_name', $data)) {
+            if (Schema::hasColumn('profiles', 'class_name') && array_key_exists('class_name', $data)) {
                 $profile->class_name = $data['class_name'] ?: null;
             }
-            if (array_key_exists('school_year', $data)) {
+            if (Schema::hasColumn('profiles', 'school_year') && array_key_exists('school_year', $data)) {
                 $profile->school_year = $data['school_year'] ?: null;
             }
             $profile->save();

@@ -55,6 +55,28 @@ class ApprovedUsersSeeder extends Seeder
             );
             $student->syncRoles(['student']);
 
+            // Thêm 4 tài khoản sinh viên nữa
+            $moreStudents = [
+                ['email' => 'student2@st.vlute.edu.vn', 'name' => 'Student Two'],
+                ['email' => 'student3@st.vlute.edu.vn', 'name' => 'Student Three'],
+                ['email' => 'student4@st.vlute.edu.vn', 'name' => 'Student Four'],
+                ['email' => 'student5@st.vlute.edu.vn', 'name' => 'Student Five'],
+            ];
+            foreach ($moreStudents as $s) {
+                $u = User::firstOrCreate(
+                    ['email' => $s['email']],
+                    [
+                        'name' => $s['name'],
+                        'password' => Hash::make($defaultPassword),
+                        'role' => 'student',
+                        'approval_status' => 'approved',
+                        'is_active' => true,
+                        'email_verified_at' => now(),
+                    ]
+                );
+                $u->syncRoles(['student']);
+            }
+
             // 2-6) 5 tài khoản Giảng viên theo 5 khoa khác nhau (đã duyệt sẵn)
             $lecturers = [
                 ['email' => 'gv.cntt@vlute.edu.vn', 'name' => 'GV CNTT', 'faculty' => $facultyCNTT],

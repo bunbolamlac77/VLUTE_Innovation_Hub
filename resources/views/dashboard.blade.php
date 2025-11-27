@@ -16,15 +16,27 @@
             $reviewQueue = \App\Models\Idea::whereIn('status', [
                 'submitted_center',
                 'needs_change_center',
+                'approved_center',
                 'submitted_board',
                 'needs_change_board',
             ])->with(['owner', 'faculty', 'category'])->orderBy('updated_at', 'asc')->limit(10)->get();
+        }
+        // Lời mời Mentor cho giảng viên (đồng bộ với email)
+        $mentorInvites = collect();
+        if ($user && $user->hasRole('staff')) {
+            $mentorInvites = \App\Models\IdeaInvitation::with(['idea','inviter'])
+                ->where('email', $user->email)
+                ->where('status', 'pending')
+                ->where('role', 'mentor')
+                ->where(function($q){ $q->whereNull('expires_at')->orWhere('expires_at','>', now()); })
+                ->latest()
+                ->limit(10)
+                ->get();
         }
         $myDrafts = collect();
         if ($user && $user->hasRole('student')) {
             $myDrafts = \App\Models\Idea::where('owner_id', $user->id)->whereIn('status', [
                 'draft',
-                
                 'needs_change_center',
                 'needs_change_board',
                 'submitted_center',
@@ -279,8 +291,6 @@
                                             <td style="text-align:center;">
                                                 @php
                                                     $map = [
-                                                        
-                                                        
                                                         'submitted_center' => ['label' => 'Đã nộp (TTĐMST)', 'class' => 'badge-blue'],
                                                         'needs_change_center' => ['label' => 'Cần chỉnh sửa (TTĐMST)', 'class' => 'badge-amber'],
                                                         'submitted_board' => ['label' => 'Đã nộp (BGH)', 'class' => 'badge-blue'],
@@ -298,6 +308,54 @@
                                     @empty
                                         <tr>
                                             <td colspan="6">Không có ý tưởng nào trong hàng chờ.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if ($user && $user->hasRole('staff'))
+                <div class="dash-card">
+                    <div class="card-body">
+                        <div style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 12px;">
+                            <div>
+                                <h2 class="dash-title">Lời mời Mentor</h2>
+                                <div class="dash-subtitle">Các lời mời tham gia cố vấn dành cho bạn</div>
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden;">
+                            <table class="dash-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ý tưởng</th>
+                                        <th>Người mời</th>
+                                        <th>Thời gian</th>
+                                        <th class="cell-right">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($mentorInvites as $inv)
+                                        <tr>
+                                            <td>
+                                                <div style="font-weight:700; color:#0f172a;">{{ $inv->idea?->title ?? 'Ý tưởng (đã xóa)' }}</div>
+                                                <div class="muted">{{ $inv->email }}</div>
+                                            </td>
+                                            <td>
+                                                <div style="font-weight:600; color:#0f172a;">{{ $inv->inviter?->name ?? 'N/A' }}</div>
+                                                <div class="muted">{{ $inv->inviter?->email ?? '' }}</div>
+                                            </td>
+                                            <td class="muted">{{ $inv->created_at?->diffForHumans() }}</td>
+                                            <td class="cell-right">
+                                                <a href="{{ route('invitations.accept', $inv->token) }}" class="btn btn-primary" style="margin-right:8px;">Chấp nhận</a>
+                                                <a href="{{ route('invitations.decline', $inv->token) }}" class="btn btn-ghost">Từ chối</a>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="muted" style="padding:16px 12px;">Không có lời mời nào.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

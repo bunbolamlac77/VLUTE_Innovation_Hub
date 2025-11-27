@@ -96,12 +96,21 @@ class ReviewFormController extends Controller
             if ($validated['action'] === 'approve') {
                 // Nếu Duyệt: Cập nhật status của Idea để chuyển lên cấp tiếp theo
                 if ($reviewLevel === 'center') {
-                    $idea->update(['status' => 'submitted_board']);
+                    // Trung tâm duyệt: hoặc approved_center, hoặc duyệt cuối nếu không yêu cầu BGH
+                    if (config('ideas.require_board_approval')) {
+                        $idea->update(['status' => 'approved_center']);
+                    } else {
+                        $idea->update(['status' => 'approved_final']);
+                    }
                 } elseif ($reviewLevel === 'board') {
                     $idea->update(['status' => 'approved_final']);
                 } else {
-                    // Fallback: treat as center level in case of legacy/unknown level
-                    $idea->update(['status' => 'submitted_center']);
+                    // Fallback an toàn: coi như cấp Trung tâm
+                    if (config('ideas.require_board_approval')) {
+                        $idea->update(['status' => 'approved_center']);
+                    } else {
+                        $idea->update(['status' => 'approved_final']);
+                    }
                 }
 
                 // Đánh dấu assignment là completed
