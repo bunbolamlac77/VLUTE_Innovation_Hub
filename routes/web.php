@@ -5,6 +5,7 @@ use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\CompetitionRegistrationController;
 use App\Http\Controllers\MyCompetitionsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SearchController;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 
@@ -21,6 +22,9 @@ Route::get('/competitions/{competition:slug}', [CompetitionController::class, 's
 
 // Events page (Cuộc thi & Sự kiện)
 Route::get('/events', [\App\Http\Controllers\EventsController::class, 'index'])->name('events.index');
+
+// Search page
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
 // Public Ideas (Ngân hàng Ý tưởng) - Trang công khai
 Route::get('/ideas', [\App\Http\Controllers\PublicIdeaController::class, 'index'])->name('ideas.index');

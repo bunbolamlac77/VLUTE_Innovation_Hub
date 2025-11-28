@@ -193,12 +193,17 @@
                 <a href="/news" data-key="news">Bản tin Nghiên cứu</a>
             </nav>
             <div class="menu-right">
-                <input type="search" placeholder="Tìm ý tưởng, cuộc thi, mentor…" style="
-              padding: 10px 12px;
-              border: 1px solid var(--border);
-              border-radius: 999px;
-              width: 260px;
-            " aria-label="Ô tìm kiếm" />
+                <form method="GET" action="{{ route('search.index') }}" style="display:flex; gap:8px; align-items:center;">
+                    <input type="search" name="q" value="{{ request('q') }}" placeholder="Tìm ý tưởng, cuộc thi, mentor…" style="
+                      padding: 10px 12px;
+                      border: 1px solid var(--border);
+                      border-radius: 999px;
+                      width: 260px;
+                    " aria-label="Ô tìm kiếm" />
+                    <button type="submit" class="btn" style="padding: 10px 14px; border: 1px solid var(--border); border-radius: 999px; background: #fff; font-weight: 700;">
+                        Tìm
+                    </button>
+                </form>
             </div>
             <div id="dropdown" class="dropdown hidden" role="menu" aria-label="Danh mục con"></div>
         </div>

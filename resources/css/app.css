@@ -1940,7 +1940,7 @@ body.bg-gray-50 .container {
     z-index: 60;
     background: #fff;
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
 }
 .menu-inner {
     display: flex;
@@ -1961,13 +1961,11 @@ body.bg-gray-50 .container {
     border: 0;
     cursor: pointer;
     font-size: var(--fs-menu);
-    transition: background 0.2s ease, color 0.2s ease;
+    transition: background 0.15s ease;
 }
 .menu a:hover,
 .menu button:hover {
     background: var(--brand-gray-50);
-    color: var(--brand-navy);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .menu {
     display: flex;
@@ -2258,10 +2256,37 @@ footer .legal {
 }
 
 /* -------------------- Profile Page Enhancements -------------------- */
-.pw-bar { height: 6px; border-radius: 999px; background: #e5e7eb; margin-top: 8px; overflow: hidden; }
-.pw-bar > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #f43f5e, #f59e0b, #22c55e); transition: width .25s ease; }
+.pw-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    margin-top: 8px;
+    overflow: hidden;
+}
+.pw-bar > span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #f43f5e, #f59e0b, #22c55e);
+    transition: width 0.25s ease;
+}
 
-.profile .card { border-radius: 12px; box-shadow: var(--shadow); }
-.profile .field { margin-bottom: 12px; }
-.profile .avatar-wrap { display:flex; align-items:center; gap:12px; }
-.profile .avatar-wrap img { width: 72px; height: 72px; border-radius: 999px; object-fit: cover; border:1px solid #e5e7eb; }
+.profile .card {
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+.profile .field {
+    margin-bottom: 12px;
+}
+.profile .avatar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.profile .avatar-wrap img {
+    width: 72px;
+    height: 72px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+}
