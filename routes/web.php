@@ -19,6 +19,9 @@ Route::get('/scientific-news', [\App\Http\Controllers\ScientificNewsController::
 Route::get('/competitions', [CompetitionController::class, 'index'])->name('competitions.index');
 Route::get('/competitions/{competition:slug}', [CompetitionController::class, 'show'])->name('competitions.show');
 
+// Events page (Cuộc thi & Sự kiện)
+Route::get('/events', [\App\Http\Controllers\EventsController::class, 'index'])->name('events.index');
+
 // Public Ideas (Ngân hàng Ý tưởng) - Trang công khai
 Route::get('/ideas', [\App\Http\Controllers\PublicIdeaController::class, 'index'])->name('ideas.index');
 Route::get('/ideas/{slug}', [\App\Http\Controllers\PublicIdeaController::class, 'show'])->name('ideas.show');
@@ -79,6 +82,11 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
     // Attachments Download
     Route::get('/attachments/{id}/download', [\App\Http\Controllers\AttachmentController::class, 'download'])
         ->name('attachments.download');
+
+    // Mentor Dashboard: các dự án đang hướng dẫn
+    Route::get('/mentored-ideas', [\App\Http\Controllers\MentorController::class, 'index'])
+        ->middleware('role:staff')
+        ->name('mentor.ideas');
 });
 
 // Invitation routes (có thể truy cập khi chưa đăng nhập)
@@ -137,6 +145,10 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin']
         // Ideas (MVP: đổi trạng thái + gán reviewer)
         Route::post('/ideas/{idea}/status', [\App\Http\Controllers\Admin\IdeaActionController::class, 'updateStatus'])->name('ideas.status');
         Route::post('/ideas/{idea}/reviewer', [\App\Http\Controllers\Admin\IdeaActionController::class, 'assignReviewer'])->name('ideas.reviewer');
+
+        // Admin CRUD: competitions & news
+        Route::resource('competitions', \App\Http\Controllers\Admin\AdminCompetitionController::class);
+        Route::resource('news', \App\Http\Controllers\Admin\AdminNewsController::class);
     });
 
 // ---- Khu người dùng (chỉ cần đăng nhập) ----
@@ -154,6 +166,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Trang danh sách các cuộc thi SV đã đăng ký
     Route::get('/my-competitions', [MyCompetitionsController::class, 'index'])
          ->name('my-competitions.index');
+
+    // Nộp bài dự thi
+    Route::get('/my-competitions/{registration}/submit', [\App\Http\Controllers\CompetitionSubmissionController::class, 'create'])
+        ->name('competitions.submit.create');
+    Route::post('/my-competitions/{registration}/submit', [\App\Http\Controllers\CompetitionSubmissionController::class, 'store'])
+        ->name('competitions.submit.store');
 });
 
 // Routes Breeze (login / register / verify / forgot ...)

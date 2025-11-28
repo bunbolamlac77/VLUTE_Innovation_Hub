@@ -40,8 +40,8 @@
                                             {{ $reg->competition->end_date->format('d/m/Y H:i') }}
                                         </td>
                                         <td class="px-6 py-4 text-sm font-medium">
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900">
-                                                Nộp bài / Quản lý bài nộp
+                                            <a href="{{ route('competitions.submit.create', $reg->id) }}" class="text-indigo-600 hover:text-indigo-900">
+                                                Nộp bài ngay
                                             </a>
                                         </td>
                                     </tr>

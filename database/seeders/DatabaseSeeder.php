@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminUserSeeder::class);
         $this->call(ApprovedUsersSeeder::class);
         $this->call(FeaturedIdeasSeeder::class);
+        $this->call(CompetitionSeeder::class);
 
         // (Tuỳ chọn) tạo user mẫu bằng factory
         // User::factory(10)->create();

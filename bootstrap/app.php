@@ -15,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'verified.to.login' => \App\Http\Middleware\EnsureEmailIsVerifiedToLogin::class,
             'approved.to.login' => \App\Http\Middleware\EnsureApprovedToLogin::class,
-            'is.admin' => \App\Http\Middleware\EnsureAdmin::class, // <— THÊM DÒNG NÀY
+            'is.admin' => \App\Http\Middleware\EnsureAdmin::class,
+            'role' => \App\Http\Middleware\EnsureRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

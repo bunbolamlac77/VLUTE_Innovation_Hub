@@ -13,7 +13,7 @@
                 @foreach ($competitions as $competition)
                     <div class="card"
                         style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px #0000000d;">
-                        <a href="{{ route('competitions.show', $competition) }}">
+                        <a href="{{ route('competitions.show', $competition->slug) }}">
                             <img src="{{ $competition->banner_url ?? '/images/panel-truong.jpg' }}" alt="{{ $competition->title }}"
                                 style="width: 100%; height: 200px; object-fit: cover;">
                         </a>

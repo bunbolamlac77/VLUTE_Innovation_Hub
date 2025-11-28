@@ -16,11 +16,25 @@ class AttachmentController extends Controller
     {
         $attachment = Attachment::findOrFail($id);
 
-        // Lấy đối tượng cha (ví dụ: Idea)
-        $idea = $attachment->attachable;
+        // Lấy đối tượng cha (Idea, CompetitionSubmission, ...)
+        $parent = $attachment->attachable;
 
-        // Kiểm tra quyền - chỉ cho phép download nếu user có quyền xem idea
-        if (!$idea || !Auth::user()->can('view', $idea)) {
+        // Kiểm tra quyền theo loại đối tượng
+        $user = Auth::user();
+        $authorized = false;
+
+        if ($parent instanceof \App\Models\Idea) {
+            $authorized = $user && $user->can('view', $parent);
+        } elseif ($parent instanceof \App\Models\CompetitionSubmission) {
+            // Chủ đăng ký cuộc thi, hoặc admin/center/board có thể tải
+            $regUserId = optional($parent->registration)->user_id;
+            $authorized = $user && (
+                $user->id === $regUserId ||
+                $user->hasRole('admin') || $user->hasRole('center') || $user->hasRole('board')
+            );
+        }
+
+        if (!$authorized) {
             abort(403, 'Bạn không có quyền truy cập file này.');
         }
 

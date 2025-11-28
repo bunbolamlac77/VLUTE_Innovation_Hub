@@ -25,7 +25,7 @@
                 </div>
                 <div class="cta">
                     <a class="btn btn-ghost" href="#submit">Gửi ý tưởng</a>
-                    <a class="btn btn-ghost" href="#events">Đăng ký cuộc thi</a>
+                    <a class="btn btn-ghost" href="{{ route('competitions.index') }}">Đăng ký cuộc thi</a>
                     <a class="btn btn-ghost" href="#mentors">Đặt lịch mentor</a>
                 </div>
             </div>
@@ -96,7 +96,7 @@
     <section id="events" class="container">
         <div class="section-header">
             <h2 class="section-title">Cuộc thi & Sự kiện</h2>
-            <a class="muted-link" href="#">Xem tất cả →</a>
+            <a class="muted-link" href="{{ route('competitions.index') }}">Xem tất cả →</a>
         </div>
         <div class="tabs" role="tablist">
             <button class="tab active" data-tab="open" role="tab" aria-selected="true">
@@ -107,7 +107,30 @@
             </button>
             <button class="tab" data-tab="past" role="tab">Đã kết thúc</button>
         </div>
-        <div class="grid-4" id="compGrid"></div>
+        <div class="grid-4">
+            @forelse($openCompetitions as $c)
+                <article class="item" style="display:flex; flex-direction:column; height:100%;">
+                    <div class="thumb" style="background: linear-gradient(135deg, #c7d2fe, #a7f3d0); height: 180px;"></div>
+                    <div class="meta" style="display:flex; flex-direction:column; flex:1;">
+                        <div class="row" style="margin-bottom:8px;">
+                            <span class="tag">Cuộc thi</span>
+                            <span style="font-size:12px;color:#6b7280">{{ optional($c->end_date)->format('d/m/Y H:i') }}</span>
+                        </div>
+                        <h5 style="margin:0 0 8px; line-height:1.35;">
+                            <a href="{{ route('competitions.show', $c->slug) }}" style="text-decoration:none; color:#0f172a;">{{ $c->title }}</a>
+                        </h5>
+                        <div class="actions" style="margin-top:auto; display:flex; gap:8px; align-items:center; padding-top:12px;">
+                            <a class="btn btn-ghost" href="{{ route('competitions.show', $c->slug) }}">Xem chi tiết</a>
+                            <a class="btn btn-primary" href="{{ route('competitions.show', $c->slug) }}">Đăng ký</a>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: #6b7280;">
+                    Chưa có cuộc thi nào đang mở.
+                </div>
+            @endforelse
+        </div>
     </section>
 
     <br />
@@ -341,7 +364,9 @@
             counterObserver.observe(section);
         });
 
-        // Mock data for cards
+        // Mock data for cards (kept only if compGrid exists on some pages)
+        const compGridEl = document.getElementById('compGrid');
+        if (compGridEl) {
         const comps = {
             open: [
                 {
@@ -401,7 +426,7 @@
 
         // Ideas data is now loaded from database via $featuredIdeas variable in Blade template
 
-        const news = [
+        var news = [
             {
                 title: 'Hội thảo "Ứng dụng trí tuệ nhân tạo trong giáo dục kỹ thuật"',
                 date: '06/02/2025',
@@ -454,20 +479,9 @@
                 renderComps(t.dataset.tab);
             });
         });
+        }
 
-        document.getElementById('featuredGrid').innerHTML = ideas
-            .map(
-                (idea) =>
-                    `
-                                <article class="item">
-                                  <div class="thumb"></div>
-                                  <div class="meta">
-                                    <div class="row"><span class="tag">${idea.dept || 'General'}</span></div>
-                                    <h5>${idea.title}</h5>
-                                  </div>
-                                </article>`
-            )
-            .join('');
+        // featured ideas rendered by Blade
         document.getElementById('newsGrid').innerHTML = news
             .map(
                 (n) =>
@@ -498,9 +512,8 @@
         // Scroller/Marquee Logic
         const scrollers = document.querySelectorAll('.scroller');
 
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            addAnimation();
-        }
+        // Luôn kích hoạt marquee logo (bỏ điều kiện giảm chuyển động để đảm bảo chạy)
+        addAnimation();
 
         function addAnimation() {
             scrollers.forEach((scroller) => {

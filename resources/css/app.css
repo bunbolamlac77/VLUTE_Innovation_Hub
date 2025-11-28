@@ -1187,10 +1187,11 @@ section {
 }
 
 .item .meta {
-    padding: 14px;
+    padding: 16px; /* tăng nhẹ để thoáng hơn */
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    flex: 1; /* chiếm phần còn lại để actions có thể dính đáy */
+    gap: 10px; /* đồng bộ khoảng cách */
 }
 
 .item .meta h5 {
@@ -1211,8 +1212,19 @@ section {
 
 .item .meta .actions {
     display: flex;
-    gap: 8px;
-    margin-top: 4px;
+    gap: 10px;
+    margin-top: auto; /* đẩy nhóm nút xuống đáy thẻ */
+    padding-top: 12px; /* khoảng cách với nội dung trên */
+}
+
+/* tinh chỉnh spacing cho hàng tag + thời gian trong card */
+.item .meta .row {
+    margin-bottom: 4px;
+}
+
+/* đồng bộ khoảng cách trong meta */
+.item .meta {
+    gap: 10px;
 }
 
 .tabs {

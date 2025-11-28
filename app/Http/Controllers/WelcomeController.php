@@ -23,7 +23,16 @@ class WelcomeController extends Controller
             ->take(4)
             ->get();
 
-        return view('welcome', compact('featuredIdeas'));
+        // Lấy 4 cuộc thi đang mở (đang chạy và chưa hết hạn)
+        $openCompetitions = \App\Models\Competition::where('status', 'open')
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>', now());
+            })
+            ->orderBy('start_date', 'desc')
+            ->take(4)
+            ->get();
+
+        return view('welcome', compact('featuredIdeas', 'openCompetitions'));
     }
 }
 
