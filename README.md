@@ -1,288 +1,173 @@
 # VLUTE Innovation Hub
 
-## 📖 Giới thiệu
+Nền tảng phục vụ Đổi mới Sáng tạo tại Trường Đại học Sư phạm Kỹ thuật Vĩnh Long (VLUTE). Kết nối sinh viên – giảng viên (mentor) – doanh nghiệp/đối tác – trung tâm để hình thành, ươm tạo và triển khai ý tưởng.
 
-**VLUTE Innovation Hub** là một nền tảng quản lý ý tưởng đổi mới sáng tạo được phát triển cho Trường Đại học Sư phạm Kỹ thuật Vĩnh Long (VLUTE). Hệ thống kết nối sinh viên – giảng viên – mentor – doanh nghiệp – đối tác để cùng giải quyết các bài toán thực tế, tổ chức đợt gọi ý tưởng, cohort ươm tạo và hỗ trợ truyền thông nghiên cứu.
+## 1) Kiến trúc & Công nghệ
 
-### Mục tiêu
+-   PHP 8.2+ · Laravel 12
+-   View: Blade · Build: Vite
+-   CSS: Tailwind CSS (100% utilities – xem thêm TAILWIND.md)
+-   JS nhẹ: Alpine.js
+-   DB mặc định: SQLite (có tuỳ chọn MySQL Docker)
 
--   **Kết nối hệ sinh thái**: Kết nối các bên liên quan để cùng giải quyết bài toán thực tế
--   **Ươm tạo & đồng hành**: Tổ chức gọi ý tưởng, cohort ươm tạo, workshop và cố vấn chuyên sâu
--   **Lan toả nghiên cứu**: Hỗ trợ truyền thông, công bố bản tin nghiên cứu, giới thiệu giải pháp tiêu biểu
+## 2) Tính năng chính
 
-## 🚀 Tính năng chính
+Công khai
 
-### Đối với người dùng công khai
+-   Trang chủ với số liệu tổng quan động (ý tưởng công khai đã duyệt, mentor, đối tác, cuộc thi đang mở)
+-   Ngân hàng ý tưởng (danh sách/chi tiết theo slug, like cần đăng nhập)
+-   Cuộc thi & sự kiện (danh sách/chi tiết, đăng ký)
+-   Bản tin Nghiên cứu Khoa học (route: `scientific-news.index`)
 
--   Xem danh sách ý tưởng công khai (Ngân hàng Ý tưởng)
--   Xem chi tiết ý tưởng theo slug
--   Thích (like) ý tưởng (cần đăng nhập)
+Đã đăng nhập
 
-### Đối với người dùng đã đăng nhập
+-   Hồ sơ cá nhân (avatar, thông tin cơ bản; kiểm tra hoàn thiện hồ sơ)
+-   Ý tưởng của tôi (tạo/cập nhật/xoá, mời thành viên, nhận xét nội bộ, nộp duyệt)
+-   Đăng ký cuộc thi, nộp bài
 
--   Quản lý hồ sơ cá nhân
--   Dashboard quản lý ý tưởng
--   Tương tác với ý tưởng
+Quản trị
 
-### Đối với Admin
+-   Phê duyệt tài khoản; Khoá/Mở khoá
+-   Phân quyền/đổi vai (student/staff/center/board/reviewer/admin)
+-   Quản trị Phân loại: Khoa, Danh mục, Thẻ
+-   Gán người phản biện (reviewer), đổi trạng thái ý tưởng
 
--   Quản lý người dùng và phân quyền
--   Duyệt/ từ chối tài khoản người dùng mới
--   Quản lý phân loại: Khoa (Faculties), Danh mục (Categories), Thẻ (Tags)
--   Quản lý ý tưởng: Cập nhật trạng thái, gán reviewer
+## 3) Cài đặt nhanh
 
-## 🛠️ Công nghệ sử dụng
+### Yêu cầu
 
-### Backend
+-   PHP ≥ 8.2, Composer
+-   Node ≥ 18, npm
+-   SQLite (mặc định) hoặc MySQL Docker (tùy chọn)
 
--   **PHP**: ^8.2
--   **Laravel**: ^12.0
--   **Database**: SQLite (mặc định)
-
-### Frontend
-
--   **TailwindCSS**: ^3.1.0
--   **AlpineJS**: ^3.4.2
--   **Vite**: ^7.0.7
--   **Laravel Breeze**: ^2.3 (Authentication)
-
-### Development Tools
-
--   **PHPUnit**: ^11.5.3 (Testing)
--   **Laravel Pint**: ^1.24 (Code formatting)
--   **Laravel Sail**: ^1.41 (Docker development)
-
-## 📋 Yêu cầu hệ thống
-
--   PHP >= 8.2
--   Composer
--   Node.js >= 18.x và npm
--   SQLite (hoặc có thể cấu hình MySQL/PostgreSQL)
-
-## 🔧 Cài đặt
-
-### Bước 1: Clone repository
-
-```bash
-git clone <repository-url>
-cd vlute-innovation-hub
-```
-
-### Bước 2: Cài đặt dependencies PHP
+### Bước 1. Cài dependencies
 
 ```bash
 composer install
+npm install
 ```
 
-### Bước 3: Cấu hình môi trường
-
-Tạo file `.env` từ `.env.example` (nếu có) hoặc tạo mới:
+### Bước 2. Tạo .env và khoá ứng dụng
 
 ```bash
-cp .env.example .env
-# Hoặc tạo file .env mới
+cp .env.example .env  # nếu .env chưa có
+php artisan key:generate
 ```
 
-Cấu hình database trong file `.env`:
+### Bước 3. Chọn DB
+
+-   Mặc định (khuyên dùng khi dev): SQLite
 
 ```env
 DB_CONNECTION=sqlite
-# Hoặc sử dụng MySQL/PostgreSQL
-# DB_CONNECTION=mysql
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
-# DB_DATABASE=vlute_innovation_hub
-# DB_USERNAME=root
-# DB_PASSWORD=
+DB_DATABASE=database/database.sqlite
 ```
-
-Nếu dùng SQLite, đảm bảo file database tồn tại:
 
 ```bash
 touch database/database.sqlite
 ```
 
-### Bước 4: Tạo application key
+-   Tuỳ chọn MySQL Docker (docker-compose.yml có sẵn)
 
 ```bash
-php artisan key:generate
+docker compose up -d mysql
 ```
 
-### Bước 5: Chạy migrations và seeders
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3307
+DB_DATABASE=vlute_innovation_hub
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
+
+### Bước 4. Migrate & seed
 
 ```bash
-php artisan migrate
-php artisan db:seed
+php artisan migrate --seed
 ```
 
 Seeder sẽ tạo:
 
--   Các roles cơ bản
--   Tài khoản Admin mặc định
+-   Roles mặc định
+-   Tài khoản Admin (email: `env(ADMIN_EMAIL,'admin@vlute.edu.vn')`, mật khẩu: `env(ADMIN_PASSWORD,'Admin@123')`)
 
-### Bước 6: Cài đặt dependencies Node.js
+### Bước 5. Chạy ứng dụng
 
-```bash
-npm install
-```
-
-### Bước 7: Build assets (hoặc chạy dev server)
-
-**Để phát triển (development):**
+-   Dev 2 cửa sổ:
 
 ```bash
-npm run dev
+php artisan serve         # http://127.0.0.1:8000
+npm run dev               # Vite dev server
 ```
 
-**Để production:**
+-   Hoặc build production:
 
 ```bash
 npm run build
 ```
 
-## ▶️ Chạy dự án
+## 4) Tailwind CSS
 
-### Chạy development server
+-   Dự án đã chuyển hoàn toàn sang Tailwind utilities.
+-   `resources/css/app.css` chỉ giữ @layer base/components cho các tinh chỉnh nhịp layout và lớp tương thích tạm thời cho các trang admin cũ.
+-   Token (màu/đổ bóng/radius/container) đã cấu hình trong `tailwind.config.js`.
+-   Tài liệu nội bộ: xem `TAILWIND.md`.
 
-Sử dụng script composer để chạy đồng thời nhiều services:
+## 5) Số liệu động trên trang chủ
 
-```bash
-composer run dev
-```
+Controller: `App\Http\Controllers\WelcomeController@index`
 
-Script này sẽ chạy:
+-   Ý tưởng đã nộp (`$ideaCount`): `Idea::publicApproved()->count()`
+-   Mentor (`$mentorCount`): người dùng có `role = 'staff'` hoặc trong pivot `roles.slug in ['staff','reviewer']`
+-   Đối tác (`$partnerCount`): `Organization::count()` nếu có dữ liệu; nếu chưa thì mặc định 13 (bằng số logo đang hiển thị)
+-   Cuộc thi đang mở (`$openCompetitionsCount`): `Competition::where('status','open')->where(end_date>now or null)`
 
--   Laravel development server
--   Queue worker
--   Log viewer (Pail)
--   Vite dev server
+> Lưu ý: Các số hiển thị khác (ví dụ khối Counters) cũng đã bind bằng các biến này.
 
-**Hoặc chạy riêng lẻ:**
+## 6) Luồng xác thực & phê duyệt
 
-Terminal 1 - Laravel server:
+Middleware:
 
-```bash
-php artisan serve
-```
+-   `auth`: yêu cầu đăng nhập
+-   `verified.to.login`: yêu cầu xác thực email
+-   `approved.to.login`: yêu cầu admin phê duyệt (đối với một số vai)
+-   `is.admin`: chỉ cho phép admin
 
-Terminal 2 - Vite dev server:
+Trang đăng nhập/đăng ký/đặt lại mật khẩu/verify đã được làm lại bằng Tailwind utilities, có modal thông báo cho trường hợp chưa verified/approved.
 
-```bash
-npm run dev
-```
+## 7) Lược đồ CSDL chính
 
-Truy cập ứng dụng tại: `http://localhost:8000`
+-   `users`, `roles`, `role_user` (pivot)
+-   `ideas`, `idea_members`, `idea_invitations`, `idea_likes`, `attachments`
+-   `reviews`, `review_assignments`, `change_requests`
+-   `faculties`, `categories`, `tags`, `idea_tag`
+-   `competitions`, `competition_registrations`, `competition_submissions`
+-   (Tuỳ chọn) `organizations` cho đối tác
 
-### Chạy tests
+## 8) Tuyến (routes) tiêu biểu
 
-```bash
-php artisan test
-```
+Công khai
 
-Hoặc:
+-   `/` Trang chủ (welcome)
+-   `/ideas`, `/ideas/{slug}` Ngân hàng ý tưởng
+-   `/events` & `/competitions` (danh sách/chi tiết)
+-   `/scientific-news` Bản tin Nghiên cứu
 
-```bash
-composer run test
-```
+Authenticated
 
-## 📁 Cấu trúc dự án
+-   `/dashboard`, `/profile`
+-   `/my-ideas/*` (CRUD ý tưởng, mời, nộp duyệt)
+-   `/my-competitions/*` (đăng ký & nộp bài)
 
-```
-vlute-innovation-hub/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/          # Controllers xử lý logic
-│   │   ├── Middleware/           # Middleware (auth, approval, admin)
-│   │   └── Requests/             # Form requests validation
-│   ├── Models/                   # Eloquent models
-│   └── Providers/                # Service providers
-├── database/
-│   ├── migrations/               # Database migrations
-│   └── seeders/                  # Database seeders
-├── resources/
-│   ├── views/                    # Blade templates
-│   ├── css/                      # CSS files
-│   └── js/                       # JavaScript files
-├── routes/
-│   ├── web.php                   # Web routes
-│   └── auth.php                  # Authentication routes
-├── public/                       # Public assets
-└── tests/                        # Test files
-```
+Admin (đã login + verified + approved + is.admin)
 
-## 👤 Tài khoản mặc định
+-   `/admin` – một trang nhiều tab (approvals, users, ideas, taxonomies, logs)
 
-Sau khi chạy seeder, hệ thống sẽ tạo tài khoản Admin mặc định. Thông tin đăng nhập có thể được kiểm tra trong file seeder:
+## 9) Email
 
--   `database/seeders/AdminUserSeeder.php`
-
-## 🔐 Xác thực và Phân quyền
-
-### Middleware
-
--   `auth`: Yêu cầu đăng nhập
--   `verified.to.login`: Yêu cầu email đã được xác thực
--   `approved.to.login`: Yêu cầu tài khoản đã được admin duyệt
--   `is.admin`: Chỉ admin mới truy cập được
-
-### Roles
-
-Hệ thống hỗ trợ phân quyền theo roles. Các roles mặc định được tạo trong `RolesSeeder`.
-
-## 🎨 Giao diện
-
--   **Framework CSS**: TailwindCSS
--   **JavaScript**: AlpineJS (lightweight framework)
--   **Build tool**: Vite
-
-## 📝 Migrations
-
-Các bảng chính:
-
--   `users`: Người dùng
--   `roles`: Vai trò
--   `ideas`: Ý tưởng
--   `idea_members`: Thành viên ý tưởng
--   `idea_invitations`: Lời mời tham gia ý tưởng
--   `reviews`: Đánh giá
--   `review_assignments`: Phân công đánh giá
--   `categories`: Danh mục
--   `faculties`: Khoa
--   `tags`: Thẻ
--   `attachments`: Tệp đính kèm
--   `change_requests`: Yêu cầu thay đổi
-
-## 🧪 Testing
-
-```bash
-# Chạy tất cả tests
-php artisan test
-
-# Chạy test cụ thể
-php artisan test --filter TestName
-```
-
-## 🔄 Scripts hữu ích
-
-```bash
-# Setup toàn bộ dự án (install + migrate + seed + build)
-composer run setup
-
-# Chạy development với tất cả services
-composer run dev
-
-# Format code
-./vendor/bin/pint
-
-# Clear cache
-php artisan cache:clear
-php artisan config:clear
-php artisan view:clear
-```
-
-## 📧 Cấu hình Email
-
-Để sử dụng tính năng xác thực email, cần cấu hình mail server trong file `.env`:
+Cấu hình trong `.env` (ví dụ với Mailtrap):
 
 ```env
 MAIL_MAILER=smtp
@@ -295,25 +180,26 @@ MAIL_FROM_ADDRESS=noreply@vlute.edu.vn
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
-## 🤝 Đóng góp
+## 10) Scripts tiện ích
 
-1. Fork repository
-2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Mở Pull Request
+```bash
+# Thiết lập nhanh (gợi ý):
+composer install && npm install && php artisan key:generate && php artisan migrate --seed && npm run dev
 
-## 📄 License
+# Dọn cache
+php artisan cache:clear && php artisan config:clear && php artisan view:clear
 
-Dự án này được phát triển cho mục đích học tập và nghiên cứu tại Trường Đại học Sư phạm Kỹ thuật Vĩnh Long.
+# Format code (Pint)
+./vendor/bin/pint
+```
 
-## 📞 Liên hệ
+## 11) Ghi chú phát triển
 
--   **Email**: spktvl@vlute.edu.vn
--   **Website**: vlute.edu.vn
--   **Địa chỉ**: Số 73 Nguyễn Huệ, Phường Long Châu, tỉnh Vĩnh Long
+-   Nếu triển khai dưới subpath, dùng `asset('...')` cho ảnh nền trong Blade (đã áp dụng ở hero) thay vì bg-[url(...)] để tránh lỗi đường dẫn.
+-   Một số trang quản trị còn dùng lớp tương thích `.card/.btn/.tbl…` trong `app.css`. Khi refactor hoàn tất admin sang utilities thuần, có thể gỡ bỏ các lớp tương thích này.
 
 ---
 
-**Phát triển bởi**: Sinh viên Khoa Khoa học Máy tính - VLUTE
-**Phiên bản**: 1.0.0
+**Liên hệ**: spktvl@vlute.edu.vn · Website: https://vlute.edu.vn · Địa chỉ: Số 73 Nguyễn Huệ, P. Long Châu, TP. Vĩnh Long
+
+Phát triển bởi sinh viên Khoa Khoa học Máy tính – VLUTE.
