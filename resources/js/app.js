@@ -27,6 +27,7 @@ function setupGlobalClickHandlers() {
             const id = closeTrigger.getAttribute("data-close");
             const target = id ? document.getElementById(id) : null;
             if (target) {
+                target.classList.add("hidden");
                 target.classList.remove("show");
             }
         }
@@ -46,9 +47,10 @@ function setupGlobalClickHandlers() {
             return;
         }
 
-        const opened = document.querySelector(".modal.show");
-        if (opened && event.target === opened) {
-            opened.classList.remove("show");
+        // close when clicking on modal backdrop
+        const backdrop = event.target.closest("#modal-login-block");
+        if (backdrop && event.target.id === "modal-login-block") {
+            backdrop.classList.add("hidden");
         }
     });
 }
@@ -58,12 +60,10 @@ function setupGlobalClickHandlers() {
 // -----------------------------------------------------------------------------
 
 function initVerifyEmailModal() {
-    if (!document.body.classList.contains("verify-email-page")) {
-        return;
-    }
-
     const modal = document.getElementById("modal-login-block");
-    modal?.classList.add("show");
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    modal.classList.add("show");
 }
 
 // -----------------------------------------------------------------------------
@@ -98,6 +98,19 @@ function initAuthTabs() {
         tabRegister.classList.toggle("active", !isLogin);
         panelLogin.classList.toggle("hidden", !isLogin);
         panelRegister.classList.toggle("hidden", isLogin);
+
+        // Tailwind styling for active tab (no custom CSS)
+        const on = ["bg-white", "shadow", "text-blue-600"]; // active styles
+        const off = ["bg-transparent", "text-slate-500"]; // inactive styles
+        tabLogin.classList.remove(...on, ...off);
+        tabRegister.classList.remove(...on, ...off);
+        if (isLogin) {
+            tabLogin.classList.add(...on);
+            tabRegister.classList.add(...off);
+        } else {
+            tabRegister.classList.add(...on);
+            tabLogin.classList.add(...off);
+        }
     };
 
     show(initial);

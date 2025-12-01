@@ -3,44 +3,30 @@
 @section('title', 'Cuộc thi & Sự kiện')
 
 @section('content')
-    <div class="container" style="padding: 32px 0;">
-        <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">
-            Các Cuộc thi & Sự kiện
-        </h1>
+  <section class="container py-8">
+    <h1 class="text-3xl font-bold mb-6">Các Cuộc thi & Sự kiện</h1>
 
         @if ($competitions->count() > 0)
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+      <div class="grid md:grid-cols-3 gap-6">
                 @foreach ($competitions as $competition)
-                    <div class="card"
-                        style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px #0000000d;">
-                        <a href="{{ route('competitions.show', $competition->slug) }}">
-                            <img src="{{ $competition->banner_url ?? '/images/panel-truong.jpg' }}" alt="{{ $competition->title }}"
-                                style="width: 100%; height: 200px; object-fit: cover;">
+          <article class="border border-slate-200 rounded-2xl overflow-hidden shadow-card bg-white">
+            <a href="{{ route('competitions.show', $competition->slug) }}" class="block h-52 bg-slate-100 overflow-hidden">
+              <img src="{{ $competition->banner_url ?? asset('images/panel-truong.jpg') }}" alt="{{ $competition->title }}" class="w-full h-full object-cover" />
                         </a>
-                        <div class="card-body" style="padding: 20px;">
-                            <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 12px;">
-                                <a href="{{ route('competitions.show', $competition) }}"
-                                    style="text-decoration: none; color: #0f172a;">
-                                    {{ $competition->title }}
-                                </a>
+            <div class="p-5">
+              <h3 class="text-lg font-semibold mb-2">
+                <a href="{{ route('competitions.show', $competition->slug) }}" class="no-underline text-slate-900">{{ $competition->title }}</a>
                             </h3>
-                            <p style="font-size: 14px; color: var(--muted); margin: 0 0 16px;">
-                                ⏳ Kết thúc: {{ $competition->end_date->format('d/m/Y') }}
-                            </p>
-                            <a href="{{ route('competitions.show', $competition) }}" class="btn btn-primary"
-                                style="display: inline-block; padding: 10px 20px; font-weight: 600; text-decoration: none;">
-                                Xem chi tiết
-                            </a>
+              <p class="text-sm text-slate-500 mb-4">⏳ Kết thúc: {{ optional($competition->end_date)->format('d/m/Y') }}</p>
+              <a href="{{ route('competitions.show', $competition->slug) }}" class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-transparent hover:brightness-95">Xem chi tiết</a>
                         </div>
-                    </div>
+          </article>
                 @endforeach
             </div>
 
-            <div style="margin-top: 32px;">
-                {{ $competitions->links() }}
-            </div>
+      <div class="mt-8">{{ $competitions->links() }}</div>
         @else
             <p>Hiện tại không có cuộc thi nào đang mở.</p>
         @endif
-    </div>
+  </section>
 @endsection
