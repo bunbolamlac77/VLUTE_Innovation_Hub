@@ -69,6 +69,7 @@
         data-key="ideas">Ý tưởng</a>
       <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="/events" data-key="events">Cuộc thi &amp;
         Sự kiện</a>
+      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="{{ route('challenges.index') }}" data-key="challenges">Challenges</a>
       <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="{{ route('scientific-news.index') }}"
         data-key="news">Bản tin Nghiên cứu</a>
     </nav>

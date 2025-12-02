@@ -16,7 +16,7 @@
 
     <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8">
       <div class="flex flex-col items-center gap-2 mb-2">
-        <img src="{{ asset('images/logotruong.jpg') }}" alt="VLUTE" class="w-18 h-18 rounded-md object-cover" />
+        <img src="{{ asset('images/logotruong.jpg') }}" alt="VLUTE" class="w-16 h-16 rounded-md object-cover" />
       </div>
       <h1 class="text-center text-3xl font-extrabold my-2">Quên mật khẩu</h1>
 

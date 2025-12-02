@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(FeaturedIdeasSeeder::class);
         $this->call(CompetitionSeeder::class);
         $this->call(ScientificNewsSeeder::class);
+        $this->call(ChallengeSeeder::class);
 
         // (Tuỳ chọn) tạo user mẫu bằng factory
         // User::factory(10)->create();

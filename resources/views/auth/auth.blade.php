@@ -14,7 +14,7 @@
 <body data-active-tab="{{ $activeTab ?? 'login' }}" data-unapproved="{{ session('unapproved') ? '1' : '' }}"
   data-unapproved-email="{{ session('unapproved_email') ?? '' }}"
   data-unverified="{{ session('unverified') ? '1' : '' }}"
-  data-unverified-email="{{ session('unverified_email') ?? '' }}" class="font-sans text-slate-900">
+  data-unverified-email="{{ session('unverified_email') ?? '' }}" class="font-sans text-slate-900 auth-page">
   <div class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
     <div class="absolute inset-0 bg-cover bg-center"
       style="background-image: url('{{ asset('images/panel-truong.jpg') }}')"></div>

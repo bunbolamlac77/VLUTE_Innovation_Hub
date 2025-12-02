@@ -21,6 +21,10 @@ Route::get('/scientific-news/{news}', [\App\Http\Controllers\ScientificNewsContr
 Route::get('/competitions', [CompetitionController::class, 'index'])->name('competitions.index');
 Route::get('/competitions/{competition:slug}', [CompetitionController::class, 'show'])->name('competitions.show');
 
+// Challenges - Trang công khai
+Route::get('/challenges', [\App\Http\Controllers\ChallengeController::class, 'index'])->name('challenges.index');
+Route::get('/challenges/{challenge}', [\App\Http\Controllers\ChallengeController::class, 'show'])->name('challenges.show');
+
 // Events page (Cuộc thi & Sự kiện)
 Route::get('/events', [\App\Http\Controllers\EventsController::class, 'index'])->name('events.index');
 
@@ -154,9 +158,10 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin']
         Route::post('/ideas/{idea}/status', [\App\Http\Controllers\Admin\IdeaActionController::class, 'updateStatus'])->name('ideas.status');
         Route::post('/ideas/{idea}/reviewer', [\App\Http\Controllers\Admin\IdeaActionController::class, 'assignReviewer'])->name('ideas.reviewer');
 
-        // Admin CRUD: competitions & news
+        // Admin CRUD: competitions, news, challenges
         Route::resource('competitions', \App\Http\Controllers\Admin\AdminCompetitionController::class);
         Route::resource('news', \App\Http\Controllers\Admin\AdminNewsController::class);
+        Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
     });
 
 // ---- Khu người dùng (chỉ cần đăng nhập) ----
@@ -180,6 +185,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('competitions.submit.create');
     Route::post('/my-competitions/{registration}/submit', [\App\Http\Controllers\CompetitionSubmissionController::class, 'store'])
         ->name('competitions.submit.store');
+
+    // Nộp bài Challenge (mỗi user 1 submission/Challenge)
+    Route::get('/challenges/{challenge}/submit', [\App\Http\Controllers\ChallengeSubmissionController::class, 'create'])
+        ->name('challenges.submit.create');
+    Route::post('/challenges/{challenge}/submit', [\App\Http\Controllers\ChallengeSubmissionController::class, 'store'])
+        ->name('challenges.submit.store');
 });
 
 // Routes Breeze (login / register / verify / forgot ...)

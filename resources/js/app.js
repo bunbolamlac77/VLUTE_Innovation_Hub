@@ -60,6 +60,10 @@ function setupGlobalClickHandlers() {
 // -----------------------------------------------------------------------------
 
 function initVerifyEmailModal() {
+    // Chỉ tự bật modal trên trang verify-email
+    if (!document.body.classList.contains("verify-page")) {
+        return;
+    }
     const modal = document.getElementById("modal-login-block");
     if (!modal) return;
     modal.classList.remove("hidden");
