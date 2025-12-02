@@ -174,11 +174,44 @@
     </div>
   </section>
 
-  {{-- News header --}}
+  {{-- Scientific Research News Section --}}
   <section class="container py-10">
-    <div class="flex items-end justify-between gap-4 mb-2">
+    <div class="flex items-end justify-between gap-4 mb-4">
       <h2 class="text-2xl font-extrabold text-slate-900">Bản tin Nghiên cứu Khoa học</h2>
       <a class="text-brand-navy font-semibold" href="{{ route('scientific-news.index') }}">Xem tất cả bản tin →</a>
+    </div>
+    <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
+      @forelse($latestScientificNews as $item)
+        <article class="flex flex-col border border-slate-200 bg-white rounded-2xl shadow-card overflow-hidden">
+          <div class="h-[180px] bg-slate-100">
+            @if ($item->image_url)
+              <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="w-full h-full object-cover" />
+            @endif
+          </div>
+          <div class="p-4 flex-1 flex flex-col">
+            <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
+              <span class="inline-block bg-brand-gray-100 text-slate-700 px-2.5 py-1 rounded-full">{{ $item->category ?? 'Chưa phân loại' }}</span>
+              <span>{{ optional($item->published_date)->format('d/m/Y') }}</span>
+            </div>
+            <h5 class="font-bold text-slate-900 leading-snug mb-1 line-clamp-2">
+              <a class="no-underline text-slate-900" href="{{ route('scientific-news.show', $item) }}">{{ $item->title }}</a>
+            </h5>
+            @if ($item->description)
+              <p class="text-sm text-slate-600 mt-1 line-clamp-3">{{ $item->description }}</p>
+            @endif
+            <div class="mt-auto pt-3 flex gap-2">
+              <a class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold hover:bg-slate-50"
+                 href="{{ route('scientific-news.show', $item) }}">Đọc thêm</a>
+              @if ($item->source)
+                <a class="inline-flex items-center gap-2 rounded-full text-indigo-600 px-3 py-1.5 text-sm font-semibold hover:bg-indigo-50"
+                   href="{{ $item->source }}" target="_blank" rel="noopener">Nguồn</a>
+              @endif
+            </div>
+          </div>
+        </article>
+      @empty
+        <div class="col-span-full text-center text-slate-500 py-6">Chưa có bản tin nào.</div>
+      @endforelse
     </div>
   </section>
 

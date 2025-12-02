@@ -15,6 +15,7 @@ Route::get('/about', function () {
 
 // Bản tin khoa học - Trang công khai
 Route::get('/scientific-news', [\App\Http\Controllers\ScientificNewsController::class, 'index'])->name('scientific-news.index');
+Route::get('/scientific-news/{news}', [\App\Http\Controllers\ScientificNewsController::class, 'show'])->name('scientific-news.show');
 
 // Cuộc thi & Sự kiện - Trang công khai
 Route::get('/competitions', [CompetitionController::class, 'index'])->name('competitions.index');

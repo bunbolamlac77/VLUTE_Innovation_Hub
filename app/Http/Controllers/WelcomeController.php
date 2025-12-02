@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Idea;
 use App\Models\User;
 use App\Models\Competition;
+use App\Models\ScientificNew;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 
@@ -51,6 +52,12 @@ class WelcomeController extends Controller
         $partnerCount = $partners > 0 ? $partners : 13;
         $awardCount = 17; // theo thiết kế hiện tại
 
+        // Bản tin Nghiên cứu Khoa học mới nhất
+        $latestScientificNews = ScientificNew::orderBy('published_date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
+
         return view('welcome', compact(
             'featuredIdeas',
             'openCompetitions',
@@ -58,7 +65,8 @@ class WelcomeController extends Controller
             'ideaCount',
             'mentorCount',
             'partnerCount',
-            'awardCount'
+            'awardCount',
+            'latestScientificNews'
         ));
     }
 }
