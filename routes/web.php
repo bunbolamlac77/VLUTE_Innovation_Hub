@@ -186,6 +186,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/my-competitions/{registration}/submit', [\App\Http\Controllers\CompetitionSubmissionController::class, 'store'])
         ->name('competitions.submit.store');
 
+    // Chỉnh sửa/Xoá bài nộp dự thi
+    Route::get('/my-competitions/submissions/{submission}/edit', [\App\Http\Controllers\CompetitionSubmissionController::class, 'edit'])
+        ->name('competitions.submit.edit');
+    Route::put('/my-competitions/submissions/{submission}', [\App\Http\Controllers\CompetitionSubmissionController::class, 'update'])
+        ->name('competitions.submit.update');
+    Route::delete('/my-competitions/submissions/{submission}', [\App\Http\Controllers\CompetitionSubmissionController::class, 'destroy'])
+        ->name('competitions.submit.destroy');
+
     // Nộp bài Challenge (mỗi user 1 submission/Challenge)
     Route::get('/challenges/{challenge}/submit', [\App\Http\Controllers\ChallengeSubmissionController::class, 'create'])
         ->name('challenges.submit.create');

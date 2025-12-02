@@ -4,21 +4,40 @@
 
 @section('content')
   <section class="container py-8">
-    <h1 class="text-3xl font-bold mb-6">Các Cuộc thi & Sự kiện</h1>
+    <h1 class="text-3xl font-extrabold mb-6">Các Cuộc thi & Sự kiện</h1>
 
         @if ($competitions->count() > 0)
-      <div class="grid md:grid-cols-3 gap-6">
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($competitions as $competition)
+          @php
+            $end = $competition->end_date;
+            $isOpen = $competition->status === 'open' && (!$end || $end->isFuture());
+          @endphp
           <article class="border border-slate-200 rounded-2xl overflow-hidden shadow-card bg-white">
-            <a href="{{ route('competitions.show', $competition->slug) }}" class="block h-52 bg-slate-100 overflow-hidden">
+            <a href="{{ route('competitions.show', $competition->slug) }}" class="block h-48 bg-slate-100 overflow-hidden">
               <img src="{{ $competition->banner_url ?? asset('images/panel-truong.jpg') }}" alt="{{ $competition->title }}" class="w-full h-full object-cover" />
                         </a>
             <div class="p-5">
-              <h3 class="text-lg font-semibold mb-2">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <h3 class="text-base font-semibold leading-tight">
                 <a href="{{ route('competitions.show', $competition->slug) }}" class="no-underline text-slate-900">{{ $competition->title }}</a>
                             </h3>
-              <p class="text-sm text-slate-500 mb-4">⏳ Kết thúc: {{ optional($competition->end_date)->format('d/m/Y') }}</p>
-              <a href="{{ route('competitions.show', $competition->slug) }}" class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-transparent hover:brightness-95">Xem chi tiết</a>
+                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $isOpen ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700' }}">{{ $competition->status }}</span>
+              </div>
+
+              <div class="text-xs text-slate-500 mb-4">
+                @if ($competition->start_date)
+                  <span>Bắt đầu: {{ $competition->start_date->format('d/m/Y') }}</span>
+                @endif
+                @if ($competition->end_date)
+                  <span class="ml-3">Hạn chót: <strong>{{ $competition->end_date->format('d/m/Y') }}</strong></span>
+                  <span class="ml-2 text-slate-400">{{ $isOpen ? 'Còn ' . $competition->end_date->diffForHumans(null, true) : 'Đã kết thúc ' . $competition->end_date->diffForHumans() }}</span>
+                @else
+                  <span class="ml-3 text-slate-400">Chưa đặt hạn</span>
+                @endif
+              </div>
+
+              <a href="{{ route('competitions.show', $competition->slug) }}" class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-slate-200 hover:bg-slate-50">{{ $isOpen ? 'Xem & đăng ký' : 'Xem chi tiết' }}</a>
                         </div>
           </article>
                 @endforeach
@@ -26,7 +45,10 @@
 
       <div class="mt-8">{{ $competitions->links() }}</div>
         @else
-            <p>Hiện tại không có cuộc thi nào đang mở.</p>
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+        <h3 class="text-xl font-semibold mb-2">Chưa có cuộc thi nào</h3>
+        <p class="text-slate-500">Vui lòng quay lại sau để cập nhật các cuộc thi mới nhất.</p>
+      </div>
         @endif
   </section>
 @endsection

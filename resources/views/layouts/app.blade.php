@@ -18,6 +18,27 @@
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 
+            <!-- Flash Messages -->
+            @if (session('success') || session('status') || session('error') || session('info'))
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                    @if (session('success') || session('status'))
+                        <div class="mb-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 px-4 py-3">
+                            {{ session('success') ?? session('status') }}
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="mb-3 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 px-4 py-3">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    @if (session('info'))
+                        <div class="mb-3 rounded-xl border border-sky-300 bg-sky-50 text-sky-800 px-4 py-3">
+                            {{ session('info') }}
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow">

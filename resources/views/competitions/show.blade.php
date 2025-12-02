@@ -43,10 +43,39 @@
                 <span class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700 cursor-default">Bạn đã đăng ký cuộc thi này</span>
                 <a class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-transparent hover:brightness-95" href="{{ route('my-competitions.index') }}">Xem cuộc thi của tôi</a>
               @else
-                <form method="POST" action="{{ route('competitions.register', $competition) }}">
+                <div x-data="{ teamName: '' }">
+                  <form method="POST" action="{{ route('competitions.register', $competition) }}" x-ref="regForm">
                   @csrf
-                  <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-transparent hover:brightness-95">Đăng ký ngay</button>
+                    <input type="hidden" name="team_name" x-model="teamName" />
+                    <button type="button" class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-transparent hover:brightness-95"
+                      x-on:click="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'confirm-registration-{{ $competition->id }}' }))">
+                      Đăng ký ngay
+                    </button>
                 </form>
+
+                  <x-modal name="confirm-registration-{{ $competition->id }}" maxWidth="lg">
+                    <div class="p-6">
+                      <h2 class="text-xl font-extrabold mb-1">Xác nhận đăng ký</h2>
+                      <p class="text-slate-600 mb-4">Bạn sắp đăng ký tham gia cuộc thi: <strong>{{ $competition->title }}</strong></p>
+
+                      <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Tên đội (tuỳ chọn)</label>
+                        <input type="text" x-model="teamName" placeholder="VD: VLUTE Innovators" class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-navy focus:border-brand-navy" />
+                      </div>
+
+                      <div class="flex items-center justify-end gap-2">
+                        <button type="button" class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50"
+                          x-on:click="$dispatch('close')">
+                          Hủy
+                        </button>
+                        <button type="button" class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold hover:brightness-110"
+                          x-on:click="$refs.regForm.submit()">
+                          Xác nhận đăng ký
+                        </button>
+                      </div>
+                    </div>
+                  </x-modal>
+                </div>
               @endif
             @else
               <a class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-transparent hover:brightness-95" href="{{ route('login') }}">Đăng nhập để đăng ký</a>
