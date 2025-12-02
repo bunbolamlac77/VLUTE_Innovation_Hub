@@ -1,710 +1,106 @@
-# 📋 CHI TIẾT DỰ ÁN: CỔNG ĐỔI MỚI SÁNG TẠO VLUTE
+# VLUTE Innovation Hub — Chi tiết dự án (2025)
 
-> Tài liệu tổng hợp đầy đủ về luồng nghiệp vụ, phân quyền, CSDL, logic chống trùng lặp và bảo mật.
-
----
-
-## 📑 Mục lục
-
-1. [Tổng quan Phân quyền & Vai trò](#1--tổng-quan-phân-quyền--vai-trò)
-2. [Luồng nghiệp vụ chính](#2--luồng-nghiệp-vụ-chính)
-3. [Cấu trúc Trang & Phân quyền chi tiết](#3--cấu-trúc-trang--phân-quyền-chi-tiết-matrix)
-4. [Cơ sở dữ liệu đầy đủ](#4--cơ-sở-dữ-liệu-đầy-đủ-mysql)
-5. [Logic dữ liệu & Tính năng chính](#5--logic-dữ-liệu--tính-năng-chính)
-6. [Công nghệ & Chiến lược Bảo mật](#6--công-nghệ--chiến-lược-bảo-mật)
+Tài liệu tổng hợp kiến trúc, module tính năng, CSDL, routes, hướng dẫn cài đặt/vận hành, và các cập nhật mới (Bản tin Nghiên cứu Khoa học).
 
 ---
 
-## 1. 🎯 TỔNG QUAN PHÂN QUYỀN & VAI TRÒ
+## 1) Tổng quan dự án
 
-Hệ thống có **7 vai trò người dùng**, mỗi vai trò có một mục đích riêng biệt:
+-   Nền tảng: Laravel 12 (PHP >= 8.2)
+-   Frontend: Blade + TailwindCSS + Vite
+-   Auth: Laravel Breeze (Email verification), phân quyền theo Role + Policy
+-   CSDL: MySQL 8 (docker-compose cung cấp service mysql, port host 3307 → container 3306)
+-   Mục tiêu: Kết nối sinh viên, giảng viên/mentor, trung tâm ĐMST, BGH, doanh nghiệp; quản lý ý tưởng, cuộc thi, bản tin nghiên cứu khoa học, mời thành viên, phản biện, quản trị.
 
-### 1.1. Khách (Guest)
+Thư mục chính:
 
--   Người dùng vãng lai chưa đăng nhập
--   Chỉ xem được các trang công khai
-
-### 1.2. Sinh viên (Student)
-
--   Vai trò trung tâm, người tạo và nộp ý tưởng
--   Tự động gán khi đăng ký với email `@st.vlute.edu.vn`
--   Tự động được duyệt (`is_approved = 1`)
-
-### 1.3. Giảng viên (Lecturer)
-
--   Đóng vai trò Cố vấn (Mentor): tham gia nhóm, góp ý nội bộ; không duyệt/chặn luồng
--   Đăng ký với email `@vlute.edu.vn`, cần Admin duyệt
-
-### 1.4. Trung tâm ĐMST (Innovation Center)
-
--   Quản lý các cuộc thi, duyệt ý tưởng cấp Trung tâm
--   Điều phối chung
--   Đăng ký với email `@vlute.edu.vn`, cần Admin gán vai trò
-
-### 1.5. Ban giám hiệu (Rectorate/Board)
-
--   Duyệt cuối cùng, xem báo cáo tổng hợp
--   Đăng ký với email `@vlute.edu.vn`, cần Admin gán vai trò
-
-### 1.6. Doanh nghiệp (Enterprise)
-
--   Đăng "Challenge" (thử thách)
--   Tìm kiếm ý tưởng, có thể làm mentor
--   Đăng ký với email khác, cần Admin duyệt
-
-### 1.7. Admin
-
--   Quản trị viên hệ thống
--   Quản lý tài khoản, cấu hình và bảo mật
--   Toàn quyền truy cập
+-   app/Http/Controllers: Controller cho public, nội bộ, admin
+-   app/Models: Eloquent models (Idea, ScientificNew, Competition, ...)
+-   resources/views: Giao diện Blade (layouts, ideas, scientific-news, admin, ...)
+-   database/migrations: Lược đồ CSDL
+-   database/seeders: Dữ liệu mẫu, tài khoản quản trị
+-   routes/web.php: Tuyến đường web
 
 ---
 
-## 2. 🗺️ LUỒNG NGHIỆP VỤ CHÍNH
+## 2) Module và tính năng chính
 
-### 2.1. Luồng 1: Đăng ký & Phê duyệt Tài khoản
+1. Ngân hàng Ý tưởng (Public)
 
-**Mục tiêu:** Tự động hóa việc cấp quyền dựa trên email.
+-   Danh sách ý tưởng đã duyệt công khai, lọc theo Khoa/Lĩnh vực/Tìm kiếm
+-   Trang chi tiết ý tưởng, hiển thị like, liên hệ, thành viên
+-   Like ý tưởng (yêu cầu đăng nhập)
 
-#### Các bước:
+2. Ý tưởng của tôi (Sinh viên)
 
-1. **Người dùng vào trang `/register`**
+-   CRUD ý tưởng (nháp → nộp)
+-   Mời thành viên qua email (IdeaInvitation)
+-   Bình luận nội bộ team-only với mentor
 
-    - Nhập: Tên, Email, Mật khẩu
+3. Phản biện & Duyệt
 
-2. **Logic Hệ thống (trong `RegisteredUserController.php`):**
+-   Hàng chờ review (Trung tâm ĐMST, BGH)
+-   Trạng thái: draft → submitted_center → approved_center → submitted_board → approved_final
+-   Nhánh cần chỉnh sửa: needs_change_center / needs_change_board
 
-    **Nếu email có đuôi `@st.vlute.edu.vn`:**
+4. Cuộc thi & Sự kiện
 
-    - Tạo `User`
-    - Gán tự động `role` = "Sinh viên"
-    - Đặt `is_approved` = 1, `is_active` = 1
-    - Gửi email xác thực
-    - Người dùng có thể đăng nhập ngay sau khi xác thực
+-   Danh sách, chi tiết, đăng ký, nộp bài
+-   Khu “Cuộc thi của tôi” cho sinh viên
 
-    **Nếu email có đuôi `@vlute.edu.vn`:**
+5. Bản tin Nghiên cứu Khoa học (Mới)
 
-    - Tạo `User`
-    - Gán tự động `role` = "Giảng viên" (hoặc vai trò chờ)
-    - Đặt `is_approved` = 0, `is_active` = 0
-    - Gửi email xác thực
-    - Sau khi xác thực, tài khoản vẫn ở trạng thái chờ Admin duyệt
-    - Admin phải vào gán vai trò chính xác (GV, Trung tâm ĐMST hay BGH) và bật `is_active` = 1
+-   Danh sách + lọc theo chủ đề + tìm kiếm (title/description/content)
+-   Chi tiết bản tin, ảnh, ngày đăng, tác giả, nguồn; sidebar bản tin mới
+-   Trang chủ hiển thị lưới 4 bản tin mới nhất
 
-    **Nếu email có đuôi khác (Gmail, Doanh nghiệp...):**
+6. Tìm kiếm tổng hợp
 
-    - Tạo `User`
-    - Gán tự động `role` = "Doanh nghiệp" (hoặc "Khách" đã xác thực)
-    - Đặt `is_approved` = 0, `is_active` = 0
-    - Tài khoản ở trạng thái chờ Admin duyệt
+-   Ô tìm kiếm trên header: route search.index
 
-### 2.2. Luồng 2: Nộp & Duyệt Ý tưởng (Luồng cốt lõi)
+7. Quản trị (Admin)
 
-Cập nhật 2025-11 — Luồng mới (Mentor, bỏ tầng duyệt GV):
-
-1. SV tạo ý tưởng (status = 'draft').
-2. SV mời Giảng viên làm Cố vấn (Mentor) vào nhóm; Mentor có quyền xem và góp ý nội bộ (comment team_only), không có quyền chặn/duyệt.
-3. Nhóm hoàn thiện nội dung theo góp ý Mentor.
-4. SV bấm Nộp: hệ thống chuyển thẳng sang 'submitted_center'.
-5. Trung tâm ĐMST xử lý:
-    - Nếu yêu cầu chỉnh sửa: 'needs_change_center' → SV chỉnh sửa rồi nộp lại.
-    - Nếu duyệt: chuyển lên 'submitted_board'.
-6. BGH xử lý:
-    - Nếu yêu cầu chỉnh sửa: 'needs_change_board'.
-    - Nếu duyệt công khai: 'approved_final' (xuất hiện trên ngân hàng ý tưởng).
-
-Lưu ý: Có thể bật ràng buộc “phải có ≥1 Mentor để nộp” qua IDEAS_REQUIRE_MENTOR=true.
-
-Đây là luồng quan trọng nhất của dự án, đi từ SV đến BGH.
-
-#### Các bước:
-
-1. **SV (Sinh viên)** vào trang "Ý tưởng của tôi" → "Tạo ý tưởng mới"
-
-2. **SV nhập thông tin:**
-
-    - Tiêu đề, Tóm tắt, Lĩnh vực...
-
-3. **Logic Chống trùng lặp:**
-
-    - Khi SV gõ Tiêu đề/Tóm tắt, hệ thống tự động chạy AJAX call
-    - Tìm các ý tưởng tương tự và hiển thị cảnh báo
-    - (Xem chi tiết ở Phần 5.1)
-
-4. **SV lưu nháp:**
-
-    - `ideas.status` = 'draft'
-
-5. **SV mời thành viên:**
-
-    - Vào tab "Thành viên", mời bạn bè qua email
-    - Hệ thống tạo `IdeaInvitation` và gửi email
-
-6. **Bạn bè chấp nhận lời mời:**
-
-    - Được thêm vào `IdeaMember`
-
-7. **SV nộp ý tưởng:**
-
-    - Bấm "Nộp ý tưởng"
-    - `ideas.status` = 'submitted_center'
-
-8. **GV xử lý:**
-
-    - **Nếu GV "Yêu cầu chỉnh sửa":**
-        - `ideas.status` = 'needs_change_gv'
-        - SV nhận thông báo, sửa và nộp lại (quay lại bước 7)
-    - **Nếu GV "Duyệt (cấp Khoa)":**
-        - `ideas.status` = 'approved_gv'
-        - `ideas.status` = 'submitted_center' (tự động chuyển sang cấp Trung tâm)
-
-9. **Trung tâm ĐMST xử lý:**
-
-    - Thấy ý tưởng trong hàng chờ "Duyệt cấp Trung tâm"
-    - **Nếu TTD MST "Yêu cầu chỉnh sửa":**
-        - `ideas.status` = 'needs_change_center'
-        - Quay lại bước 9 (hoặc 7)
-    - **Nếu TTD MST "Duyệt (cấp Trường)":**
-        - `ideas.status` = 'approved_center'
-        - `ideas.status` = 'submitted_board' (tự động chuyển sang cấp BGH)
-
-10. **BGH (Ban giám hiệu) xử lý:**
-    - Thấy ý tưởng trong hàng chờ "Duyệt cuối cùng"
-    - **Nếu BGH "Duyệt công khai":**
-        - `ideas.status` = 'approved_final'
-        - Ý tưởng xuất hiện trên Ngân hàng Ý tưởng công khai
+-   Duyệt tài khoản, gán quyền
+-   Quản lý taxonomies (Khoa, Lĩnh vực, Tags)
+-   Quản lý Cuộc thi, Bản tin KH
 
 ---
 
-## 3. 🖥️ CẤU TRÚC TRANG & PHÂN QUYỀN CHI TIẾT (MATRIX)
+## 3) Vai trò & phân quyền
 
-| Trang / Module                       | Nhiệm vụ                                                                     | Khách              | Sinh viên                     | Giảng viên         | Trung tâm ĐMST             | BGH                        | Doanh nghiệp        | Admin              |
-| :----------------------------------- | :--------------------------------------------------------------------------- | :----------------- | :---------------------------- | :----------------- | :------------------------- | :------------------------- | :------------------ | :----------------- |
-| **A. Chung (Public)**                |                                                                              |                    |                               |                    |                            |                            |                     |                    |
-| `/` (Trang chủ)                      | Hiển thị banner, tin tức, ý tưởng/cuộc thi nổi bật                           | ✅ Xem             | ✅ Xem                        | ✅ Xem             | ✅ Xem                     | ✅ Xem                     | ✅ Xem              | ✅ Xem             |
-| `/about` (Giới thiệu)                | Giới thiệu về cổng thông tin                                                 | ✅ Xem             | ✅ Xem                        | ✅ Xem             | ✅ Xem                     | ✅ Xem                     | ✅ Xem              | ✅ Xem             |
-| `/login`, `/register`                | Đăng nhập/Đăng ký                                                            | ✅ Tương tác       | Ẩn                            | Ẩn                 | Ẩn                         | Ẩn                         | Ẩn                  | Ẩn                 |
-| **B. Ý tưởng (Ideas)**               |                                                                              |                    |                               |                    |                            |                            |                     |                    |
-| `/ideas` (Ngân hàng Ý tưởng)         | Danh sách ý tưởng đã duyệt công khai                                         | ✅ Xem, Lọc, Thích | ✅ Xem, Lọc, Thích            | ✅ Xem, Lọc, Thích | ✅ Xem, Lọc, Thích         | ✅ Xem, Lọc, Thích         | ✅ Xem, Lọc, Thích  | ✅ Xem, Lọc, Thích |
-| `/ideas/show/{id}`                   | Chi tiết ý tưởng công khai                                                   | ✅ Xem             | ✅ Xem, Comment               | ✅ Xem, Comment    | ✅ Xem                     | ✅ Xem                     | ✅ Xem, Comment     | ✅ Xem             |
-| `/my-ideas` (Ý tưởng của tôi)        | Danh sách ý tưởng (nháp, đang nộp, đã duyệt) mà SV sở hữu hoặc là thành viên | ❌                 | ✅ Tạo, Sửa, Xóa (nháp), Nộp  | ❌                 | ❌                         | ❌                         | ❌                  | ❌                 |
-| `/my-ideas/create`                   | Form tạo ý tưởng mới                                                         | ❌                 | ✅ Tương tác                  | ❌                 | ❌                         | ❌                         | ❌                  | ❌                 |
-| `/my-ideas/edit/{id}`                | Form chỉnh sửa ý tưởng (chỉ chủ sở hữu, trước khi duyệt cuối)                | ❌                 | ✅ Tương tác                  | ❌                 | ❌                         | ❌                         | ❌                  | ❌                 |
-| `/my-ideas/invite/{id}`              | Gửi và quản lý lời mời thành viên                                            | ❌                 | ✅ Tương tác (Chỉ chủ sở hữu) | ❌                 | ❌                         | ❌                         | ❌                  | ❌                 |
-| **C. Phản biện & Duyệt**             |                                                                              |                    |                               |                    |                            |                            |                     |                    |
-| `/review-queue` (Hàng chờ phản biện) | Danh sách ý tưởng chờ phản biện (cấp Trung tâm/BGH)                          | ❌                 | ❌                            | ❌                 | ✅ Xem, Tương tác          | ✅ Xem, Tương tác          | ❌                  | ✅ Xem (Toàn bộ)   |
-| `/review/form/{id}`                  | Biểu mẫu chấm điểm, nhận xét, duyệt/từ chối                                  | ❌                 | ❌                            | ❌                 | ✅ Tương tác (Duyệt cấp 2) | ✅ Tương tác (Duyệt cấp 3) | ❌                  | ✅ Tương tác       |
-| **D. Cuộc thi & Challenge**          |                                                                              |                    |                               |                    |                            |                            |                     |                    |
-| `/competitions`                      | Danh sách cuộc thi (cấp trường)                                              | ✅ Xem             | ✅ Xem, Đăng ký               | ✅ Xem             | ✅ Tạo, Sửa, Xóa           | ✅ Xem                     | ✅ Xem              | ✅ Quản lý         |
-| `/challenges`                        | Danh sách challenge (từ DN)                                                  | ✅ Xem             | ✅ Xem, Nộp bài               | ✅ Xem             | ✅ Xem                     | ✅ Xem                     | ✅ Tạo, Sửa, Xóa    | ✅ Quản lý         |
-| **E. Hồ sơ & Bảng điều khiển**       |                                                                              |                    |                               |                    |                            |                            |                     |                    |
-| `/dashboard`                         | Bảng điều khiển cá nhân (ý tưởng, thông báo...)                              | ❌                 | ✅ Xem                        | ✅ Xem (Queue)     | ✅ Xem (Stats)             | ✅ Xem (Stats)             | ✅ Xem (Challenges) | ✅ Xem (Admin)     |
-| `/profile`                           | Cập nhật thông tin cá nhân, đổi mật khẩu                                     | ❌                 | ✅ Tương tác                  | ✅ Tương tác       | ✅ Tương tác               | ✅ Tương tác               | ✅ Tương tác        | ✅ Tương tác       |
-| **F. Quản trị (Admin)**              |                                                                              |                    |                               |                    |                            |                            |                     |                    |
-| `/admin` (Admin Panel)               | Trang quản trị tổng                                                          | ❌                 | ❌                            | ❌                 | ✅ Xem (giới hạn)          | ❌                         | ❌                  | ✅ Toàn quyền      |
-| `/admin/users`                       | Quản lý tài khoản, gán quyền, duyệt tài khoản                                | ❌                 | ❌                            | ❌                 | ❌                         | ❌                         | ❌                  | ✅ Toàn quyền      |
-| `/admin/approvals`                   | Duyệt tài khoản chờ (GV, DN)                                                 | ❌                 | ❌                            | ❌                 | ❌                         | ❌                         | ❌                  | ✅ Toàn quyền      |
-| `/admin/taxonomies`                  | Quản lý Khoa, Lĩnh vực, Thẻ (Tags)                                           | ❌                 | ❌                            | ❌                 | ✅ Tương tác               | ❌                         | ❌                  | ✅ Toàn quyền      |
+Các vai trò tiêu biểu: student (SV), staff (Giảng viên/Mentor), center (Trung tâm ĐMST), board (BGH), enterprise (DN), admin.
+
+-   Middleware: verified.to.login, approved.to.login, is.admin, role checks
+-   Policies: ví dụ IdeaPolicy kiểm soát view/update/delete/approve
+-   Menu header đã liên kết tới các trang công khai và theo phiên đăng nhập
 
 ---
 
-## 4. 🗄️ CƠ SỞ DỮ LIỆU ĐẦY ĐỦ (MySQL)
+## 4) Cấu hình môi trường
 
-### 4.1. Các bảng đã có (Dựa trên file migrations)
+Sử dụng MySQL trong docker-compose:
 
-#### Bảng người dùng & phân quyền:
+file.env.md (tham khảo):
 
--   `users` (id, name, email, password, role, is_approved, is_active, ...)
--   `roles` (id, name, slug)
--   `role_user` (user_id, role_id, assigned_by)
-
-#### Bảng ý tưởng:
-
--   `ideas` (id, title, slug, description, summary, content, status, visibility, owner_id, category_id, faculty_id, like_count, ...)
--   `idea_members` (id, idea_id, user_id, role_in_team)
--   `idea_invitations` (id, idea_id, invited_by, email, token, status, expires_at)
--   `idea_likes` (idea_id, user_id)
--   `idea_tag` (idea_id, tag_id)
-
-#### Bảng phân loại:
-
--   `categories` (id, name, slug, description, sort_order)
--   `faculties` (id, name, code, description, sort_order)
--   `tags` (id, name, slug)
-
-#### Bảng duyệt & phản biện:
-
--   `review_assignments` (id, idea_id, reviewer_id, assigned_by, review_level, status)
--   `reviews` (id, assignment_id, overall_comment, decision)
--   `change_requests` (id, review_id, idea_id, request_message, is_resolved)
-
-#### Bảng khác:
-
--   `attachments` (id, attachable_type, attachable_id, path, filename, mime_type, uploaded_by)
--   `organizations` (id, name, address, contact_person)
--   `profiles` (id, user_id, student_code, bio, avatar_url, organization_id)
-
-### 4.2. Các bảng cần bổ sung
-
-#### Bảng Cuộc thi (Quản lý bởi Trung tâm ĐMST):
-
-```sql
-CREATE TABLE competitions (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) UNIQUE NOT NULL,
-    description TEXT,
-    start_date DATETIME,
-    end_date DATETIME,
-    status ENUM('draft', 'open', 'closed', 'archived') DEFAULT 'draft',
-    created_by BIGINT UNSIGNED NOT NULL,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE competition_registrations (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    competition_id BIGINT UNSIGNED NOT NULL,
-    user_id BIGINT UNSIGNED NOT NULL,
-    team_name VARCHAR(255) NULL,
-    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-    FOREIGN KEY (competition_id) REFERENCES competitions(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE(competition_id, user_id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE competition_submissions (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    registration_id BIGINT UNSIGNED NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    abstract TEXT,
-    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (registration_id) REFERENCES competition_registrations(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+```
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3307 # host port
+DB_DATABASE=vlute_innovation_hub
+DB_USERNAME=sail
+DB_PASSWORD=password
+FORWARD_DB_PORT=3307
+MYSQL_EXTRA_OPTIONS=
 ```
 
-#### Bảng Challenge (Quản lý bởi Doanh nghiệp):
+docker-compose.yml (chính):
 
-```sql
-CREATE TABLE challenges (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    organization_id BIGINT UNSIGNED NOT NULL,
-    deadline DATETIME,
-    reward VARCHAR(255),
-    status ENUM('draft', 'open', 'closed') DEFAULT 'draft',
-    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+-   mysql: map 3307:3306, user: sail/password, db: vlute_innovation_hub
+-   phpmyadmin: http://localhost:8081 (PMA_HOST=mysql, PMA_PORT=3306)
 
-CREATE TABLE challenge_submissions (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    challenge_id BIGINT UNSIGNED NOT NULL,
-    user_id BIGINT UNSIGNED NOT NULL,
-    idea_id BIGINT UNSIGNED NULL,
-    title VARCHAR(255) NOT NULL,
-    solution_description TEXT,
-    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (challenge_id) REFERENCES challenges(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (idea_id) REFERENCES ideas(id) ON DELETE SET NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+Mail (ví dụ, cần chỉnh lại theo thực tế):
+
 ```
-
-#### Bảng ghi lại lịch sử hoạt động (Bảo mật):
-
-```sql
-CREATE TABLE audit_logs (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT UNSIGNED NULL,
-    action VARCHAR(255) NOT NULL,
-    loggable_type VARCHAR(255),
-    loggable_id BIGINT UNSIGNED,
-    old_values TEXT,
-    new_values TEXT,
-    ip_address VARCHAR(45),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-);
-```
-
----
-
-## 5. 💡 LOGIC DỮ LIỆU & TÍNH NĂNG CHÍNH
-
-### 5.1. Logic Chống trùng lặp ý tưởng
-
-**Mục tiêu:** Cảnh báo SV khi họ sắp tạo một ý tưởng _tương tự_ ý tưởng đã có.
-
-#### Cách thực hiện:
-
-**Bước 1: Chuẩn bị CSDL (Chỉ làm 1 lần)**
-
-Tạo migration để kích hoạt `FULLTEXT` search trên MySQL:
-
-```bash
-php artisan make:migration add_fulltext_index_to_ideas_table
-```
-
-**Nội dung file migration:**
-
-```php
-<?php
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration {
-    public function up(): void {
-        // Thêm index FULLTEXT vào cột title và summary
-        DB::statement('ALTER TABLE ideas ADD FULLTEXT(title, summary)');
-    }
-
-    public function down(): void {
-        Schema::table('ideas', function (Blueprint $table) {
-            $table->dropFullText(['title', 'summary']);
-        });
-    }
-};
-```
-
-**Bước 2: Tạo Route (trong `routes/web.php`):**
-
-```php
-Route::post('/ideas/check-similarity', [IdeaController::class, 'checkSimilarity'])
-     ->middleware(['auth', 'verified']);
-```
-
-**Bước 3: Tạo Controller Function:**
-
-```php
-<?php
-// Trong Controller của bạn
-use Illuminate\Http\Request;
-use App\Models\Idea;
-
-public function checkSimilarity(Request $request)
-{
-    $request->validate(['query' => 'required|string|min:10']);
-    $query = $request->input('query');
-
-    // Sử dụng FULLTEXT search
-    $similarIdeas = Idea::whereRaw('MATCH(title, summary) AGAINST(? IN NATURAL LANGUAGE MODE)', [$query])
-        ->where('status', 'approved_final') // Chỉ so với ý tưởng đã công khai
-        ->select('id', 'title', 'slug')
-        ->take(5)
-        ->get();
-
-    return response()->json($similarIdeas);
-}
-```
-
-**Bước 4: Frontend (Javascript tại trang `/my-ideas/create`):**
-
-```javascript
-// Giả sử bạn có <input id="idea_title"> và <div id="similarity_results">
-
-document.getElementById("idea_title").addEventListener("blur", async (e) => {
-    let query = e.target.value;
-    if (query.length < 10) return;
-
-    let resultsDiv = document.getElementById("similarity_results");
-    resultsDiv.innerHTML = "Đang kiểm tra...";
-
-    try {
-        const response = await fetch("/ideas/check-similarity", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector(
-                    'meta[name="csrf-token"]'
-                ).content,
-            },
-            body: JSON.stringify({ query: query }),
-        });
-
-        const ideas = await response.json();
-
-        if (ideas.length > 0) {
-            let html =
-                "<strong>Cảnh báo:</strong> Đã tìm thấy các ý tưởng tương tự:<br><ul>";
-            ideas.forEach((idea) => {
-                html += `<li><a href="/ideas/${idea.slug}" target="_blank">${idea.title}</a></li>`;
-            });
-            html += "</ul>";
-            resultsDiv.innerHTML = html;
-        } else {
-            resultsDiv.innerHTML =
-                '<span style="color: green;">Tốt! Có vẻ đây là ý tưởng mới.</span>';
-        }
-    } catch (error) {
-        resultsDiv.innerHTML = "Không thể kiểm tra trùng lặp.";
-    }
-});
-```
-
-### 5.2. Logic Mời thành viên
-
-**Mục tiêu:** Cho phép SV mời bạn bè tham gia vào nhóm phát triển ý tưởng.
-
-#### Các bước:
-
-1. **SV A (chủ ý tưởng)** vào `/my-ideas/invite/{id}`
-2. **SV A nhập email của SV B** và bấm "Mời"
-3. **Hệ thống tạo `IdeaInvitation`:**
-    - Tạo bản ghi trong `idea_invitations`
-    - Token ngẫu nhiên, an toàn (ví dụ: `Str::random(64)`)
-    - `status` = 'pending'
-    - `expires_at` = now() + 7 days
-4. **Hệ thống gửi Email:**
-    - Sử dụng Mailable của Laravel (`IdeaInvitationMail`)
-    - Email chứa link với token: `/invitations/accept/{token}`
-5. **SV B nhận email, bấm vào link**
-6. **Hệ thống xử lý (route `/invitations/accept/{token}`):**
-    - Tìm token trong bảng `idea_invitations`
-    - Kiểm tra token hợp lệ và chưa hết hạn
-    - Nếu hợp lệ:
-        - Lấy `idea_id` và `email` từ bản ghi invitation
-        - Tìm `user_id` của SV B dựa trên `email`
-        - Nếu user chưa tồn tại, yêu cầu đăng ký
-        - Nếu user chưa đăng nhập, yêu cầu đăng nhập
-        - Kiểm tra user đã là member chưa
-        - Thêm SV B vào bảng `idea_members`
-        - Cập nhật `idea_invitations.status` = 'accepted'
-        - Chuyển hướng SV B đến trang chi tiết ý tưởng với thông báo thành công
-
----
-
-## 6. 🔒 CÔNG NGHỆ & CHIẾN LƯỢC BẢO MẬT
-
-### 6.1. Xác thực (Authentication)
-
-#### Laravel Breeze:
-
--   ✅ CSRF Protection
--   ✅ Session Security
--   ✅ Rate Limiting (chống đăng nhập vét)
--   ✅ Password Hashing (bcrypt)
-
-#### Xác thực Email:
-
--   ✅ Bắt buộc 100% người dùng phải xác thực email
--   ✅ Middleware: `EnsureEmailIsVerifiedToLogin.php`
--   ✅ Đảm bảo vai trò được gán tự động là chính xác
-
-### 6.2. Phân quyền (Authorization)
-
-#### Middleware:
-
--   ✅ `EnsureAdmin.php` cho các route `/admin/*`
--   ✅ `EnsureEmailIsVerifiedToLogin.php` cho các route yêu cầu xác thực
--   ✅ `EnsureApprovedToLogin.php` cho các route yêu cầu duyệt
-
-**Nên tạo thêm:**
-
--   `EnsureRole:lecturer` cho các route chuyên biệt của giảng viên
--   `EnsureRole:student` cho các route chuyên biệt của sinh viên
-
-#### Laravel Policies (Rất quan trọng):
-
-**Tạo Policy cho `Idea`:**
-
-```bash
-php artisan make:policy IdeaPolicy --model=Idea
-```
-
-**Nội dung `app/Policies/IdeaPolicy.php`:**
-
-```php
-<?php
-namespace App\Policies;
-
-use App\Models\Idea;
-use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
-
-class IdeaPolicy
-{
-    use HandlesAuthorization;
-
-    /**
-     * Cho phép Admin xem mọi thứ
-     */
-    public function before(User $user, $ability)
-    {
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-    }
-
-    /**
-     * Ai được xem chi tiết ý tưởng?
-     */
-    public function view(User $user, Idea $idea): bool
-    {
-        // 1. Nếu ý tưởng là public
-        if ($idea->visibility == 'public' && $idea->status == 'approved_final') {
-            return true;
-        }
-
-        // 2. Nếu là chủ sở hữu
-        if ($user->id === $idea->owner_id) {
-            return true;
-        }
-
-        // 3. Nếu là thành viên trong nhóm
-        return $idea->members->contains(function ($member) use ($user) {
-            return $member->user_id === $user->id;
-        });
-    }
-
-    /**
-     * Ai được cập nhật ý tưởng?
-     */
-    public function update(User $user, Idea $idea): bool
-    {
-        // Chỉ chủ sở hữu và khi ý tưởng còn là bản nháp hoặc cần chỉnh sửa
-        return $user->id === $idea->owner_id &&
-               ($idea->status == 'draft' || $idea->needsChange());
-    }
-
-    /**
-     * Ai được xóa ý tưởng?
-     */
-    public function delete(User $user, Idea $idea): bool
-    {
-        return $user->id === $idea->owner_id && $idea->status == 'draft';
-    }
-
-    /**
-     * Ai được duyệt ý tưởng?
-     */
-    public function approve(User $user, Idea $idea): bool
-    {
-        // Chỉ Giảng viên, Trung tâm ĐMST, hoặc BGH
-        return $user->hasRole('staff') ||
-               $user->hasRole('center') ||
-               $user->hasRole('board');
-    }
-}
-```
-
-**Sử dụng Policy trong Controller:**
-
-```php
-// Trong hàm show()
-public function show(Idea $idea)
-{
-    // Tự động kiểm tra hàm 'view' của IdeaPolicy
-    // Nếu thất bại, sẽ ném ra lỗi 403 (Cấm truy cập)
-    $this->authorize('view', $idea);
-
-    // ... code còn lại ...
-}
-
-// Trong hàm update()
-public function update(Request $request, Idea $idea)
-{
-    $this->authorize('update', $idea);
-    // ... code còn lại ...
-}
-```
-
-### 6.3. Bảo vệ Dữ liệu (Input/Output)
-
-#### Chống SQL Injection:
-
--   ✅ **Luôn sử dụng Eloquent hoặc Query Builder**
--   ✅ Ví dụ: `Idea::findOrFail($id)` thay vì raw SQL
--   ❌ **Không bao giờ** viết SQL thô với dữ liệu từ người dùng
-
-#### Chống XSS (Cross-Site Scripting):
-
--   ✅ **Luôn sử dụng `{{ $variable }}` trong Blade**
-    -   Cú pháp này tự động lọc HTML
-    -   Ví dụ: `{{ $idea->title }}`
--   ⚠️ **Chỉ dùng `{!! $variable !!}` khi chắc chắn 100% nội dung đó an toàn**
-    -   Ví dụ: `{!! $idea->content !!}` (nếu đã được sanitize)
-
-#### Form Request Validation:
-
--   ✅ **Sử dụng các file Request cho mọi form**
-    -   Ví dụ: `ProfileUpdateRequest.php`, `StoreIdeaRequest.php`
--   ✅ **Đảm bảo dữ liệu đầu vào luôn sạch sẽ**
-    -   Validation rules: `required`, `email`, `min:10`, `max:255`, etc.
-
-### 6.4. Bảo vệ File (File Uploads)
-
-#### Vị trí lưu trữ:
-
--   ✅ **KHÔNG lưu file trong thư mục `public`**
--   ✅ **Lưu file trong `storage/app/private_attachments`**
-
-#### Cách truy cập file:
-
-**Tạo route trong `routes/web.php`:**
-
-```php
-Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(function () {
-    Route::get('/attachments/{id}/download', [AttachmentController::class, 'download'])
-        ->name('attachments.download');
-});
-```
-
-**Tạo Controller Function:**
-
-```php
-<?php
-namespace App\Http\Controllers;
-
-use App\Models\Attachment;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
-
-class AttachmentController extends Controller
-{
-    public function download($id)
-    {
-        $attachment = Attachment::findOrFail($id);
-
-        // Lấy đối tượng cha (ví dụ: Idea)
-        $idea = $attachment->attachable; // Giả sử attachable là Idea
-
-        // Kiểm tra quyền
-        if (!Auth::user()->can('view', $idea)) {
-            abort(403, 'Bạn không có quyền truy cập file này.');
-        }
-
-        // Kiểm tra file tồn tại
-        if (!Storage::exists($attachment->path)) {
-            abort(404, 'File không tồn tại.');
-        }
-
-        // Trả về file để download
-        return Storage::download($attachment->path, $attachment->filename);
-    }
-}
-```
-
----
-
-## 7. 📝 GHI CHÚ QUAN TRỌNG
-
-### 7.1. Cấu hình Mail
-
-Để gửi email mời thành viên, cần cấu hình mail trong `.env`:
-
-```env
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
@@ -715,71 +111,259 @@ MAIL_FROM_ADDRESS=noreply@vlute.edu.vn
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
-### 7.2. Cấu trúc Status của Ý tưởng
+Admin seeder sử dụng ENV:
 
-```
-draft → submitted_center → approved_center → submitted_board → approved_final
-             ↓                    ↓
-     needs_change_center   needs_change_board
-             ↓                    ↓
-        (Quay lại draft)     (Quay lại draft)
-```
-
-### 7.3. Các trạng thái Visibility
-
--   `private`: Chỉ chủ sở hữu và thành viên nhóm
--   `team_only`: Thành viên nhóm và người được mời
--   `public`: Mọi người có thể xem (sau khi duyệt)
+-   ADMIN_EMAIL (mặc định: admin@vlute.edu.vn)
+-   ADMIN_PASSWORD (mặc định: Admin@123)
 
 ---
 
-## 8. 📚 TÀI LIỆU THAM KHẢO
+## 5) Cài đặt & chạy
 
--   [Laravel Documentation](https://laravel.com/docs)
--   [Laravel Policies](https://laravel.com/docs/authorization#creating-policies)
--   [Laravel Mail](https://laravel.com/docs/mail)
--   [MySQL FULLTEXT Search](https://dev.mysql.com/doc/refman/8.0/en/fulltext-search.html)
+1. Khởi động MySQL:
+
+-   docker compose up -d
+
+2. Cài dự án:
+
+-   composer install
+-   cp .env.example .env (hoặc đảm bảo .env tồn tại)
+-   php artisan key:generate
+-   Cập nhật biến DB\_ trong .env theo docker-compose
+
+3. Build frontend:
+
+-   npm install
+-   npm run build (hoặc npm run dev khi phát triển)
+
+4. Migrate & Seed:
+
+-   php artisan migrate
+-   php artisan db:seed
+    -   DatabaseSeeder đã gọi: RolesSeeder, AdminUserSeeder, ApprovedUsersSeeder, FeaturedIdeasSeeder, CompetitionSeeder, ScientificNewsSeeder
+
+5. Chạy server dev:
+
+-   php artisan serve (mặc định http://127.0.0.1:8000)
+
+Lưu ý: Nếu môi trường bị coi là production, thêm cờ --force cho migrate/seed.
 
 ---
 
-**Tài liệu này được tạo ngày:** 2025-01-XX
+## 6) Dữ liệu mẫu mặc định
 
-**Phiên bản:** 1.0
+-   Admin: theo ADMIN_EMAIL/ADMIN_PASSWORD
+-   ApprovedUsersSeeder: tạo sẵn một số tài khoản/phân quyền được duyệt
+-   Ý tưởng nổi bật, cuộc thi mẫu, 10 bản tin nghiên cứu khoa học mẫu
 
-**Cập nhật lần cuối:** 2025-01-XX
+---
 
-Password@123
+## 7) Lược đồ CSDL chính (rút gọn)
 
-gv.cntt@vlute.edu.vn — Khoa CNTT
-gv.ddt@vlute.edu.vn — Khoa Điện – Điện tử
-gv.ckd@vlute.edu.vn — Khoa Cơ khí – Động lực
-gv.kt@vlute.edu.vn — Khoa Kinh tế
-gv.nn@vlute.edu.vn — Khoa Ngoại ngữ
+Ý tưởng & phân loại:
 
-student2@st.vlute.edu.vn — tên: Student Two
-student3@st.vlute.edu.vn — tên: Student Three
-student4@st.vlute.edu.vn — tên: Student Four
-student5@st.vlute.edu.vn — tên: Student Five
+-   ideas (title, slug, summary, content, faculty_id, category_id, status, visibility, owner_id, like_count, ...)
+-   idea_members (idea_id, user_id, role_in_team)
+-   idea_invitations (idea_id, email, token, status, expires_at)
+-   categories, faculties, tags, idea_tag
+-   idea_likes (idea_id, user_id)
 
-1. Sinh viên
-   Email: student1@st.vlute.edu.vn
-   Role: student
-   Approved: yes, Email verified: yes
-2. Giảng viên (đã gán khoa CNTT)
-   Email: gv.cntt@vlute.edu.vn
-   Role: staff
-   Faculty: Khoa Công nghệ thông tin (CNTT) — nếu chưa có, seeder tự tạo
-   Approved: yes, Email verified: yes
-3. Trung tâm ĐMST
-   Email: center@vlute.edu.vn
-   Role: center
-   Approved: yes, Email verified: yes
-4. Ban giám hiệu
-   Email: board@vlute.edu.vn
-   Role: board
-   Approved: yes, Email verified: yes
-5. Doanh nghiệp
-   Email: hr@acme.example
-   Role: enterprise
-   Approved: yes, Email verified: yes
-   Company: ACME Corp
+Phản biện & duyệt:
+
+-   review_assignments (idea_id, reviewer_id, review_level, status)
+-   reviews (assignment_id, decision, overall_comment)
+-   change_requests (review_id, idea_id, request_message, is_resolved)
+
+Cuộc thi:
+
+-   competitions (title, slug, description, start_date, end_date, status, created_by)
+-   competition_registrations (competition_id, user_id, status, team_name)
+-   competition_submissions (registration_id, title, abstract, submitted_at)
+
+Bản tin NCKH (mới):
+
+-   scientific_news: id, title, description, content, author, source, image_url, published_date(date), category, timestamps
+
+Tài khoản & hồ sơ:
+
+-   users (role, approval_status/is_approved, is_active, email_verified_at, ...)
+-   roles, role_user
+-   profiles, organizations, attachments
+
+---
+
+## 8) Tuyến đường quan trọng (routes)
+
+Công khai:
+
+-   GET / → WelcomeController@index (trang chủ; có lưới 4 bản tin NCKH mới nhất)
+-   GET /ideas → PublicIdeaController@index (Ngân hàng ý tưởng, lọc/tìm)
+-   GET /ideas/{slug} → PublicIdeaController@show
+-   POST /ideas/{id}/like → PublicIdeaController@like (auth)
+-   GET /competitions → CompetitionController@index; /competitions/{competition:slug} → show
+-   GET /events → EventsController@index
+-   GET /scientific-news → ScientificNewsController@index
+-   GET /scientific-news/{news} → ScientificNewsController@show
+-   GET /search → SearchController@index
+
+Nội bộ (đăng nhập + verified + approved):
+
+-   /dashboard
+-   /my-ideas (MyIdeasController) CRUD + submit + invite + comments
+-   /manage/review-queue, /manage/review/{idea} (Review\*)
+
+Admin (/admin, middleware is.admin):
+
+-   AdminHomeController@index, Approvals, Users, Taxonomies, Ideas (actions),
+-   Resource: competitions, news (bản tin KH)
+
+---
+
+## 8.1) Đường dẫn đầy đủ (Localhost)
+
+Gợi ý: thay {id}, {slug}, {idea}, {registration}, {token} bằng giá trị thực tế.
+Cơ sở: http://localhost:8000 (có thể dùng http://127.0.0.1:8000 tương đương).
+
+-   Trang chủ
+
+    -   http://localhost:8000/
+    -   Giới thiệu: http://localhost:8000/about
+
+-   Ngân hàng Ý tưởng (Public)
+
+    -   Danh sách: http://localhost:8000/ideas
+    -   Chi tiết: http://localhost:8000/ideas/{slug}
+    -   Like (POST): http://localhost:8000/ideas/{id}/like
+
+-   Bản tin Nghiên cứu Khoa học
+
+    -   Danh sách: http://localhost:8000/scientific-news
+    -   Chi tiết: http://localhost:8000/scientific-news/{id}
+
+-   Cuộc thi & Sự kiện
+
+    -   Danh sách cuộc thi: http://localhost:8000/competitions
+    -   Chi tiết cuộc thi: http://localhost:8000/competitions/{slug}
+    -   Đăng ký (POST): http://localhost:8000/competitions/{id}/register
+    -   Trang Sự kiện: http://localhost:8000/events
+
+-   Tìm kiếm
+
+    -   http://localhost:8000/search?q=tu+khoa
+
+-   Khu nội bộ (đăng nhập + xác minh + được duyệt)
+
+    -   Dashboard: http://localhost:8000/dashboard
+    -   Hồ sơ cá nhân: http://localhost:8000/profile
+    -   Ý tưởng của tôi:
+        -   Danh sách: http://localhost:8000/my-ideas
+        -   Tạo mới: http://localhost:8000/my-ideas/create
+        -   Chi tiết: http://localhost:8000/my-ideas/{idea}
+        -   Sửa: http://localhost:8000/my-ideas/{idea}/edit
+    -   Hàng chờ phản biện:
+        -   Danh sách: http://localhost:8000/manage/review-queue
+        -   Biểu mẫu: http://localhost:8000/manage/review/{idea}
+    -   Đính kèm (tải): http://localhost:8000/attachments/{id}/download
+    -   Dự án đang hướng dẫn (Giảng viên): http://localhost:8000/mentored-ideas
+
+-   Cuộc thi của tôi (Sinh viên)
+
+    -   Danh sách: http://localhost:8000/my-competitions
+    -   Nộp bài: http://localhost:8000/my-competitions/{registration}/submit
+
+-   Lời mời tham gia ý tưởng
+
+    -   Chấp nhận: http://localhost:8000/invitations/accept/{token}
+    -   Từ chối: http://localhost:8000/invitations/decline/{token}
+
+-   Khu Admin (/admin)
+
+    -   Bảng quản trị: http://localhost:8000/admin
+    -   Duyệt tài khoản: http://localhost:8000/admin/approvals
+    -   Người dùng: http://localhost:8000/admin/users
+    -   Cuộc thi (resource):
+        -   Danh sách: http://localhost:8000/admin/competitions
+        -   Tạo mới: http://localhost:8000/admin/competitions/create
+        -   Sửa: http://localhost:8000/admin/competitions/{id}/edit
+    -   Bản tin KH (resource):
+        -   Danh sách: http://localhost:8000/admin/news
+        -   Tạo mới: http://localhost:8000/admin/news/create
+        -   Sửa: http://localhost:8000/admin/news/{id}/edit
+
+-   Xác thực (Breeze)
+    -   Đăng nhập: http://localhost:8000/login
+    -   Đăng ký: http://localhost:8000/register
+    -   Quên mật khẩu: http://localhost:8000/forgot-password
+    -   Đặt lại mật khẩu: http://localhost:8000/reset-password
+    -   Xác minh email: http://localhost:8000/verify-email
+    -   Xác minh (link ký): http://localhost:8000/verify-email/{id}/{hash}
+    -   Gửi lại email xác minh (POST): http://localhost:8000/email/verification-notification
+    -   Đổi mật khẩu (trong phiên, PUT): http://localhost:8000/password
+    -   Xác nhận mật khẩu: http://localhost:8000/confirm-password
+    -   Đăng xuất (POST): http://localhost:8000/logout
+    -   Đăng xuất (GET fallback): http://localhost:8000/logout
+
+## 9) Bản tin Nghiên cứu Khoa học — chi tiết triển khai
+
+-   Model: app/Models/ScientificNew.php
+-   Migration: database/migrations/2025_11_13_054340_create_scientific_news_table.php
+-   Seeder: database/seeders/ScientificNewsSeeder.php (10 bài mẫu)
+-   Controller: app/Http/Controllers/ScientificNewsController.php
+    -   index: lọc tìm theo search/category, phân trang 12, trả về danh sách chủ đề (distinct category)
+    -   show: trang chi tiết; sidebar hiển thị 5 bài mới
+-   Views:
+    -   resources/views/scientific-news/index.blade.php: lưới bài viết, ảnh, chủ đề, ngày, mô tả, nút “Đọc thêm/Nguồn”
+    -   resources/views/scientific-news/show.blade.php: hero + nội dung + sidebar
+-   Trang chủ:
+    -   WelcomeController@index: lấy 4 bài mới nhất theo published_date/created_at
+    -   resources/views/welcome.blade.php: mục “Bản tin Nghiên cứu Khoa học” hiển thị lưới 4 bài mới
+-   Menu header đã có link tới /scientific-news
+
+---
+
+## 10) Quy ước trạng thái ý tưởng & hiển thị
+
+Trạng thái: draft → submitted_center → approved_center → submitted_board → approved_final
+
+-   Nhánh chỉnh sửa: needs_change_center / needs_change_board
+    Hiển thị công khai khi: visibility = public và status = approved_final
+
+---
+
+## 11) Hướng dẫn triển khai (Deployment)
+
+-   Thiết lập biến môi trường .env (APP*ENV=production, APP_KEY, DB*\_, MAIL\_\_)
+-   php artisan migrate --force
+-   php artisan db:seed --force (tùy chọn dữ liệu mẫu)
+-   npm run build
+-   php artisan config:cache && php artisan route:cache && php artisan view:cache
+-   php artisan storage:link (nếu dùng upload)
+-   Kiểm tra quyền ghi storage/ bootstrap/cache
+
+---
+
+## 12) Kiểm thử & chẩn đoán
+
+-   php artisan test
+-   Log: storage/logs/laravel.log
+-   Kiểm tra health DB (docker compose ps; phpMyAdmin http://localhost:8081)
+
+---
+
+## 13) Checklist nhanh
+
+-   [ ] docker compose up -d (MySQL, phpMyAdmin)
+-   [ ] Cập nhật .env DB\_\* khớp docker-compose.yml
+-   [ ] composer install; php artisan key:generate
+-   [ ] php artisan migrate; php artisan db:seed
+-   [ ] npm install; npm run dev (hoặc build)
+-   [ ] Mở http://127.0.0.1:8000
+-   [ ] Đăng nhập Admin (ADMIN_EMAIL/ADMIN_PASSWORD)
+-   [ ] Kiểm tra: Ngân hàng Ý tưởng, Cuộc thi, Bản tin NCKH, Tìm kiếm
+
+---
+
+Ghi chú:
+
+-   Tất cả dữ liệu nhạy cảm cần được cấu hình qua biến môi trường.
+-   Khi seed trên môi trường production, luôn dùng cờ --force và cân nhắc dữ liệu.

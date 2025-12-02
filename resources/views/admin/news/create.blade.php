@@ -41,7 +41,7 @@
 
       <div>
         <label class="lbl">Ngày đăng</label>
-        <input class="ipt" type="date" name="published_date" value="{{ old('published_date') }}" />
+        <input class="ipt" type="date" name="published_date" value="{{ old('published_date', now()->format('Y-m-d')) }}" required />
       </div>
 
       <div>

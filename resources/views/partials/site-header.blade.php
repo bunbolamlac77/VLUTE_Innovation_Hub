@@ -19,7 +19,7 @@
       @auth
       {{-- User menu --}}
       <div id="userBox" class="relative flex items-center gap-2" aria-haspopup="true" aria-expanded="false">
-        <img src="{{ Auth::user()->avatar_url ? asset(Auth::user()->avatar_url) : asset('images/avatar-default.jpg') }}"
+        <img src="{{ Auth::user()->avatar_url ? asset(Auth::user()->avatar_url) : asset('images/avatar-default.svg') }}"
           alt="Ảnh đại diện" class="w-10 h-10 rounded-full object-cover bg-white border-2 border-white/30"
           onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2740%27 fill=%27%230a0f5a%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2740%27 fill=%27white%27 text-anchor=%27middle%27%3E{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}%3C/text%3E%3C/svg%3E'" />
         <button id="btnUserMenu" class="px-2 py-1 rounded hover:bg-white/15" aria-label="Mở menu người dùng">▾</button>

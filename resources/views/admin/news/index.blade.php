@@ -29,6 +29,19 @@
             <td>{{ $n->author ?? '—' }}</td>
             <td>{{ $n->category ?? '—' }}</td>
           </tr>
+          <tr>
+            <td colspan="4" class="text-right">
+              <div class="flex gap-2 justify-end">
+                <a class="btn btn-ghost" href="{{ route('scientific-news.show', $n) }}" target="_blank">Xem</a>
+                <a class="btn btn-ghost" href="{{ route('admin.news.edit', $n) }}">Sửa</a>
+                <form method="POST" action="{{ route('admin.news.destroy', $n) }}" onsubmit="return confirm('Xoá bản tin này?');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger">Xoá</button>
+                </form>
+              </div>
+            </td>
+          </tr>
         @empty
           <tr>
             <td colspan="4" class="empty">Chưa có bản tin nào.</td>

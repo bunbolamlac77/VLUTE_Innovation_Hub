@@ -29,7 +29,7 @@ class AdminNewsController extends Controller
             'author' => 'nullable|string|max:255',
             'source' => 'nullable|string|max:255',
             'image_url' => 'nullable|url',
-            'published_date' => 'nullable|date',
+            'published_date' => 'required|date',
             'category' => 'nullable|string|max:255',
         ]);
 
@@ -38,6 +38,33 @@ class AdminNewsController extends Controller
         return redirect()->route('admin.news.index')->with('status', 'Tạo bản tin thành công');
     }
 
-    // TODO: edit, update, destroy
+    public function edit(ScientificNew $news)
+    {
+        return view('admin.news.edit', compact('news'));
+    }
+
+    public function update(Request $request, ScientificNew $news)
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'content' => 'required|string',
+            'author' => 'nullable|string|max:255',
+            'source' => 'nullable|string|max:255',
+            'image_url' => 'nullable|url',
+            'published_date' => 'required|date',
+            'category' => 'nullable|string|max:255',
+        ]);
+
+        $news->update($data);
+
+        return redirect()->route('admin.news.index')->with('status', 'Cập nhật bản tin thành công');
+    }
+
+    public function destroy(ScientificNew $news)
+    {
+        $news->delete();
+        return redirect()->route('admin.news.index')->with('status', 'Đã xóa bản tin');
+    }
 }
 

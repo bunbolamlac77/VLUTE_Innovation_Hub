@@ -48,11 +48,8 @@
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-4">
                 <h3 class="m-0 mb-3 text-lg font-extrabold text-slate-900">Bản tin mới</h3>
-                @php
-                  $recent = \App\Models\ScientificNew::orderBy('published_date','desc')->take(5)->get();
-                @endphp
                 <ul class="m-0 p-0 space-y-2">
-                    @foreach($recent as $n)
+                    @foreach(($recent ?? []) as $n)
                       <li>
                         <a href="{{ route('scientific-news.show', $n) }}" class="text-slate-800 hover:text-brand-navy font-semibold line-clamp-2">{{ $n->title }}</a>
                         <div class="text-xs text-slate-500">{{ optional($n->published_date)->format('d/m/Y') }}</div>

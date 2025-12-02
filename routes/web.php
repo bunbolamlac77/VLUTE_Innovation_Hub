@@ -27,6 +27,9 @@ Route::get('/events', [\App\Http\Controllers\EventsController::class, 'index'])-
 // Search page
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
+// Newsletter subscribe
+Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
 // Public Ideas (Ngân hàng Ý tưởng) - Trang công khai
 Route::get('/ideas', [\App\Http\Controllers\PublicIdeaController::class, 'index'])->name('ideas.index');
 Route::get('/ideas/{slug}', [\App\Http\Controllers\PublicIdeaController::class, 'show'])->name('ideas.show');

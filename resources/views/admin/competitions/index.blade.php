@@ -32,7 +32,15 @@
             <td>{{ optional($c->end_date)->format('d/m/Y H:i') }}</td>
             <td class="text-xs text-gray-500">{{ $c->slug }}</td>
             <td class="text-right">
-              <a class="btn btn-ghost" href="{{ route('competitions.show', $c->slug) }}" target="_blank">Xem</a>
+              <div class="flex gap-2 justify-end">
+                <a class="btn btn-ghost" href="{{ route('competitions.show', $c->slug) }}" target="_blank">Xem</a>
+                <a class="btn btn-ghost" href="{{ route('admin.competitions.edit', $c) }}">Sửa</a>
+                <form method="POST" action="{{ route('admin.competitions.destroy', $c) }}" onsubmit="return confirm('Xoá cuộc thi này?');" class="inline">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger">Xoá</button>
+                </form>
+              </div>
             </td>
           </tr>
         @empty

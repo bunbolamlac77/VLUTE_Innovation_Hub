@@ -39,6 +39,32 @@ class AdminCompetitionController extends Controller
         return redirect()->route('admin.competitions.index')->with('status', 'Tạo cuộc thi thành công');
     }
 
-    // TODO: edit, update, destroy (sau)
+    public function edit(Competition $competition)
+    {
+        return view('admin.competitions.edit', compact('competition'));
+    }
+
+    public function update(Request $request, Competition $competition)
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'banner_url' => 'nullable|url',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'required|in:draft,open,judging,closed,archived',
+        ]);
+
+        // Không thay đổi slug sau khi tạo để tránh gãy liên kết công khai
+        $competition->update($data);
+
+        return redirect()->route('admin.competitions.index')->with('status', 'Cập nhật cuộc thi thành công');
+    }
+
+    public function destroy(Competition $competition)
+    {
+        $competition->delete(); // Soft delete
+        return redirect()->route('admin.competitions.index')->with('status', 'Đã xóa cuộc thi');
+    }
 }
 

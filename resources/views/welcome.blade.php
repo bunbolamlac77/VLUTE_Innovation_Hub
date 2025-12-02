@@ -279,14 +279,17 @@
   {{-- Newsletter Section --}}
   <section class="bg-brand-gray-50 border-y border-slate-200 py-10">
     <div class="container">
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-4 flex items-center gap-3">
+      <form method="POST" action="{{ route('newsletter.subscribe') }}" class="bg-white border border-slate-200 rounded-2xl shadow-card p-4 flex items-center gap-3">
+        @csrf
         <strong class="text-slate-900">Nhận bản tin Đổi mới Sáng tạo</strong>
-        <input type="email" placeholder="Email @vlute.edu.vn" aria-label="Email nhận bản tin"
+        <input type="text" name="name" placeholder="Họ tên (tuỳ chọn)" aria-label="Họ tên"
+          class="rounded-full border border-slate-300 px-4 py-2 hidden md:block" />
+        <input type="email" name="email" placeholder="Email @vlute.edu.vn" aria-label="Email nhận bản tin" required
           class="flex-1 rounded-full border border-slate-300 px-4 py-2" />
-        <button
-          class="rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-slate-200 hover:bg-slate-50">Đăng
-          ký</button>
-      </div>
+        <input type="hidden" name="source" value="homepage" />
+        <button type="submit"
+          class="rounded-full bg-white text-brand-navy px-4 py-2 font-bold border border-slate-200 hover:bg-slate-50">Đăng ký</button>
+      </form>
     </div>
   </section>
 @endsection

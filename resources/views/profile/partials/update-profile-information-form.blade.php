@@ -71,7 +71,7 @@
         <div>
             <x-input-label for="avatar" value="Ảnh đại diện" />
             <div class="flex items-center gap-4 mt-1">
-                <img id="avatarPreview" src="{{ $user->avatar_url ? asset($user->avatar_url) : asset('images/avatar-default.jpg') }}" alt="Avatar"
+                <img id="avatarPreview" src="{{ $user->avatar_url ? asset($user->avatar_url) : asset('images/avatar-default.svg') }}" alt="Avatar"
                      class="w-16 h-16 rounded-full object-cover border" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2740%27 fill=%27%230a0f5a%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2740%27 fill=%27white%27 text-anchor=%27middle%27%3E{{ strtoupper(substr($user->name, 0, 1)) }}%3C/text%3E%3C/svg%3E'" />
                 <input id="avatar" name="avatar" type="file" accept="image/*" class="block" />
             </div>

@@ -50,6 +50,10 @@ class ScientificNewsController extends Controller
      */
     public function show(ScientificNew $news)
     {
-        return view('scientific-news.show', compact('news'));
+        $recent = ScientificNew::orderBy('published_date','desc')
+            ->orderBy('created_at','desc')
+            ->take(5)
+            ->get();
+        return view('scientific-news.show', compact('news','recent'));
     }
 }
