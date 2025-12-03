@@ -21,7 +21,19 @@ class IdeaActionController extends Controller
             'status' => 'required|string',
         ]);
 
+        $old = $idea->status;
         $idea->update(['status' => $request->status]);
+
+        // Ghi nhật ký nếu có AuditLog
+        if (class_exists(\App\Models\AuditLog::class)) {
+            \App\Models\AuditLog::create([
+                'action' => 'idea_status_changed',
+                'actor_id' => $request->user()->id,
+                'target_id' => $idea->id,
+                'target_type' => Idea::class,
+                'meta' => json_encode(['old' => $old, 'new' => $request->status], JSON_UNESCAPED_UNICODE),
+            ]);
+        }
 
         return back()->with('status', 'Trạng thái ý tưởng đã được cập nhật.');
     }

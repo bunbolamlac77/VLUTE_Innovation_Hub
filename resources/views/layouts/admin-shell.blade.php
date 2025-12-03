@@ -15,17 +15,17 @@
   {{-- HEADER: copy nguyên markup từ index vào partial này --}}
   @include('partials.site-header')
 
-  <main style="min-height: 100vh;">
-    {{-- Thanh tiêu đề/ breadcrumb nhỏ nếu cần --}}
-    <div class="container" style="padding: 24px 0;">
-      <h1 style="font-size: 24px; font-weight: 700;">Bảng điều khiển quản trị</h1>
-      <p style="margin-top: 4px; color: #6b7280;">Quản lý người dùng, phê duyệt, ý tưởng, phân loại và nhật ký.</p>
-    </div>
+  <main class="min-h-screen">
+    {{-- Header nhỏ cho Admin --}}
+    <section class="container py-6">
+      <h1 class="text-2xl font-extrabold text-slate-900 m-0">Bảng điều khiển quản trị</h1>
+      <p class="text-slate-500 mt-1">Quản lý người dùng, phê duyệt, ý tưởng, phân loại và nhật ký.</p>
+    </section>
 
-    {{-- Khu tabs + nội dung chính --}}
-    <div class="container" style="padding-bottom: 48px;">
+    {{-- Tabs + Nội dung --}}
+    <section class="container pb-16">
       @yield('main')
-    </div>
+    </section>
   </main>
 
   {{-- FOOTER: copy nguyên markup từ index vào partial này --}}

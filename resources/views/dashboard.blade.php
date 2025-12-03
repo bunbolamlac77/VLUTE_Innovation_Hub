@@ -118,8 +118,8 @@
                                         <th>Chủ sở hữu</th>
                                         <th>Khoa</th>
                                         <th>Trạng thái</th>
-                                        <th>Cập nhật</th>
-                                        <th></th>
+                                        <th>Ngày</th>
+                                        <th class="cell-right">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -216,61 +216,41 @@
                         <div class="dash-actions"><a href="{{ route('my-competitions.index') }}" class="btn btn-primary">Xem tất cả</a></div>
                     </div>
 
-                    <div class="table-responsive" style="border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden;">
-                        <table class="dash-table">
-                            <thead>
-                                <tr>
-                                    <th>Tên cuộc thi</th>
-                                    <th>Nhóm</th>
-                                    <th>Trạng thái</th>
-                                    <th>Hạn chót</th>
-                                    <th class="cell-right">Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($myRegistrations as $reg)
-                                    @php
-                                        $comp = $reg->competition;
-                                        $end = $comp?->end_date;
-                                        $isOpen = $comp && $comp->status === 'open' && (!$end || $end->isFuture());
-                                        $submitted = (int) ($reg->submissions_count ?? 0);
-                                    @endphp
-                                    <tr>
-                                        <td>
-                                            <div style="font-weight:700; color:#0f172a;">{{ $comp?->title ?? 'Cuộc thi (đã xóa)' }}</div>
-                                            @if ($submitted > 0)
-                                                <div class="muted">Đã nộp: {{ $submitted }}</div>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="muted">{{ $reg->team_name ?? '(Cá nhân)' }}</div>
-                                        </td>
-                                        <td style="text-align:center;">
-                                            <span class="badge {{ $isOpen ? 'badge-green' : 'badge-blue' }}">{{ $comp?->status ?? 'n/a' }}</span>
-                                        </td>
-                                        <td>
-                                            @if ($end)
-                                                <div>{{ $end->format('d/m/Y H:i') }}</div>
-                                                <div class="muted">{{ $isOpen ? 'Còn ' . $end->diffForHumans(null, true) : 'Kết thúc ' . $end->diffForHumans() }}</div>
-                                            @else
-                                                <span class="muted">Chưa đặt hạn</span>
-                                            @endif
-                                        </td>
-                                        <td class="cell-right">
-                                            @if ($isOpen)
-                                                <a href="{{ route('competitions.submit.create', $reg->id) }}" class="btn-review" style="box-shadow:none;">Nộp bài</a>
-                                            @else
-                                                <a href="{{ route('competitions.show', $comp?->slug ?? '') }}" class="btn-ghost">Xem</a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="muted" style="padding:16px 12px;">Bạn chưa đăng ký cuộc thi nào. <a href="{{ route('competitions.index') }}" style="color:#1d4ed8; font-weight:700;">Khám phá cuộc thi</a></td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <div class="grid gap-3">
+                        @forelse ($myRegistrations as $reg)
+                            @php
+                                $comp = $reg->competition;
+                                $end = $comp?->end_date;
+                                $isOpen = $comp && $comp->status === 'open' && (!$end || $end->isFuture());
+                                $submitted = (int) ($reg->submissions_count ?? 0);
+                            @endphp
+                            <article class="flex items-center gap-3 border border-slate-200 rounded-xl p-3 bg-white">
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-bold text-slate-900 truncate">{{ $comp?->title ?? 'Cuộc thi (đã xóa)' }}</div>
+                                    <div class="muted truncate">{{ $reg->team_name ?? '(Cá nhân)' }}@if ($submitted > 0) • Đã nộp: {{ $submitted }}@endif</div>
+                                </div>
+                                <div>
+                                    <span class="badge {{ $isOpen ? 'badge-green' : 'badge-blue' }}">{{ $comp?->status ?? 'n/a' }}</span>
+                                </div>
+                                <div class="text-right">
+                                    @if ($end)
+                                        <div class="text-sm">{{ $end->format('d/m/Y H:i') }}</div>
+                                        <div class="muted">{{ $isOpen ? 'Còn ' . $end->diffForHumans(null, true) : 'Kết thúc ' . $end->diffForHumans() }}</div>
+                                    @else
+                                        <span class="muted">Chưa đặt hạn</span>
+                                    @endif
+                                </div>
+                                <div class="cell-right">
+                                    @if ($isOpen)
+                                        <a href="{{ route('competitions.submit.create', $reg->id) }}" class="btn-review">Nộp bài</a>
+                                    @else
+                                        <a href="{{ route('competitions.show', $comp?->slug ?? '') }}" class="btn-ghost">Xem</a>
+                                    @endif
+                                </div>
+                            </article>
+                        @empty
+                            <div class="muted">Bạn chưa đăng ký cuộc thi nào. <a href="{{ route('competitions.index') }}" class="text-indigo-600 font-semibold">Khám phá cuộc thi</a></div>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -287,46 +267,34 @@
                             <div class="dash-actions"><a href="{{ route('my-ideas.index') }}" class="btn btn-primary">Xem tất
                                     cả</a></div>
                         </div>
-                        <div class="table-responsive" style="border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden;">
-                            <table class="dash-table">
-                                <thead>
-                                    <tr>
-                                        <th>Tiêu đề</th>
-                                        <th>Trạng thái</th>
-                                        <th>Cập nhật</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($myDrafts as $idea)
-                                        <tr>
-                                            <td style="font-weight: 700; color:#0f172a;">{{ $idea->title }}</td>
-                                            <td>
-                                                @php
-                                                    $map = [
-                                                        'draft' => ['label' => 'Nháp', 'class' => 'badge-amber'],
-                                                        'needs_change_center' => ['label' => 'Cần chỉnh sửa (TTĐMST)', 'class' => 'badge-amber'],
-                                                        'needs_change_board' => ['label' => 'Cần chỉnh sửa (BGH)', 'class' => 'badge-amber'],
-                                                        'submitted_center' => ['label' => 'Đã nộp (TTĐMST)', 'class' => 'badge-blue'],
-                                                        'submitted_board' => ['label' => 'Đã nộp (BGH)', 'class' => 'badge-blue'],
-                                                        'approved_final' => ['label' => 'Đã duyệt (BGH)', 'class' => 'badge-green'],
-                                                    ];
-                                                    $info = $map[$idea->status] ?? ['label' => $idea->status, 'class' => 'badge-blue'];
-                                                @endphp
-                                                <span class="badge {{ $info['class'] }}">{{ $info['label'] }}</span>
-                                            </td>
-                                            <td>{{ $idea->updated_at->diffForHumans() }}</td>
-                                            <td>
-                                                <a href="{{ route('my-ideas.show', $idea->id) }}" class="btn-ghost">Chi tiết</a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4">Chưa có ý tưởng nào.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                        <div class="grid gap-3">
+                            @forelse ($myDrafts as $idea)
+                                @php
+                                    $map = [
+                                        'draft' => ['label' => 'Nháp', 'class' => 'badge-amber'],
+                                        'needs_change_center' => ['label' => 'Cần chỉnh sửa (TTĐMST)', 'class' => 'badge-amber'],
+                                        'needs_change_board' => ['label' => 'Cần chỉnh sửa (BGH)', 'class' => 'badge-amber'],
+                                        'submitted_center' => ['label' => 'Đã nộp (TTĐMST)', 'class' => 'badge-blue'],
+                                        'submitted_board' => ['label' => 'Đã nộp (BGH)', 'class' => 'badge-blue'],
+                                        'approved_final' => ['label' => 'Đã duyệt (BGH)', 'class' => 'badge-green'],
+                                    ];
+                                    $info = $map[$idea->status] ?? ['label' => $idea->status, 'class' => 'badge-blue'];
+                                @endphp
+                                <article class="flex items-center gap-3 border border-slate-200 rounded-xl p-3 bg-white">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="font-bold text-slate-900 truncate">{{ $idea->title }}</div>
+                                        <div class="muted truncate">Cập nhật {{ $idea->updated_at->diffForHumans() }}</div>
+                                    </div>
+                                    <div>
+                                        <span class="badge {{ $info['class'] }}">{{ $info['label'] }}</span>
+                                    </div>
+                                    <div class="cell-right">
+                                        <a href="{{ route('my-ideas.show', $idea->id) }}" class="btn-ghost">Chi tiết</a>
+                                    </div>
+                                </article>
+                            @empty
+                                <div>Chưa có ý tưởng nào. <a href="{{ route('my-ideas.create') }}" class="text-indigo-600 font-semibold">Tạo ý tưởng</a></div>
+                            @endforelse
                         </div>
                     </div>
                 </div>

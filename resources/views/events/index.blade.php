@@ -5,18 +5,16 @@
 @section('content')
     {{-- Hero Section --}}
     <section class="relative text-white">
-        <div class="absolute inset-0 bg-cover bg-center filter brightness-50 saturate-90 blur-sm"
-            style="background-image: url('{{ asset('images/panel-truong.jpg') }}')"></div>
-        <div class="absolute inset-0 bg-gradient-to-tr from-brand-navy/70 to-brand-green/50"></div>
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ asset('images/panel-truong.jpg') }}')"></div>
+        <div class="absolute inset-0 bg-gradient-to-tr from-brand-navy/90 to-brand-green/85"></div>
         <div class="relative">
             <div class="container py-14">
-                <div class="flex items-center gap-6 mb-2">
+                <div class="flex items-center gap-6 mb-4">
                     <img src="{{ asset('images/logotruong.jpg') }}" alt="Logo Trường ĐHSPKT Vĩnh Long"
                         class="h-20 w-auto object-contain bg-white/95 p-2 rounded-lg shadow" />
                     <div>
                         <h1 class="m-0 text-4xl font-extrabold">Cuộc thi & Sự kiện</h1>
-                        <p class="max-w-3xl text-white/90 text-lg m-0">Danh sách các cuộc thi đang mở và sắp diễn ra dành
-                            cho sinh viên VLUTE.</p>
+                        <p class="max-w-3xl text-white/90 text-lg m-0">Danh sách các cuộc thi đang mở và sắp diễn ra dành cho sinh viên VLUTE.</p>
                     </div>
                 </div>
             </div>

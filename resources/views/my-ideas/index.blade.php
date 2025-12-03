@@ -4,24 +4,25 @@
 
 @section('content')
     {{-- Hero Section --}}
-    <section class="hero"
-        style="background: linear-gradient(120deg, rgba(7, 26, 82, 0.9), rgba(10, 168, 79, 0.85)), url('{{ asset('images/panel-truong.jpg') }}') center/cover no-repeat;">
-        <div class="container" style="padding: 56px 0">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
-                <div style="display: flex; align-items: center; gap: 24px;">
-                    <img src="{{ asset('images/logotruong.jpg') }}" alt="Logo Trường ĐHSPKT Vĩnh Long"
-                        style="height: 80px; width: auto; object-fit: contain; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);" />
-                    <div>
-                        <h1 style="color: #fff; margin: 0 0 8px; font-size: 40px;">Ý tưởng của tôi</h1>
-                        <p class="sub" style="max-width: 820px; color: rgba(255, 255, 255, 0.92); font-size: 18px; margin: 0;">
-                            Quản lý và theo dõi các ý tưởng của bạn
-                        </p>
+    <section class="relative text-white">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ asset('images/panel-truong.jpg') }}')"></div>
+        <div class="absolute inset-0 bg-gradient-to-tr from-brand-navy/90 to-brand-green/85"></div>
+        <div class="relative">
+            <div class="container py-14">
+                <div class="flex items-center justify-between gap-6 mb-2">
+                    <div class="flex items-center gap-6">
+                        <img src="{{ asset('images/logotruong.jpg') }}" alt="Logo Trường ĐHSPKT Vĩnh Long"
+                             class="h-20 w-auto object-contain bg-white/95 p-2 rounded-lg shadow" />
+                        <div>
+                            <h1 class="m-0 text-4xl font-extrabold">Ý tưởng của tôi</h1>
+                            <p class="max-w-3xl text-white/90 text-lg m-0">Quản lý và theo dõi các ý tưởng của bạn</p>
+                        </div>
                     </div>
+                    <a href="{{ route('my-ideas.create') }}"
+                       class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-5 py-3 font-bold border border-transparent hover:brightness-95">
+                        + Tạo ý tưởng mới
+                    </a>
                 </div>
-                <a href="{{ route('my-ideas.create') }}" class="btn btn-primary"
-                    style="padding: 14px 28px; font-weight: 700; background: rgba(255, 255, 255, 0.95); color: var(--brand-navy); border: none;">
-                    + Tạo ý tưởng mới
-                </a>
             </div>
         </div>
     </section>

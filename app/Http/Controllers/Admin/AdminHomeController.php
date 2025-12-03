@@ -52,9 +52,26 @@ class AdminHomeController extends Controller
         $ideaFilters = [];
         $reviewers = collect();
         if ($tab === 'ideas') {
-            $ideas = \App\Models\Idea::with(['owner', 'reviewAssignments.reviewer'])
-                ->latest()
-                ->paginate(15);
+            $q = $request->string('q')->toString();
+            $status = $request->string('status')->toString();
+            $reviewer_id = $request->string('reviewer_id')->toString();
+
+            $query = \App\Models\Idea::with(['owner', 'reviewAssignments.reviewer']);
+            if ($q) {
+                $query->where('title', 'like', "%$q%");
+            }
+            if ($status) {
+                $query->where('status', $status);
+            }
+            if ($reviewer_id) {
+                $query->whereHas('reviewAssignments', function ($q) use ($reviewer_id) {
+                    $q->where('reviewer_id', $reviewer_id);
+                });
+            }
+
+            $ideas = $query->latest()->paginate(15)->withQueryString();
+            $ideaFilters = compact('q', 'status', 'reviewer_id');
+
             // Reviewer lấy những user nội bộ:
             $reviewers = User::whereIn('role', ['staff', 'center'])->get(['id', 'name', 'email']);
         }

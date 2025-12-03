@@ -4,16 +4,117 @@
 
 /* Tailwind-first project: limit custom CSS to thin base/layout tweaks */
 @layer base {
-    /* Top masthead (role=banner) higher, roomier */
-    [role="banner"] .container {
-        @apply py-5;
+    :root {
+        --brand-navy: #0a0f5a;
+        --brand-green: #0aa84f;
+        --brand-gray-50: #f5f7fb;
+        --brand-gray-100: #eef2f7;
+        --muted: #64748b;
+        --border: #e5e7eb;
     }
-    /* Sticky menubar taller */
-    header[role="navigation"] .container {
-        @apply py-4;
-    }
-    /* Section rhythm across public pages */
-    main > section {
-        @apply py-12;
-    }
+
+    [role="banner"] .container { @apply py-5; }
+    header[role="navigation"] .container { @apply py-4; }
+    main > section { @apply py-12; }
+}
+
+@layer components {
+    /* Base cards */
+    .card { @apply bg-white border border-slate-200 rounded-2xl shadow-card overflow-hidden; }
+    .card-body { @apply p-6 lg:p-8; }
+    .card-title { @apply px-5 py-3 border-b border-slate-200 text-lg font-bold text-slate-900; }
+
+    /* Chips / Tags */
+    .tag { @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-slate-100 text-slate-700; }
+    .chip { @apply inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200; }
+
+    /* Buttons */
+    .btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-300; }
+    .btn-primary { @apply bg-brand-navy text-white hover:opacity-90; }
+    .btn-ghost { @apply border border-slate-200 rounded-xl px-3 py-2 font-semibold text-slate-900 hover:bg-slate-50; }
+    .btn-review { @apply bg-indigo-600 text-white rounded-xl px-3 py-2 font-semibold hover:bg-indigo-700; }
+    .btn-danger { @apply bg-red-600 text-white rounded-xl px-3 py-2 font-semibold hover:bg-red-700; }
+    .btn-sm { @apply px-2 py-1 text-sm; }
+    .btn-xs { @apply px-2 py-1 text-xs rounded-lg; }
+
+    /* Inputs */
+    .ipt { @apply rounded-xl border border-slate-300 px-3 py-2; }
+    .ipt-sm { @apply rounded-lg border border-slate-300 px-2 py-1 text-sm; }
+    .sel { @apply rounded-xl border border-slate-300 px-3 py-2 bg-white; }
+    .sel-sm { @apply rounded-lg border border-slate-300 px-2 py-1 text-sm bg-white; }
+
+    /* Prose helpers */
+    .prose-content p { @apply mb-3 leading-7 text-slate-700; }
+    .prose-content h3 { @apply mt-6 mb-2 text-lg font-bold text-slate-900; }
+
+    /* Dashboard helpers */
+    .dash-card { @apply card; }
+    .dash-card .card-body { @apply p-5; }
+    .dash-title { @apply m-0 text-lg font-bold text-slate-900; }
+    .dash-subtitle { @apply mt-1 text-xs text-slate-500; }
+    .muted { @apply text-xs text-slate-500; }
+    .cell-right { @apply text-right; }
+
+    .dash-table { @apply w-full border-collapse; }
+    .dash-table thead th { @apply text-[12px] uppercase tracking-wider text-slate-500 bg-slate-50 px-3 py-2 border-b border-slate-200 text-left; }
+    .dash-table tbody td { @apply px-3 py-3 border-b border-slate-100 align-middle; }
+    .dash-table tbody tr:hover { @apply bg-slate-50; }
+
+    .badge { @apply inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold border; }
+    .badge-blue { @apply bg-blue-50 text-blue-700 border-blue-200; }
+    .badge-amber { @apply bg-amber-50 text-amber-700 border-amber-200; }
+    .badge-green { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
+    .badge-red { @apply bg-red-50 text-red-700 border-red-200; }
+    .badge.ok { @apply bg-emerald-50 text-emerald-700 border border-emerald-200; }
+    .badge.warn { @apply bg-amber-50 text-amber-700 border border-amber-200; }
+
+    /* Simple table + wrappers for Admin panels */
+    .table-wrap { @apply border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm; }
+    .tbl { @apply w-full text-sm; }
+    .tbl thead th { @apply text-[12px] uppercase tracking-wider text-slate-600 bg-slate-50 px-4 py-2.5 border-b border-slate-200 text-left; }
+    .tbl tbody td { @apply px-4 py-3 border-b border-slate-100 align-middle; }
+    .tbl tbody tr:hover { @apply bg-slate-50; }
+
+    /* Lists (Taxonomies) */
+    .list { @apply border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-200 bg-white; }
+    .list-item { @apply flex items-center justify-between gap-3 px-3 py-2; }
+    .sub { @apply text-xs text-slate-500; }
+    .actions { @apply flex items-center gap-3 ml-auto; }
+    .actions form:first-child { @apply flex items-center gap-3; }
+    .actions form:first-child .btn-ghost { margin-left: auto; }
+
+    /* Filters */
+    .filter-bar { @apply flex flex-wrap items-end gap-2 mb-3; }
+
+    /* Enterprise info block */
+    .enterprise-info { @apply grid gap-1; }
+    .info-row { @apply flex items-center gap-2; }
+    .info-label { @apply text-xs text-slate-500; }
+    .info-value { @apply text-sm text-slate-800; }
+
+    /* Admin tabs — pill style */
+    .admin-tabs { @apply flex flex-wrap gap-2 items-center bg-white border border-slate-200 rounded-xl p-1 mb-4 shadow-sm; }
+    .admin-tab { @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-slate-700 transition; }
+    .admin-tab:hover { @apply bg-slate-50; }
+    .admin-tab.is-active { @apply bg-brand-navy text-white; }
+
+    /* Flash & empty */
+    .flash-success { @apply my-3 p-4 border-l-4 border-emerald-500 bg-emerald-50 text-emerald-800 rounded; }
+    .empty { @apply px-4 py-3 text-slate-500; }
+
+    /* Taxonomies panel refinements */
+    .taxonomies { @apply gap-8; }
+    .taxonomies .card { @apply shadow-sm; }
+    .taxonomies .card-title { @apply bg-white; }
+    .taxonomies .card > form { @apply px-4 md:px-5 pt-4 gap-3 mb-4; }
+    .taxonomies .card > .list { @apply mx-4 md:mx-5 mb-4; }
+    .taxonomies .list-item { @apply bg-white px-4 py-3 justify-start; }
+    .taxonomies .list-item > span:first-child { @apply flex-1; }
+    .taxonomies .actions { @apply flex-1 flex items-center gap-3 justify-end; }
+    .taxonomies .list-item .ipt-sm { @apply w-36; }
+    .taxonomies .list-item form { @apply inline-flex items-center gap-3; }
+
+    /* Ideas panel refinements */
+    .ideas-actions { @apply grid gap-2 justify-end; grid-template-columns: repeat(1,minmax(0,1fr)); }
+    @screen md { .ideas-actions { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 }
