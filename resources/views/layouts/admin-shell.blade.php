@@ -20,6 +20,30 @@
     <section class="container py-6">
       <h1 class="text-2xl font-extrabold text-slate-900 m-0">Bảng điều khiển quản trị</h1>
       <p class="text-slate-500 mt-1">Quản lý người dùng, phê duyệt, ý tưởng, phân loại và nhật ký.</p>
+
+      <!-- Admin quick links -->
+      <nav class="mt-4">
+        <ul class="flex items-center gap-2">
+          <li>
+            <a href="{{ route('admin.home', ['tab' => 'approvals']) }}"
+               class="px-3 py-1.5 rounded-lg font-semibold {{ request()->routeIs('admin.home') ? 'bg-slate-200 text-slate-900' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50' }}">
+              Tổng quan
+            </a>
+          </li>
+          <li>
+            <a href="{{ route('admin.news.index') }}"
+               class="px-3 py-1.5 rounded-lg font-semibold {{ request()->routeIs('admin.news.*') ? 'bg-slate-200 text-slate-900' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50' }}">
+              📰 Quản lý Tin tức
+            </a>
+          </li>
+          <li>
+            <a href="{{ route('admin.competitions.index') }}"
+               class="px-3 py-1.5 rounded-lg font-semibold {{ request()->routeIs('admin.competitions.*') ? 'bg-slate-200 text-slate-900' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50' }}">
+              🏆 Quản lý Cuộc thi
+            </a>
+          </li>
+        </ul>
+      </nav>
     </section>
 
     {{-- Tabs + Nội dung --}}

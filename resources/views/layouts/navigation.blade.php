@@ -35,6 +35,17 @@
 
                     <x-slot name="content">
                         @php($u = Auth::user())
+
+                        @if ($u && $u->hasRole('admin'))
+                            <x-dropdown-link :href="route('admin.home')">
+                                {{ __('Trang Quản trị') }}
+                            </x-dropdown-link>
+                        @else
+                            <x-dropdown-link :href="route('dashboard')">
+                                {{ __('Bảng điều khiển') }}
+                            </x-dropdown-link>
+                        @endif
+
                         @if ($u && ($u->hasRole('student') || (!$u->hasRole('staff') && !$u->hasRole('center') && !$u->hasRole('board') && !$u->hasRole('admin'))))
                             <x-dropdown-link :href="route('my-ideas.index')">
                                 {{ __('Ý tưởng của tôi') }}

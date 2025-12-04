@@ -37,8 +37,14 @@
                   <a class="block px-3 py-2 rounded-lg font-semibold hover:bg-slate-100"
                     href="{{ route('my-competitions.index') }}">Cuộc thi của tôi</a>
                 @elseif ($u && ($u->hasRole('staff') || $u->hasRole('center') || $u->hasRole('board') || $u->hasRole('reviewer')))
+                  @if ($u->hasRole('staff'))
+                    <a class="block px-3 py-2 rounded-lg font-semibold hover:bg-slate-100"
+                      href="{{ route('mentor.ideas') }}">Dự án hướng dẫn</a>
+                  @endif
+                  @if ($u->hasRole('center') || $u->hasRole('board') || $u->hasRole('reviewer'))
                   <a class="block px-3 py-2 rounded-lg font-semibold hover:bg-slate-100"
                     href="{{ route('manage.review-queue.index') }}">Hàng chờ phản biện</a>
+                  @endif
                 @elseif ($u && $u->hasRole('admin'))
                   <a class="block px-3 py-2 rounded-lg font-semibold hover:bg-slate-100" href="{{ route('admin.home') }}">Bảng
                     quản trị</a>
