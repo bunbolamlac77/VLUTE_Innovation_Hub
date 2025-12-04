@@ -99,6 +99,18 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
     Route::get('/mentored-ideas', [\App\Http\Controllers\MentorController::class, 'index'])
         ->middleware('role:staff')
         ->name('mentor.ideas');
+
+    // Nhóm dành riêng cho Doanh nghiệp (Enterprise)
+    Route::middleware(['role:enterprise'])->prefix('enterprise')->name('enterprise.')->group(function () {
+        // Quản lý Challenge
+        Route::get('/challenges', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'index'])->name('challenges.index');
+        Route::get('/challenges/create', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'create'])->name('challenges.create');
+        Route::post('/challenges', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'store'])->name('challenges.store');
+        Route::get('/challenges/{challenge}', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'show'])->name('challenges.show');
+        Route::post('/challenges/{challenge}/close', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'close'])->name('challenges.close');
+        Route::post('/challenges/{challenge}/reopen', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'reopen'])->name('challenges.reopen');
+        Route::post('/challenges/{challenge}/submissions/{submission}/review', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'reviewSubmission'])->name('challenges.submissions.review');
+    });
 });
 
 // Invitation routes (có thể truy cập khi chưa đăng nhập)

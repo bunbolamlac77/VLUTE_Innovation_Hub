@@ -157,6 +157,23 @@
                 </div>
             @endif
 
+            @if ($user && $user->hasRole('enterprise'))
+                <div class="dash-card">
+                    <div class="card-body">
+                        <div style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 12px;">
+                            <div>
+                                <h2 class="dash-title">Doanh nghiệp & Thách thức</h2>
+                                <div class="dash-subtitle">Đăng tải vấn đề thực tiễn để tìm kiếm giải pháp từ sinh viên</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="{{ route('enterprise.challenges.create') }}" class="btn-review">+ Đăng Thách thức</a>
+                            <a href="{{ route('enterprise.challenges.index') }}" class="btn-ghost">Quản lý bài đăng</a>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if ($user && $user->hasRole('staff'))
                 <div class="dash-card">
                     <div class="card-body">

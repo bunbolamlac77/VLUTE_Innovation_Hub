@@ -16,11 +16,22 @@ class ChallengeSubmission extends Model
         'title',
         'solution_description',
         'submitted_at',
+        'reviewed_by',
+        'reviewed_at',
+        'score',
+        'feedback',
     ];
 
     protected $casts = [
         'submitted_at' => 'datetime',
+        'reviewed_at' => 'datetime',
+        'score' => 'integer',
     ];
+
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
 
     public function challenge()
     {
