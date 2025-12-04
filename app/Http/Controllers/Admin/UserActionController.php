@@ -37,7 +37,7 @@ class UserActionController extends Controller
                 'actor_id' => $request->user()->id,
                 'target_id' => $user->id,
                 'target_type' => User::class,
-                'meta' => json_encode(['old' => $old, 'new' => $role], JSON_UNESCAPED_UNICODE),
+                'meta' => json_encode(['email' => $user->email, 'old' => $old, 'new' => $role], JSON_UNESCAPED_UNICODE),
             ]);
         }
 

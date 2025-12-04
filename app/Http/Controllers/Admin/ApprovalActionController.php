@@ -32,7 +32,7 @@ class ApprovalActionController extends Controller
                 'actor_id' => $request->user()->id,
                 'target_id' => $user->id,
                 'target_type' => User::class,
-                'meta' => json_encode(['role' => $role], JSON_UNESCAPED_UNICODE),
+                'meta' => json_encode(['email' => $user->email, 'role' => $role], JSON_UNESCAPED_UNICODE),
             ]);
         }
 
@@ -49,7 +49,7 @@ class ApprovalActionController extends Controller
                 'actor_id' => $request->user()->id,
                 'target_id' => $user->id,
                 'target_type' => User::class,
-                'meta' => json_encode([], JSON_UNESCAPED_UNICODE),
+                'meta' => json_encode(['email' => $user->email], JSON_UNESCAPED_UNICODE),
             ]);
         }
 

@@ -87,7 +87,7 @@ class AdminHomeController extends Controller
         if ($tab === 'logs' && class_exists(\App\Models\AuditLog::class)) {
             $action = $request->string('action')->toString();
             $q = $request->string('q')->toString();
-            $items = \App\Models\AuditLog::query()->latest();
+            $items = \App\Models\AuditLog::query()->with(['actor','target'])->latest();
             if ($action)
                 $items->where('action', $action);
             if ($q)
