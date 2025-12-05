@@ -3,13 +3,12 @@
 namespace App\Exports;
 
 use App\Models\CompetitionRegistration;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-/**
- * Export class for Competition Registrations
- * 
- * Hỗ trợ cả Maatwebsite Excel (XLSX) và CSV fallback
- */
-class CompetitionRegistrationsExport
+class CompetitionRegistrationsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
 {
     protected $competitionId;
 
@@ -29,7 +28,7 @@ class CompetitionRegistrationsExport
     }
 
     /**
-     * Tiêu đề các cột trong file Excel/CSV
+     * Tiêu đề các cột trong file Excel
      */
     public function headings(): array
     {
@@ -54,22 +53,9 @@ class CompetitionRegistrationsExport
             $registration->team_name ?? 'Cá nhân',
             $registration->user->name,
             $registration->user->email,
-            $registration->user->profile->phone ?? 'N/A',
-            $registration->user->profile->class ?? 'N/A',
+            optional($registration->user->profile)->phone ?? 'N/A', // Lấy từ profile
+            optional($registration->user->profile)->class_name ?? 'N/A',
             $registration->created_at->format('d/m/Y H:i'),
         ];
-    }
-
-    /**
-     * Tạo mảng dữ liệu CSV (dùng cho fallback)
-     */
-    public function toCSV(): array
-    {
-        $rows = [];
-        $rows[] = $this->headings();
-        foreach ($this->collection() as $item) {
-            $rows[] = $this->map($item);
-        }
-        return $rows;
     }
 }

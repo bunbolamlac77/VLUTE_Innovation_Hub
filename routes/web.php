@@ -176,6 +176,23 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin']
             ->name('competitions.export');
         Route::resource('news', \App\Http\Controllers\Admin\AdminNewsController::class);
         Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
+
+        // TEMP: Debug schema for profiles table (admin-only). Remove after verification.
+        Route::get('/_debug/schema/profiles', function () {
+            try {
+                $cols = \Illuminate\Support\Facades\Schema::getColumnListing('profiles');
+                return response()->json([
+                    'ok' => true,
+                    'has_class_name' => in_array('class_name', $cols, true),
+                    'columns' => $cols,
+                ]);
+            } catch (\Throwable $e) {
+                return response()->json([
+                    'ok' => false,
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        })->name('admin.debug.schema.profiles');
     });
 
 // ---- Khu người dùng (chỉ cần đăng nhập) ----

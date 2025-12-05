@@ -69,7 +69,7 @@ class AdminCompetitionController extends Controller
     }
 
     /**
-     * Xuất danh sách đăng ký ra Excel
+     * Xuất danh sách đăng ký ra Excel/CSV
      */
     public function exportRegistrations(Competition $competition)
     {
@@ -78,10 +78,15 @@ class AdminCompetitionController extends Controller
 
         $export = new CompetitionRegistrationsExport($competition->id);
 
-        // Nếu thư viện Maatwebsite Excel đã cài đặt, sử dụng nó
+        // Thử sử dụng Maatwebsite Excel nếu có và hoạt động
         if (class_exists('Maatwebsite\Excel\Facades\Excel')) {
-            $fileName = 'DS_DangKy_' . $competition->slug . '_' . date('d-m-Y') . '.xlsx';
-            return \Maatwebsite\Excel\Facades\Excel::download($export, $fileName);
+            try {
+                $fileName = 'DS_DangKy_' . $competition->slug . '_' . date('d-m-Y') . '.xlsx';
+                return \Maatwebsite\Excel\Facades\Excel::download($export, $fileName, \Maatwebsite\Excel\Excel::XLSX);
+            } catch (\Exception $e) {
+                // Nếu lỗi (ví dụ: thiếu writer), fallback sang CSV
+                \Log::warning('Excel export failed, falling back to CSV: ' . $e->getMessage());
+            }
         }
 
         // Fallback: Xuất ra CSV

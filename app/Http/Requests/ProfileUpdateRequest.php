@@ -16,10 +16,10 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         $user = $this->user();
-        $role = $user->role;
-        $isStaff = in_array($role, ['staff','center','board'], true);
-        $isEnterprise = $role === 'enterprise';
-        $isStudent = $role === 'student';
+        // Dùng cơ chế kiểm tra vai trò thống nhất với view (hasRole) thay vì chỉ đọc cột role
+        $isStaff = $user->hasRole('staff') || $user->hasRole('center') || $user->hasRole('board');
+        $isEnterprise = $user->hasRole('enterprise');
+        $isStudent = $user->hasRole('student');
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
