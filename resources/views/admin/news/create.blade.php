@@ -49,7 +49,7 @@
       <div class="card">
         <div class="card-title">Nội dung</div>
         <div class="card-body">
-          <textarea class="ipt w-full min-h-[320px]" name="content" rows="12" placeholder="Soạn thảo nội dung chi tiết" required>{{ old('content') }}</textarea>
+          <textarea id="news-editor" class="ipt w-full min-h-[320px]" name="content" rows="12" placeholder="Soạn thảo nội dung chi tiết" required>{{ old('content') }}</textarea>
           @error('content')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
           <p class="mt-2 text-xs text-slate-500">Gợi ý: Bạn có thể dán nội dung từ trình soạn thảo khác. Hỗ trợ đoạn văn, liên kết, và định dạng cơ bản.</p>
         </div>
@@ -107,3 +107,21 @@
     </aside>
   </form>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+    <script>
+        if (document.querySelector('#news-editor')) {
+            ClassicEditor
+                .create(document.querySelector('#news-editor'), {
+                    toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'insertTable', '|', 'undo', 'redo' ]
+                })
+                .then(editor => {
+                    editor.editing.view.change(writer => {
+                        writer.setStyle('min-height', '400px', editor.editing.view.document.getRoot());
+                    });
+                })
+                .catch(error => { console.error(error); });
+        }
+    </script>
+@endpush

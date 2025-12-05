@@ -180,8 +180,8 @@
                                 <h3 style="margin: 0 0 12px; font-size: 18px; color: #0f172a; font-weight: 700;">
                                     Mô tả ý tưởng
                                 </h3>
-                                <div style="color: #374151; line-height: 1.8; white-space: pre-wrap;">
-                                    {{ $idea->description }}
+                                <div class="ck-content" style="color: #374151; line-height: 1.8;">
+                                    {!! $idea->description !!}
                                 </div>
                             </div>
                           @endif

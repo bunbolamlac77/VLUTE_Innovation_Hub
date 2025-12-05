@@ -46,7 +46,8 @@
                                 Mô tả ý tưởng <span style="color: #ef4444;">*</span>
                                 <span style="font-weight: 400; color: var(--muted); font-size: 14px;">(Tối thiểu 50 ký tự)</span>
                             </label>
-                            <textarea name="description" id="description" rows="6" required
+                            {{-- Lưu ý: id="editor" là quan trọng để script bắt được --}}
+                            <textarea id="editor" name="description" rows="10" required
                                 placeholder="Mô tả chi tiết về ý tưởng của bạn..."
                                 style="width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; font-family: inherit; resize: vertical; transition: all 0.2s ease; background: #fff; line-height: 1.6;"
                                 onfocus="this.style.borderColor='var(--brand-navy)'; this.style.boxShadow='0 0 0 4px rgba(10, 15, 90, 0.1)';"
@@ -397,5 +398,25 @@
             }
         }
     </style>
+@endpush
+
+@push('scripts')
+    {{-- Load thư viện CKEditor từ CDN --}}
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+    <script>
+        if (document.querySelector('#editor')) {
+            ClassicEditor
+                .create(document.querySelector('#editor'), {
+                    toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo' ],
+                    placeholder: 'Nhập mô tả chi tiết về ý tưởng của bạn tại đây...'
+                })
+                .then(editor => {
+                    editor.editing.view.change(writer => {
+                        writer.setStyle('min-height', '300px', editor.editing.view.document.getRoot());
+                    });
+                })
+                .catch(error => { console.error(error); });
+        }
+    </script>
 @endpush
 

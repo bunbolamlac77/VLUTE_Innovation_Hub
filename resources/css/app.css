@@ -47,6 +47,14 @@
     .prose-content p { @apply mb-3 leading-7 text-slate-700; }
     .prose-content h3 { @apply mt-6 mb-2 text-lg font-bold text-slate-900; }
 
+    /* CKEditor output styles */
+    .ck-content ul { list-style-type: disc; padding-left: 20px; }
+    .ck-content ol { list-style-type: decimal; padding-left: 20px; }
+    .ck-content h2 { font-size: 1.5em; font-weight: 700; margin-top: 10px; }
+    .ck-content h3 { font-size: 1.25em; font-weight: 700; margin-top: 10px; }
+    .ck-content p { margin-bottom: 10px; }
+    .ck-content a { color: #1d4ed8; text-decoration: underline; }
+
     /* Dashboard helpers */
     .dash-card { @apply card; }
     .dash-card .card-body { @apply p-5; }

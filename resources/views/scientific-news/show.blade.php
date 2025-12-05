@@ -30,8 +30,8 @@
             @if ($news->image_url)
                 <img src="{{ $news->image_url }}" alt="{{ $news->title }}" class="w-full h-[320px] object-cover" />
             @endif
-            <div class="p-6 prose max-w-none">
-                {!! nl2br(e($news->content)) !!}
+            <div class="p-6 prose max-w-none ck-content">
+                {!! $news->content !!}
             </div>
         </article>
         <aside class="space-y-4">
