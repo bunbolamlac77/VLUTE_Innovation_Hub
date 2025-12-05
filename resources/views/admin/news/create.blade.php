@@ -120,6 +120,17 @@
                     editor.editing.view.change(writer => {
                         writer.setStyle('min-height', '400px', editor.editing.view.document.getRoot());
                     });
+                    // Đồng bộ nội dung về textarea mỗi khi gõ để qua được HTML5 required
+                    editor.model.document.on('change:data', () => {
+                        editor.updateSourceElement();
+                    });
+                    // Và chắc chắn sync thêm ngay trước khi submit
+                    const form = document.querySelector('#news-editor')?.closest('form');
+                    if (form) {
+                        form.addEventListener('submit', () => {
+                            editor.updateSourceElement();
+                        });
+                    }
                 })
                 .catch(error => { console.error(error); });
         }
