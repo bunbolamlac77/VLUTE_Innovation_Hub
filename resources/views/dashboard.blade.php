@@ -48,7 +48,7 @@
 
 
 
-            // Thống kê (Chỉ dành cho Trung tâm & BGH)
+            // Thống kê nhanh (Chỉ dành cho Trung tâm & BGH để nắm tình hình)
 
             if ($user->hasRole('center') || $user->hasRole('board')) {
 
@@ -94,7 +94,7 @@
 
 
 
-            // Các dự án đang hướng dẫn (Đã là thành viên với vai trò mentor)
+            // [MỚI] Các dự án đang hướng dẫn (Đã chấp nhận làm mentor)
 
             $mentoredIdeas = \App\Models\IdeaMember::where('user_id', $user->id)
 
@@ -117,6 +117,8 @@
         $myChallenges = collect();
 
         if ($user && $user->hasRole('enterprise')) {
+
+            // [MỚI] Lấy danh sách challenge kèm số lượng bài nộp
 
             $myChallenges = \App\Models\Challenge::where('owner_id', $user->id)
 
@@ -254,7 +256,7 @@
 
             @if ($isReviewer)
 
-                {{-- Thống kê nhanh (Chỉ hiện cho Center/Board) --}}
+                {{-- [MỚI] Thống kê nhanh --}}
 
                 @if(!empty($stats))
 
@@ -424,7 +426,7 @@
 
                         
 
-                        {{-- Danh sách Challenges --}}
+                        {{-- [MỚI] Danh sách Challenges & Số lượng submission --}}
 
                         <div class="grid gap-4">
 
@@ -484,7 +486,7 @@
 
                 <div class="grid md:grid-cols-2 gap-6">
 
-                    {{-- 3.1 Dự án đang hướng dẫn --}}
+                    {{-- [MỚI] 3.1 Dự án đang hướng dẫn (Quan trọng) --}}
 
                     <div class="dash-card">
 
