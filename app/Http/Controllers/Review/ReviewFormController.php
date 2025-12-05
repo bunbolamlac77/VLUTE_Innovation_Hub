@@ -77,19 +77,19 @@ class ReviewFormController extends Controller
             // 2. Tìm hoặc tạo ReviewAssignment cho idea này và reviewer hiện tại
             $assignment = ReviewAssignment::firstOrCreate(
                 [
-                    'idea_id' => $idea->id,
-                    'reviewer_id' => $user->id,
+                    'idea_id' => $idea?->id,
+                    'reviewer_id' => $user?->id,
                     'review_level' => $reviewLevel,
                 ],
                 [
-                    'assigned_by' => $user->id, // Tự phân công hoặc có thể để null
+                    'assigned_by' => $user?->id, // Tự phân công hoặc có thể để null
                     'status' => 'pending',
                 ]
             );
 
             // 3. Tạo bản ghi Review (để lưu lịch sử)
             $review = Review::create([
-                'assignment_id' => $assignment->id,
+                'assignment_id' => $assignment?->id,
                 'overall_comment' => $validated['comment'] ?? null,
                 'decision' => $validated['action'] === 'approve' ? 'approved' : 'needs_change',
             ]);
@@ -100,23 +100,23 @@ class ReviewFormController extends Controller
                 if ($reviewLevel === 'center') {
                     // Trung tâm duyệt: hoặc approved_center, hoặc duyệt cuối nếu không yêu cầu BGH
                     if (config('ideas.require_board_approval')) {
-                        $idea->update(['status' => 'approved_center']);
+                        $idea?->update(['status' => 'approved_center']);
                     } else {
-                        $idea->update(['status' => 'approved_final']);
+                        $idea?->update(['status' => 'approved_final']);
                     }
                 } elseif ($reviewLevel === 'board') {
-                    $idea->update(['status' => 'approved_final']);
+                    $idea?->update(['status' => 'approved_final']);
                 } else {
                     // Fallback an toàn: coi như cấp Trung tâm
                     if (config('ideas.require_board_approval')) {
-                        $idea->update(['status' => 'approved_center']);
+                        $idea?->update(['status' => 'approved_center']);
                     } else {
-                        $idea->update(['status' => 'approved_final']);
+                        $idea?->update(['status' => 'approved_final']);
                     }
                 }
 
                 // Đánh dấu assignment là completed
-                $assignment->markAsCompleted();
+                $assignment?->markAsCompleted();
 
                 // (Tùy chọn: Gửi email cho SV báo đã được duyệt)
 
@@ -124,24 +124,24 @@ class ReviewFormController extends Controller
 
                 // Nếu Yêu cầu sửa: Tạo bản ghi ChangeRequest
                 ChangeRequest::create([
-                    'review_id' => $review->id, // Liên kết với review vừa tạo
-                    'idea_id' => $idea->id,
+                    'review_id' => $review?->id, // Liên kết với review vừa tạo
+                    'idea_id' => $idea?->id,
                     'request_message' => $validated['comment'],
                     'is_resolved' => false,
                 ]);
 
                 // Cập nhật status của Idea để trả về cho SV
                 if ($reviewLevel === 'center') {
-                    $idea->update(['status' => 'needs_change_center']);
+                    $idea?->update(['status' => 'needs_change_center']);
                 } elseif ($reviewLevel === 'board') {
-                    $idea->update(['status' => 'needs_change_board']);
+                    $idea?->update(['status' => 'needs_change_board']);
                 } else {
                     // Fallback: treat as center level in case of legacy data
-                    $idea->update(['status' => 'needs_change_center']);
+                    $idea?->update(['status' => 'needs_change_center']);
                 }
 
                 // Đánh dấu assignment là completed
-                $assignment->markAsCompleted();
+                $assignment?->markAsCompleted();
 
                 // (Tùy chọn: Gửi email cho SV báo cần chỉnh sửa)
             }
@@ -151,7 +151,7 @@ class ReviewFormController extends Controller
             // Gửi thông báo cho chủ sở hữu ý tưởng
             try {
                 $notificationStatus = $validated['action'] === 'approve' ? 'approved' : 'needs_change';
-                if ($idea->owner) {
+                if ($idea?->owner) {
                     $idea->owner->notify(new IdeaStatusChanged($idea, $notificationStatus));
                 }
             } catch (\Throwable $e) {

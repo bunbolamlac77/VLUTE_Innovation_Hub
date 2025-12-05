@@ -35,7 +35,7 @@ class MyCompetitionsController extends Controller
             });
         }
 
-        if (in_array($sort, ['deadline_asc', 'deadline_desc'], true)) {
+        if (\in_array($sort, ['deadline_asc', 'deadline_desc'], true)) {
             $direction = $sort === 'deadline_asc' ? 'asc' : 'desc';
             $query->leftJoin('competitions', 'competition_registrations.competition_id', '=', 'competitions.id')
                 ->orderBy('competitions.end_date', $direction)

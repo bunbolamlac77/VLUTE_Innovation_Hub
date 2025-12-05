@@ -26,7 +26,7 @@ class UserRoleController extends Controller
         // Nếu admin muốn đổi "vai chính" (users.role), có thể chọn 1 slug làm primary_role:
         if ($request->filled('primary_role')) {
             $primary = $request->string('primary_role')->toString();
-            if (in_array($primary, ['student', 'staff', 'enterprise', 'admin', 'reviewer', 'center', 'board'], true)) {
+            if (\in_array($primary, ['student', 'staff', 'enterprise', 'admin', 'reviewer', 'center', 'board'], true)) {
                 $user->update(['role' => $primary]);
             }
         }

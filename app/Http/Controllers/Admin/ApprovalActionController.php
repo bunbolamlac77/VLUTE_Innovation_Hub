@@ -14,7 +14,7 @@ class ApprovalActionController extends Controller
         $allowed = $domain === 'vlute.edu.vn' ? ['staff', 'center', 'board'] : ['enterprise'];
         $role = $request->string('role')->toString();
 
-        if (!in_array($role, $allowed, true)) {
+        if (!\in_array($role, $allowed, true)) {
             return to_route('admin.home', ['tab' => 'approvals'])->with('status', 'Vai trò không hợp lệ.');
         }
 

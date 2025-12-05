@@ -122,10 +122,10 @@ class IdeaPolicy
         $centerStatuses = ['submitted_center', 'needs_change_center'];
         $boardStatuses  = ['approved_center', 'submitted_board', 'needs_change_board'];
 
-        if (in_array($idea->status, $centerStatuses, true)) {
+        if (\in_array($idea->status, $centerStatuses, true)) {
             return $user->hasRole('center') || $user->hasRole('reviewer');
         }
-        if (in_array($idea->status, $boardStatuses, true)) {
+        if (\in_array($idea->status, $boardStatuses, true)) {
             return $user->hasRole('board') || $user->hasRole('reviewer');
         }
         return false;

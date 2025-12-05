@@ -25,7 +25,7 @@ class ChallengeController extends Controller
             });
         }
 
-        if (in_array($status, ['open','closed','draft'], true)) {
+        if (\in_array($status, ['open','closed','draft'], true)) {
             $query->where('status', $status);
         } else {
             // Mặc định hiển thị đang mở

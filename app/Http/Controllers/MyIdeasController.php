@@ -263,7 +263,7 @@ class MyIdeasController extends Controller
 
         // Map all submissions to center directly
         if ($idea->needsChange()) {
-            if (in_array($idea->status, ['needs_change_center', 'needs_change_board'], true)) {
+            if (\in_array($idea->status, ['needs_change_center', 'needs_change_board'], true)) {
                 $idea->status = $idea->status === 'needs_change_board' ? 'submitted_board' : 'submitted_center';
             } else {
                 // includes legacy needs_change_gv

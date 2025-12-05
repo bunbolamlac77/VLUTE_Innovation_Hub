@@ -34,7 +34,7 @@ class RegisteredUserController extends Controller
         $domain = str($email)->after('@')->toString();
 
         // Xác định xem có phải domain VLUTE không
-        $isVluteDomain = in_array($domain, ['vlute.edu.vn', 'st.vlute.edu.vn'], true);
+        $isVluteDomain = \in_array($domain, ['vlute.edu.vn', 'st.vlute.edu.vn'], true);
 
         // Validation rules cơ bản
         $rules = [

@@ -21,7 +21,7 @@ class SearchController extends Controller
         $categoryId = $request->input('category');
 
         $allowedTypes = ['all', 'ideas', 'competitions', 'mentors'];
-        if (!in_array($type, $allowedTypes, true)) {
+        if (!\in_array($type, $allowedTypes, true)) {
             $type = 'all';
         }
 

@@ -75,7 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function needsApproval(): bool
     {
-        return in_array($this->role, ['staff', 'enterprise'], true);
+        return \in_array($this->role, ['staff', 'enterprise'], true);
     }
     public function roles()
     {
@@ -192,7 +192,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $required[] = (bool) $p && trim((string) $p->address) !== '';
         $required[] = trim((string) $this->avatar_url) !== '';
 
-        return !in_array(false, $required, true);
+        return !\in_array(false, $required, true);
     }
 
     /**

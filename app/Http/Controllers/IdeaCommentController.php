@@ -35,12 +35,12 @@ class IdeaCommentController extends Controller
         try {
             $idea->loadMissing(['owner', 'members.user']);
             $notifiedIds = [$user->id];
-            if ($idea->owner && !in_array($idea->owner->id, $notifiedIds, true)) {
+            if ($idea->owner && !\in_array($idea->owner->id, $notifiedIds, true)) {
                 $idea->owner->notify(new NewIdeaComment($idea, $comment));
                 $notifiedIds[] = $idea->owner->id;
             }
             foreach ($idea->members as $m) {
-                if ($m->user && !in_array($m->user->id, $notifiedIds, true)) {
+                if ($m->user && !\in_array($m->user->id, $notifiedIds, true)) {
                     $m->user->notify(new NewIdeaComment($idea, $comment));
                     $notifiedIds[] = $m->user->id;
                 }

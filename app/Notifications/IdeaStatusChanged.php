@@ -42,7 +42,7 @@ class IdeaStatusChanged extends Notification
         $msg = $this->message;
 
         if (!$msg) {
-            $title = $this->idea->title;
+            $title = $this->idea?->title;
             $msg = match ($this->status) {
                 'approved' => "Ý tưởng '{$title}' đã được duyệt!",
                 'rejected' => "Ý tưởng '{$title}' bị từ chối.",
@@ -53,12 +53,12 @@ class IdeaStatusChanged extends Notification
         }
 
         // Link để người dùng bấm vào xem
-        $url = route('my-ideas.show', $this->idea->id);
+        $url = route('my-ideas.show', $this->idea?->id);
 
         // Nếu là admin/reviewer thì trỏ về trang quản lý khi có bài mới nộp
         if (method_exists($notifiable, 'hasRole') && ($notifiable->hasRole('admin') || $notifiable->hasRole('staff') || $notifiable->hasRole('center'))) {
             if ($this->status === 'submitted') {
-                $url = route('manage.review.form', $this->idea->id);
+                $url = route('manage.review.form', $this->idea?->id);
             }
         }
 

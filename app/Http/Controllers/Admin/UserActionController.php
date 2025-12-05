@@ -15,7 +15,7 @@ class UserActionController extends Controller
         $domain = str($user->email)->after('@')->lower()->toString();
 
         // Kiểm tra user có được phép đổi vai không
-        $canChangeRole = $domain === 'vlute.edu.vn' && in_array($user->role, ['staff', 'center', 'board'], true);
+        $canChangeRole = $domain === 'vlute.edu.vn' && \in_array($user->role, ['staff', 'center', 'board'], true);
 
         if (!$canChangeRole) {
             return to_route('admin.home', ['tab' => 'users'])->with('status', 'Không thể đổi vai trò cho ' . $user->role_label . '.');
@@ -24,7 +24,7 @@ class UserActionController extends Controller
         $allowed = ['staff', 'center', 'board'];
         $role = $request->string('role')->toString();
 
-        if (!in_array($role, $allowed, true)) {
+        if (!\in_array($role, $allowed, true)) {
             return to_route('admin.home', ['tab' => 'users'])->with('status', 'Vai trò không hợp lệ.');
         }
 

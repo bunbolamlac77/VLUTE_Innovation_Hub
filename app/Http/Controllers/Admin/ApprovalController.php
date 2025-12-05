@@ -47,7 +47,7 @@ class ApprovalController extends Controller
             ? ['staff', 'center', 'board']
             : ['enterprise'];
 
-        if (!in_array($role, $allowed, true)) {
+        if (!\in_array($role, $allowed, true)) {
             return back()->with('status', 'Vai trò không hợp lệ cho email này.');
         }
 

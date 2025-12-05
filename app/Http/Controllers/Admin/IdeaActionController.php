@@ -30,8 +30,8 @@ class IdeaActionController extends Controller
         if (class_exists(\App\Models\AuditLog::class)) {
             \App\Models\AuditLog::create([
                 'action' => 'idea_status_changed',
-                'actor_id' => $request->user()->id,
-                'target_id' => $idea->id,
+                'actor_id' => $request->user()?->id,
+                'target_id' => $idea?->id,
                 'target_type' => Idea::class,
                 'meta' => json_encode(['old' => $old, 'new' => $new], JSON_UNESCAPED_UNICODE),
             ]);
@@ -79,15 +79,15 @@ class IdeaActionController extends Controller
         $reviewer = User::find($request->reviewer_id);
 
         // Ensure the selected user is a reviewer
-        if (!$reviewer || !in_array($reviewer->role, ['staff', 'center', 'board'])) {
+        if (!$reviewer || !\in_array($reviewer->role, ['staff', 'center', 'board'])) {
             return back()->withErrors(['reviewer_id' => 'Người dùng được chọn không phải là reviewer.']);
         }
 
         // Create a new review assignment, avoiding duplicates
         ReviewAssignment::updateOrCreate(
             [
-                'idea_id' => $idea->id,
-                'reviewer_id' => $reviewer->id,
+                'idea_id' => $idea?->id,
+                'reviewer_id' => $reviewer?->id,
             ],
             [
                 'status' => 'pending', // Set status to pending

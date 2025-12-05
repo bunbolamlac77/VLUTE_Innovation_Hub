@@ -58,18 +58,18 @@
           </div>
           <div class="max-h-96 overflow-y-auto divide-y divide-slate-200">
             @forelse($__notifications as $n)
-              <a href="{{ route('notifications.read', $n->id) }}"
-                class="flex items-start gap-3 px-4 py-4 hover:bg-slate-50 {{ $n->read_at ? '' : 'bg-blue-50/40' }}">
+              <a href="{{ route('notifications.read', $n?->id) }}"
+                class="flex items-start gap-3 px-4 py-4 hover:bg-slate-50 {{ $n?->read_at ? '' : 'bg-blue-50/40' }}">
                 <div
                   class="flex-shrink-0 w-9 h-9 rounded-full bg-slate-100 text-slate-600 grid place-items-center mt-0.5">🔔
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-[15px] font-bold text-slate-900 leading-5 truncate">
-                    {{ $n->data['title'] ?? 'Thông báo' }}</div>
-                  <div class="text-[14px] text-slate-700 leading-6 line-clamp-2">{{ $n->data['message'] ?? '' }}</div>
-                  <div class="text-[12px] text-slate-500 mt-1">{{ $n->created_at->diffForHumans() }}</div>
+                    {{ $n?->data['title'] ?? 'Thông báo' }}</div>
+                  <div class="text-[14px] text-slate-700 leading-6 line-clamp-2">{{ $n?->data['message'] ?? '' }}</div>
+                  <div class="text-[12px] text-slate-500 mt-1">{{ $n?->created_at->diffForHumans() }}</div>
                 </div>
-                @if(!$n->read_at)
+                @if(!$n?->read_at)
                   <span class="mt-1 h-2 w-2 bg-blue-600 rounded-full"></span>
                 @endif
               </a>
@@ -82,10 +82,10 @@
       {{-- User menu --}}
       <div id="userBox" class="relative flex items-center gap-2" aria-haspopup="true"
         aria-expanded="false">
-      <img src="{{ Auth::user()->avatar_url ? asset(Auth::user()->avatar_url) : asset('images/avatar-default.svg') }}"
+      <img src="{{ Auth::user()?->avatar_url ? asset(Auth::user()?->avatar_url) : asset('images/avatar-default.svg') }}"
         alt="Ảnh đại diện" class="w-10 h-10 rounded-full object-cover bg-white border-2 border-white/30 cursor-pointer"
         id="userAvatar"
-        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2740%27 fill=%27%230a0f5a%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2740%27 fill=%27white%27 text-anchor=%27middle%27%3E{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}%3C/text%3E%3C/svg%3E'" />
+        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2740%27 fill=%27%230a0f5a%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2740%27 fill=%27white%27 text-anchor=%27middle%27%3E{{ strtoupper(substr(auth()->user()?->name, 0, 1)) }}%3C/text%3E%3C/svg%3E'" />
       <button id="btnUserMenu" type="button" aria-controls="userMenu" class="px-3 py-2 rounded hover:bg-white/15 text-lg font-bold" aria-label="Mở menu người dùng">▾</button>
       <div id="userMenu"
         class="hidden absolute right-0 top-full mt-2 w-56 bg-white text-slate-900 rounded-xl shadow-xl border border-slate-200 p-2 z-50"
@@ -95,7 +95,7 @@
         <a class="block px-3 py-2 rounded-lg font-semibold hover:bg-slate-100" href="{{ route('profile.edit') }}">Hồ
           sơ cá nhân</a>
         @php($u = auth()->user())
-              @if ($u && ($u->hasRole('student') || (!$u->hasRole('staff') && !$u->hasRole('center') && !$u->hasRole('board') && !$u->hasRole('admin'))))
+              @if ($u !== null && ($u->hasRole('student') || (!$u->hasRole('staff') && !$u->hasRole('center') && !$u->hasRole('board') && !$u->hasRole('admin'))))
                 <a class="block px-3 py-2 rounded-lg font-semibold hover:bg-slate-100" href="{{ route('my-ideas.index') }}">Ý
                   tưởng của tôi</a>
                 <a class="block px-3 py-2 rounded-lg font-semibold hover:bg-slate-100"

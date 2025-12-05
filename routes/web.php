@@ -9,9 +9,7 @@ use App\Http\Controllers\SearchController;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 
-Route::get('/about', function () {
-    return view('about');
-});
+Route::get('/about', fn() => view('about'));
 
 // Bản tin khoa học - Trang công khai
 Route::get('/scientific-news', [\App\Http\Controllers\ScientificNewsController::class, 'index'])->name('scientific-news.index');
@@ -205,7 +203,7 @@ Route::middleware('auth')->group(function () {
     // Notifications: đánh dấu đã đọc
     Route::post('/notifications/read-all', function () {
         $user = auth()->user();
-        if ($user) {
+        if ($user !== null) {
             $user->unreadNotifications->markAsRead();
         }
         return back();
