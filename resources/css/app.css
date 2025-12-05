@@ -13,6 +13,9 @@
         --border: #e5e7eb;
     }
 
+    /* Prevent global horizontal scrolling */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
     [role="banner"] .container { @apply py-5; }
     header[role="navigation"] .container { @apply py-4; }
     main > section { @apply py-12; }
@@ -48,12 +51,21 @@
     .prose-content h3 { @apply mt-6 mb-2 text-lg font-bold text-slate-900; }
 
     /* CKEditor output styles */
+    .ck-content { overflow-wrap: anywhere; word-break: break-word; white-space: pre-wrap; max-width: 100%; }
     .ck-content ul { list-style-type: disc; padding-left: 20px; }
     .ck-content ol { list-style-type: decimal; padding-left: 20px; }
     .ck-content h2 { font-size: 1.5em; font-weight: 700; margin-top: 10px; }
     .ck-content h3 { font-size: 1.25em; font-weight: 700; margin-top: 10px; }
     .ck-content p { margin-bottom: 10px; }
     .ck-content a { color: #1d4ed8; text-decoration: underline; }
+
+    /* Prevent horizontal overflow in common containers */
+    .container { overflow-x: clip; }
+    .card, .card-body { max-width: 100%; }
+    .card * { min-width: 0; }
+
+    /* Media scaling */
+    img, video { max-width: 100%; height: auto; display: block; }
 
     /* Dashboard helpers */
     .dash-card { @apply card; }

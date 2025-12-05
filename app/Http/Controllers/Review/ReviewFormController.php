@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Review;
 
+use App\Notifications\IdeaStatusChanged;
+
 use App\Http\Controllers\Controller;
 use App\Models\Idea;
 use App\Models\Review;
@@ -145,6 +147,16 @@ class ReviewFormController extends Controller
             }
 
             DB::commit();
+
+            // Gửi thông báo cho chủ sở hữu ý tưởng
+            try {
+                $notificationStatus = $validated['action'] === 'approve' ? 'approved' : 'needs_change';
+                if ($idea->owner) {
+                    $idea->owner->notify(new IdeaStatusChanged($idea, $notificationStatus));
+                }
+            } catch (\Throwable $e) {
+                // Không để lỗi notify làm hỏng luồng chính
+            }
 
             // 5. Chuyển hướng về hàng chờ
             return redirect()->route('manage.review-queue.index')

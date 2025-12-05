@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Idea;
 use App\Models\ReviewAssignment;
 use App\Models\User;
+use App\Notifications\IdeaStatusChanged;
 use Illuminate\Http\Request;
 
 class IdeaActionController extends Controller
@@ -22,7 +23,8 @@ class IdeaActionController extends Controller
         ]);
 
         $old = $idea->status;
-        $idea->update(['status' => $request->status]);
+        $new = $request->status;
+        $idea->update(['status' => $new]);
 
         // Ghi nhật ký nếu có AuditLog
         if (class_exists(\App\Models\AuditLog::class)) {
@@ -31,8 +33,35 @@ class IdeaActionController extends Controller
                 'actor_id' => $request->user()->id,
                 'target_id' => $idea->id,
                 'target_type' => Idea::class,
-                'meta' => json_encode(['old' => $old, 'new' => $request->status], JSON_UNESCAPED_UNICODE),
+                'meta' => json_encode(['old' => $old, 'new' => $new], JSON_UNESCAPED_UNICODE),
             ]);
+        }
+
+        // Gửi thông báo cho chủ ý tưởng (và có thể mở rộng cho các thành viên nếu cần)
+        try {
+            $notifyStatus = match (true) {
+                $new === 'rejected' => 'rejected',
+                str_contains($new, 'needs_change') => 'needs_change',
+                str_contains($new, 'submitted') => 'submitted',
+                str_contains($new, 'approved') => 'approved',
+                default => 'updated',
+            };
+            if ($idea->owner) {
+                $idea->owner->notify(new IdeaStatusChanged($idea, $notifyStatus));
+            }
+            // Thông báo cho các thành viên nhóm (nếu có)
+            try {
+                $idea->loadMissing('members.user');
+                foreach ($idea->members as $member) {
+                    if ($member->user && (!$idea->owner || $member->user_id !== $idea->owner->id)) {
+                        $member->user->notify(new IdeaStatusChanged($idea, $notifyStatus));
+                    }
+                }
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        } catch (\Throwable $e) {
+            // Không để lỗi notify ảnh hưởng thao tác admin
         }
 
         return back()->with('status', 'Trạng thái ý tưởng đã được cập nhật.');

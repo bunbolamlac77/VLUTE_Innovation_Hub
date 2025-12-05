@@ -78,12 +78,15 @@
             @endforelse
           </div>
         </div>
-      </div {{-- User menu --}} <div id="userBox" class="relative flex items-center gap-2" aria-haspopup="true"
+      </div>
+      {{-- User menu --}}
+      <div id="userBox" class="relative flex items-center gap-2" aria-haspopup="true"
         aria-expanded="false">
       <img src="{{ Auth::user()->avatar_url ? asset(Auth::user()->avatar_url) : asset('images/avatar-default.svg') }}"
-        alt="Ảnh đại diện" class="w-10 h-10 rounded-full object-cover bg-white border-2 border-white/30"
+        alt="Ảnh đại diện" class="w-10 h-10 rounded-full object-cover bg-white border-2 border-white/30 cursor-pointer"
+        id="userAvatar"
         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2740%27 fill=%27%230a0f5a%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2740%27 fill=%27white%27 text-anchor=%27middle%27%3E{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}%3C/text%3E%3C/svg%3E'" />
-      <button id="btnUserMenu" class="px-2 py-1 rounded hover:bg-white/15" aria-label="Mở menu người dùng">▾</button>
+      <button id="btnUserMenu" type="button" aria-controls="userMenu" class="px-3 py-2 rounded hover:bg-white/15 text-lg font-bold" aria-label="Mở menu người dùng">▾</button>
       <div id="userMenu"
         class="hidden absolute right-0 top-full mt-2 w-56 bg-white text-slate-900 rounded-xl shadow-xl border border-slate-200 p-2 z-50"
         role="menu" aria-label="Menu người dùng">
@@ -157,6 +160,7 @@
 @push('scripts')
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Notifications dropdown (bell)
       const notifBox = document.getElementById('notifBox');
       const btn = document.getElementById('btnNotifMenu');
       const menu = document.getElementById('notifMenu');
@@ -176,6 +180,58 @@
           if (!notifBox.contains(e.target)) {
             menu.classList.add('hidden');
             btn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+
+
+    });
+  </script>
+@endpush
+
+@push('scripts')
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const userBox = document.getElementById('userBox');
+      const userBtn = document.getElementById('btnUserMenu');
+      const userAvatar = document.getElementById('userAvatar');
+      const userMenu = document.getElementById('userMenu');
+      
+      if (userBox && userBtn && userMenu) {
+        // Toggle menu function
+        const toggleMenu = function (e) {
+          e.stopPropagation();
+          const isHidden = userMenu.classList.contains('hidden');
+          if (isHidden) {
+            userMenu.classList.remove('hidden');
+            userBtn.setAttribute('aria-expanded', 'true');
+          } else {
+            userMenu.classList.add('hidden');
+            userBtn.setAttribute('aria-expanded', 'false');
+          }
+        };
+        
+        // Button click handler
+        userBtn.addEventListener('click', toggleMenu);
+        
+        // Avatar click handler
+        if (userAvatar) {
+          userAvatar.addEventListener('click', toggleMenu);
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+          if (!userBox.contains(e.target)) {
+            userMenu.classList.add('hidden');
+            userBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+        
+        // Close menu on Escape key
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') {
+            userMenu.classList.add('hidden');
+            userBtn.setAttribute('aria-expanded', 'false');
           }
         });
       }

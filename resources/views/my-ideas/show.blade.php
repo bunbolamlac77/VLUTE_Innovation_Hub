@@ -154,7 +154,7 @@
               </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+          <div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 32px; width: 100%;">
               {{-- Main Content --}}
               <div>
                   {{-- Idea Info --}}
@@ -191,7 +191,7 @@
                                 <h3 style="margin: 0 0 12px; font-size: 18px; color: #0f172a; font-weight: 700;">
                                     Nội dung chi tiết
                                 </h3>
-                                <div style="color: #374151; line-height: 1.8; white-space: pre-wrap;">
+                                <div style="color: #374151; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;">
                                     {!! nl2br(e($idea->content)) !!}
                                 </div>
                             </div>

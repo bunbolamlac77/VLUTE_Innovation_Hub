@@ -64,25 +64,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            const btnUserMenu = document.getElementById('btnUserMenu');
-            const userMenu = document.getElementById('userMenu');
-            const userBox = document.getElementById('userBox');
-
-            if (btnUserMenu && userMenu && userBox) {
-                btnUserMenu.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    userMenu.classList.toggle('hidden');
-                    userBox.setAttribute('aria-expanded', userMenu.classList.contains('hidden') ? 'false' : 'true');
-                });
-                document.addEventListener('click', (e) => {
-                    if (!userBox.contains(e.target)) {
-                        userMenu.classList.add('hidden');
-                        userBox.setAttribute('aria-expanded', 'false');
-                    }
-                });
-                userMenu.addEventListener('click', (e) => { e.stopPropagation(); });
-            }
-
             const flashToast = document.getElementById('flash-toast');
             if (flashToast) setTimeout(() => { closeFlashToast(); }, 5000);
             const profileToast = document.getElementById('profile-toast');

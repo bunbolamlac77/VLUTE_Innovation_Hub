@@ -181,6 +181,38 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Notifications: đánh dấu đã đọc
+    Route::post('/notifications/read-all', function () {
+        $user = auth()->user();
+        if ($user) {
+            $user->unreadNotifications->markAsRead();
+        }
+        return back();
+    })->name('notifications.readAll');
+
+    Route::get('/notifications/{id}/read', function (string $id) {
+        $user = auth()->user();
+        $redirect = url()->previous();
+        if ($user) {
+            $notification = $user->notifications()->whereKey($id)->firstOrFail();
+            if (is_null($notification->read_at)) {
+                $notification->markAsRead();
+            }
+            $data = $notification->data ?? [];
+            if (is_array($data)) {
+                $target = $data['url'] ?? $data['link'] ?? null;
+                if ($target) {
+                    if (filter_var($target, FILTER_VALIDATE_URL)) {
+                        $redirect = $target;
+                    } elseif (is_string($target)) {
+                        $redirect = url($target);
+                    }
+                }
+            }
+        }
+        return redirect($redirect);
+    })->name('notifications.read');
 });
 
 // Route để xử lý đăng ký cuộc thi (cần đăng nhập và verified)
