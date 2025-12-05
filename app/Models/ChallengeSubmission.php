@@ -20,6 +20,13 @@ class ChallengeSubmission extends Model
         'reviewed_at',
         'score',
         'feedback',
+        'full_name',
+        'phone',
+        'address',
+        'class_name',
+        'school_name',
+        'team_members',
+        'mentor_name',
     ];
 
     protected $casts = [

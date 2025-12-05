@@ -42,7 +42,7 @@ class ChallengeController extends Controller
      */
     public function show(Challenge $challenge): View
     {
-        $challenge->load('organization');
+        $challenge->load(['organization', 'attachments']);
         return view('challenges.show', compact('challenge'));
     }
 }

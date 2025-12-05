@@ -4,8 +4,9 @@
 
 @section('content')
   {{-- Hero --}}
+  @php($hero = $challenge->image ? asset('storage/' . $challenge->image) : asset('images/panel-truong.jpg'))
   <section class="relative text-white">
-    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ asset('images/panel-truong.jpg') }}')"></div>
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ $hero }}')"></div>
     <div class="absolute inset-0 bg-gradient-to-tr from-brand-navy/90 to-brand-green/85"></div>
     <div class="relative">
       <div class="container py-12">
@@ -27,7 +28,17 @@
   <section class="container py-10 grid lg:grid-cols-[1fr,320px] gap-8">
     <article class="bg-white border border-slate-200 rounded-2xl shadow-card overflow-hidden">
       <div class="p-6 prose max-w-none">
+        @if($challenge->problem_statement)
+          <h2>Bối cảnh & vấn đề</h2>
+          {!! $challenge->problem_statement !!}
+        @endif
+        @if($challenge->requirements)
+          <h2>Yêu cầu & phạm vi</h2>
+          {!! $challenge->requirements !!}
+        @endif
+        @if(!$challenge->problem_statement && !$challenge->requirements)
         {!! nl2br(e($challenge->description)) !!}
+        @endif
       </div>
     </article>
     <aside class="space-y-4">
@@ -51,8 +62,18 @@
         </ul>
       </div>
       <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-4">
-        <h3 class="m-0 mb-3 text-lg font-extrabold text-slate-900">Hướng dẫn tham gia</h3>
-        <p class="m-0 text-sm text-slate-700">Liên hệ doanh nghiệp hoặc Trung tâm ĐMST để biết thêm chi tiết về cách nộp bài và yêu cầu cụ thể.</p>
+        <h3 class="m-0 mb-3 text-lg font-extrabold text-slate-900">Tài liệu/Đề bài</h3>
+        @if($challenge->attachments->isNotEmpty())
+          <ul class="m-0 p-0 text-sm space-y-2">
+            @foreach($challenge->attachments as $file)
+              <li>
+                <a class="inline-flex items-center gap-2 text-indigo-600 hover:underline" href="{{ route('attachments.download', $file->id) }}">📎 {{ $file->filename }}</a>
+              </li>
+            @endforeach
+          </ul>
+        @else
+          <p class="m-0 text-sm text-slate-600">Chưa có tệp đính kèm.</p>
+        @endif
       </div>
     </aside>
   </section>

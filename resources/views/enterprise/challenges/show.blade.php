@@ -50,7 +50,39 @@
                 </div>
                 <div><strong>Phần thưởng:</strong> <span style="font-weight:700; color:#047857;">{{ $challenge->reward ?? '—' }}</span></div>
             </div>
-            <div style="margin-top:12px; color:#374151; white-space: pre-wrap;">{{ $challenge->description }}</div>
+
+            @if($challenge->image)
+                <div style="margin-top:12px;">
+                    <img src="{{ asset('storage/' . $challenge->image) }}" alt="Ảnh bìa" style="width:100%; height:220px; object-fit:cover; border-radius:12px; border:1px solid #eef2f7;" />
+                </div>
+            @endif
+
+            <div style="margin-top:12px; color:#374151;">
+                @if($challenge->problem_statement)
+                    <h3 style="margin:8px 0 4px; font-weight:800;">Bối cảnh & vấn đề</h3>
+                    {!! $challenge->problem_statement !!}
+                @endif
+                @if($challenge->requirements)
+                    <h3 style="margin:12px 0 4px; font-weight:800;">Yêu cầu & phạm vi</h3>
+                    {!! $challenge->requirements !!}
+                @endif
+                @if(!$challenge->problem_statement && !$challenge->requirements)
+                    <div style="white-space: pre-wrap;">{{ $challenge->description }}</div>
+                @endif
+            </div>
+
+            <div style="margin-top:12px;">
+                <h4 style="margin:0 0 8px; font-weight:800;">Tệp đính kèm (đề bài/dữ liệu)</h4>
+                @if($challenge->attachments->isNotEmpty())
+                    <div style="display:grid; gap:6px;">
+                        @foreach($challenge->attachments as $file)
+                            <a href="{{ route('attachments.download', $file->id) }}" class="btn btn-ghost" style="justify-content:flex-start;">📎 {{ $file->filename }}</a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="muted">Chưa có tệp đính kèm.</div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -64,6 +96,31 @@
                         <div style="flex:1; min-width:0;">
                             <div style="font-size: 18px; font-weight: 800; color:#1e3a8a;">{{ $sub->title }}</div>
                             <div class="muted" style="margin-top: 2px;">Tác giả: {{ $sub->user->name ?? 'N/A' }} • {{ $sub->created_at?->format('d/m/Y H:i') }}</div>
+
+                            <div style="margin-top:8px; display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size: 13px;">
+                                @if($sub->full_name)
+                                    <div><strong>Họ tên:</strong> {{ $sub->full_name }}</div>
+                                @endif
+                                @if($sub->phone)
+                                    <div><strong>Điện thoại:</strong> {{ $sub->phone }}</div>
+                                @endif
+                                @if($sub->address)
+                                    <div class="md:col-span-2"><strong>Địa chỉ:</strong> {{ $sub->address }}</div>
+                                @endif
+                                @if($sub->class_name)
+                                    <div><strong>Lớp:</strong> {{ $sub->class_name }}</div>
+                                @endif
+                                @if($sub->school_name)
+                                    <div><strong>Trường:</strong> {{ $sub->school_name }}</div>
+                                @endif
+                                @if($sub->mentor_name)
+                                    <div class="md:col-span-2"><strong>GV hướng dẫn:</strong> {{ $sub->mentor_name }}</div>
+                                @endif
+                                @if($sub->team_members)
+                                    <div class="md:col-span-2"><strong>Thành viên nhóm:</strong> {{ $sub->team_members }}</div>
+                                @endif
+                            </div>
+
                             @if ($sub->solution_description)
                                 <div style="margin-top: 8px; color:#374151; white-space: pre-wrap;">{{ $sub->solution_description }}</div>
                             @endif

@@ -32,6 +32,15 @@ class AttachmentController extends Controller
                 $user->id === $regUserId ||
                 $user->hasRole('admin') || $user->hasRole('center') || $user->hasRole('board')
             );
+        } elseif ($parent instanceof \App\Models\ChallengeSubmission) {
+            $authorized = $user && (
+                $user->id === $parent->user_id ||
+                ($user->profile && optional($parent->challenge)->organization_id === optional($user->profile)->organization_id) ||
+                $user->hasRole('admin') || $user->hasRole('center') || $user->hasRole('board')
+            );
+        } elseif ($parent instanceof \App\Models\Challenge) {
+            // Cho phép người dùng đã đăng nhập tải tài liệu public của Challenge
+            $authorized = $user !== null;
         }
 
         if (!$authorized) {

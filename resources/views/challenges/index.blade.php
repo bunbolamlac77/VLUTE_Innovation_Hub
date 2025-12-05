@@ -47,7 +47,8 @@
       <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
         @foreach ($challenges as $c)
           <article class="flex flex-col border border-slate-200 bg-white rounded-2xl shadow-card overflow-hidden">
-            <div class="h-[160px] bg-gradient-to-br from-indigo-200 to-emerald-200"></div>
+            @php($img = $c->image ? asset('storage/' . $c->image) : null)
+            <div class="h-[160px] bg-cover bg-center" style="background-image: url('{{ $img ?: asset('images/panel-truong.jpg') }}');"></div>
             <div class="p-4 flex-1 flex flex-col">
               <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
                 <span class="inline-block bg-brand-gray-100 text-slate-700 px-2.5 py-1 rounded-full">{{ $c->organization->name ?? 'Doanh nghiệp' }}</span>

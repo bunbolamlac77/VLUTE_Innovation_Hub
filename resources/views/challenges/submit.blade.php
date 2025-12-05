@@ -15,6 +15,48 @@
           <input type="text" name="title" value="{{ old('title') }}" required class="w-full rounded-xl border border-slate-300 px-4 py-3" />
           @error('title')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
         </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-2 font-semibold text-slate-900">Họ tên</label>
+            <input type="text" name="full_name" value="{{ old('full_name', auth()->user()->name) }}" required class="w-full rounded-xl border border-slate-300 px-4 py-3" />
+            @error('full_name')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+          </div>
+          <div>
+            <label class="block mb-2 font-semibold text-slate-900">Số điện thoại</label>
+            <input type="text" name="phone" value="{{ old('phone', auth()->user()->profile->phone ?? '') }}" required class="w-full rounded-xl border border-slate-300 px-4 py-3" />
+            @error('phone')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+          </div>
+          <div>
+            <label class="block mb-2 font-semibold text-slate-900">Địa chỉ</label>
+            <input type="text" name="address" value="{{ old('address', auth()->user()->profile->address ?? '') }}" class="w-full rounded-xl border border-slate-300 px-4 py-3" />
+            @error('address')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+          </div>
+          <div>
+            <label class="block mb-2 font-semibold text-slate-900">Lớp</label>
+            <input type="text" name="class_name" value="{{ old('class_name', auth()->user()->profile->class_name ?? '') }}" class="w-full rounded-xl border border-slate-300 px-4 py-3" />
+            @error('class_name')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+          </div>
+          <div class="md:col-span-2">
+            <label class="block mb-2 font-semibold text-slate-900">Trường</label>
+            <input type="text" name="school_name" value="{{ old('school_name', 'ĐH SPKT Vĩnh Long (VLUTE)') }}" class="w-full rounded-xl border border-slate-300 px-4 py-3" />
+            @error('school_name')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+          </div>
+        </div>
+
+        <div>
+          <label class="block mb-2 font-semibold text-slate-900">Thành viên nhóm tham gia (mời)</label>
+          <textarea name="team_members" rows="3" class="w-full rounded-xl border border-slate-300 px-4 py-3" placeholder="Nhập email từng thành viên, cách nhau bởi dấu phẩy (,) hoặc xuống dòng"></textarea>
+          @error('team_members')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+          <p class="text-xs text-slate-500 mt-1">Gợi ý: Bạn cũng có thể mời sau ở trang “Bài nộp của tôi”.</p>
+        </div>
+
+        <div>
+          <label class="block mb-2 font-semibold text-slate-900">Giáo viên hướng dẫn (nếu có)</label>
+          <input type="text" name="mentor_name" value="{{ old('mentor_name') }}" class="w-full rounded-xl border border-slate-300 px-4 py-3" />
+          @error('mentor_name')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+        </div>
+
         <div>
           <label class="block mb-2 font-semibold text-slate-900">Mô tả giải pháp (tuỳ chọn)</label>
           <textarea name="solution_description" rows="6" class="w-full rounded-xl border border-slate-300 px-4 py-3">{{ old('solution_description') }}</textarea>

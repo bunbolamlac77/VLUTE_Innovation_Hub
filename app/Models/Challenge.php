@@ -13,6 +13,9 @@ class Challenge extends Model
         'organization_id',
         'title',
         'description',
+        'problem_statement',
+        'requirements',
+        'image',
         'deadline',
         'reward',
         'status',
@@ -31,6 +34,11 @@ class Challenge extends Model
     public function submissions()
     {
         return $this->hasMany(ChallengeSubmission::class);
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 }
 

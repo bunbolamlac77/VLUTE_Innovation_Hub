@@ -53,6 +53,15 @@ class ChallengeSubmissionController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'solution_description' => 'nullable|string',
+            // Thông tin người nộp
+            'full_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:30',
+            'address' => 'nullable|string|max:255',
+            'class_name' => 'nullable|string|max:100',
+            'school_name' => 'nullable|string|max:255',
+            'team_members' => 'nullable|string',
+            'mentor_name' => 'nullable|string|max:255',
+            // File
             'file' => 'required|file|max:30720|mimes:pdf,doc,docx,zip,ppt,pptx', // 30MB
         ]);
 
@@ -62,6 +71,13 @@ class ChallengeSubmissionController extends Controller
             'user_id' => $userId,
             'title' => $request->input('title'),
             'solution_description' => $request->input('solution_description'),
+            'full_name' => $request->input('full_name'),
+            'phone' => $request->input('phone'),
+            'address' => $request->input('address'),
+            'class_name' => $request->input('class_name'),
+            'school_name' => $request->input('school_name'),
+            'team_members' => $request->input('team_members'),
+            'mentor_name' => $request->input('mentor_name'),
         ]);
 
         // Lưu file đính kèm (dùng bảng Attachments đã có)

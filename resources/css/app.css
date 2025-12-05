@@ -46,6 +46,18 @@
     .sel { @apply rounded-xl border border-slate-300 px-3 py-2 bg-white; }
     .sel-sm { @apply rounded-lg border border-slate-300 px-2 py-1 text-sm bg-white; }
 
+    /* Generic form styles used outside Tailwind form kit */
+    .form-label { @apply block font-semibold text-slate-800 mb-1.5; }
+    .form-input, .form-textarea { @apply w-full rounded-xl border border-slate-300 px-4 py-3 text-[15px] bg-white placeholder-slate-400; }
+    .form-input:focus, .form-textarea:focus { @apply outline-none ring-2 ring-indigo-500; }
+    .form-textarea { @apply min-h-[120px]; }
+
+    /* File input normalize (keep native but nicer paddings) */
+    input[type="file"].form-input { @apply py-2.5; }
+
+    /* CKEditor wrapper full width */
+    .ck-editor, .ck-editor__editable_inline { max-width: 100%; }
+
     /* Prose helpers */
     .prose-content p { @apply mb-3 leading-7 text-slate-700; }
     .prose-content h3 { @apply mt-6 mb-2 text-lg font-bold text-slate-900; }
@@ -76,9 +88,14 @@
     .cell-right { @apply text-right; }
 
     .dash-table { @apply w-full border-collapse; }
-    .dash-table thead th { @apply text-[12px] uppercase tracking-wider text-slate-500 bg-slate-50 px-3 py-2 border-b border-slate-200 text-left; }
-    .dash-table tbody td { @apply px-3 py-3 border-b border-slate-100 align-middle; }
+    /* Enterprise tables */
+    .table-responsive { @apply bg-white border border-slate-200 rounded-2xl shadow-card overflow-hidden; }
+    .dash-table thead th { @apply text-[12px] uppercase tracking-wider text-slate-600 bg-slate-50 px-4 py-3 border-b border-slate-200 text-left font-semibold; }
+    .dash-table tbody td { @apply px-4 py-4 border-b border-slate-100 align-middle; }
     .dash-table tbody tr:hover { @apply bg-slate-50; }
+    .dash-table tbody td:first-child { @apply font-extrabold text-slate-900; }
+    .dash-table tbody td.cell-right { @apply text-right; }
+    .dash-table .badge { @apply bg-indigo-50 text-indigo-700 border-indigo-200 font-bold; }
 
     .badge { @apply inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold border; }
     .badge-blue { @apply bg-blue-50 text-blue-700 border-blue-200; }

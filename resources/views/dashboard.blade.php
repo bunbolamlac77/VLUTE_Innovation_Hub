@@ -22,7 +22,7 @@
 
         $user = auth()->user();
 
-        
+
 
         // --- 1. LOGIC CHO REVIEWER (Trung tâm, BGH, Reviewer) ---
 
@@ -30,9 +30,9 @@
 
         $reviewQueue = collect();
 
-        $stats = []; 
+        $stats = [];
 
-        
+
 
         if ($isReviewer) {
 
@@ -40,9 +40,12 @@
 
             $reviewQueue = \App\Models\Idea::whereIn('status', [
 
-                'submitted_center', 'needs_change_center', 'approved_center',
+                'submitted_center',
+                'needs_change_center',
+                'approved_center',
 
-                'submitted_board', 'needs_change_board',
+                'submitted_board',
+                'needs_change_board',
 
             ])->with(['owner', 'faculty', 'category'])->orderBy('updated_at', 'asc')->limit(10)->get();
 
@@ -70,13 +73,13 @@
 
         $mentoredIdeas = collect();
 
-        
+
 
         if ($user && $user->hasRole('staff')) {
 
             // Lời mời Mentor đang chờ
 
-            $mentorInvites = \App\Models\IdeaInvitation::with(['idea','inviter'])
+            $mentorInvites = \App\Models\IdeaInvitation::with(['idea', 'inviter'])
 
                 ->where('email', $user->email)
 
@@ -84,7 +87,9 @@
 
                 ->where('role', 'mentor')
 
-                ->where(function($q){ $q->whereNull('expires_at')->orWhere('expires_at','>', now()); })
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })
 
                 ->latest()
 
@@ -98,9 +103,9 @@
 
             $mentoredIdeas = \App\Models\IdeaMember::where('user_id', $user->id)
 
-                ->where('role', 'mentor')
+                ->where('role_in_team', 'mentor')
 
-                ->with('idea')
+                ->with(['idea.owner'])
 
                 ->latest()
 
@@ -120,7 +125,7 @@
 
             // [MỚI] Lấy danh sách challenge kèm số lượng bài nộp
 
-            $myChallenges = \App\Models\Challenge::where('owner_id', $user->id)
+            $myChallenges = \App\Models\Challenge::where('organization_id', data_get($user, 'profile.organization_id'))
 
                 ->withCount('submissions')
 
@@ -142,9 +147,13 @@
 
             $myDrafts = \App\Models\Idea::where('owner_id', $user->id)->whereIn('status', [
 
-                'draft', 'needs_change_center', 'needs_change_board',
+                'draft',
+                'needs_change_center',
+                'needs_change_board',
 
-                'submitted_center', 'submitted_board', 'approved_final',
+                'submitted_center',
+                'submitted_board',
+                'approved_final',
 
             ])->latest()->limit(6)->get();
 
@@ -181,73 +190,179 @@
         <div class="container" style="display: grid; grid-template-columns: 1fr; gap: 32px;">
 
             <style>
-
                 /* CSS Dashboard */
 
-                .dash-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: none; overflow: hidden; }
+                .dash-card {
+                    background: #fff;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 12px;
+                    box-shadow: none;
+                    overflow: hidden;
+                }
 
-                .dash-card .card-body { padding: 20px; }
+                .dash-card .card-body {
+                    padding: 20px;
+                }
 
-                .dash-title { margin: 0; font-size: 18px; font-weight: 700; color: #0f172a; }
+                .dash-title {
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #0f172a;
+                }
 
-                .dash-subtitle { margin-top: 4px; color: #64748b; font-size: 13px; }
+                .dash-subtitle {
+                    margin-top: 4px;
+                    color: #64748b;
+                    font-size: 13px;
+                }
 
-                
+
 
                 /* Table Styles */
 
-                .dash-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+                .dash-table {
+                    width: 100%;
+                    border-collapse: separate;
+                    border-spacing: 0;
+                }
 
-                .dash-table thead th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #64748b; background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }
+                .dash-table thead th {
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: .06em;
+                    color: #64748b;
+                    background: #f8fafc;
+                    padding: 10px 12px;
+                    border-bottom: 1px solid #e5e7eb;
+                }
 
-                .dash-table tbody td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 14px; }
+                .dash-table tbody td {
+                    padding: 12px;
+                    border-bottom: 1px solid #f1f5f9;
+                    vertical-align: middle;
+                    font-size: 14px;
+                }
 
-                .dash-table tbody tr:hover { background: #f9fafb; }
+                .dash-table tbody tr:hover {
+                    background: #f9fafb;
+                }
 
-                
+
 
                 /* Badges & Buttons */
 
-                .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; font-size: 11px; font-weight: 600; border: 1px solid rgba(0,0,0,.06); }
+                .badge {
+                    display: inline-flex;
+                    align-items: center;
+                    border-radius: 999px;
+                    padding: 4px 8px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    border: 1px solid rgba(0, 0, 0, .06);
+                }
 
-                .badge-blue { background: rgba(59,130,246,.10); color: #1d4ed8; border-color: rgba(59,130,246,.2); }
+                .badge-blue {
+                    background: rgba(59, 130, 246, .10);
+                    color: #1d4ed8;
+                    border-color: rgba(59, 130, 246, .2);
+                }
 
-                .badge-amber { background: rgba(245,158,11,.10); color: #b45309; border-color: rgba(245,158,11,.2); }
+                .badge-amber {
+                    background: rgba(245, 158, 11, .10);
+                    color: #b45309;
+                    border-color: rgba(245, 158, 11, .2);
+                }
 
-                .badge-green { background: rgba(16,185,129,.10); color: #047857; border-color: rgba(16,185,129,.2); }
+                .badge-green {
+                    background: rgba(16, 185, 129, .10);
+                    color: #047857;
+                    border-color: rgba(16, 185, 129, .2);
+                }
 
-                .badge-red { background: rgba(239,68,68,.10); color: #b91c1c; border-color: rgba(239,68,68,.2); }
+                .badge-red {
+                    background: rgba(239, 68, 68, .10);
+                    color: #b91c1c;
+                    border-color: rgba(239, 68, 68, .2);
+                }
 
-                
 
-                .muted { color: #6b7280; font-size: 12px; }
 
-                .cell-right { text-align: right; }
+                .muted {
+                    color: #6b7280;
+                    font-size: 12px;
+                }
 
-                
+                .cell-right {
+                    text-align: right;
+                }
 
-                .btn-ghost { border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 12px; font-weight: 600; color: #334155; text-decoration: none; font-size: 13px; transition: all 0.2s; }
 
-                .btn-ghost:hover { background: #f1f5f9; color: #0f172a; }
 
-                
+                .btn-ghost {
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    padding: 6px 12px;
+                    font-weight: 600;
+                    color: #334155;
+                    text-decoration: none;
+                    font-size: 13px;
+                    transition: all 0.2s;
+                }
 
-                .btn-review { display:inline-flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:8px; background:#1d4ed8; color:#fff !important; font-weight:600; text-decoration:none; font-size: 13px; }
+                .btn-ghost:hover {
+                    background: #f1f5f9;
+                    color: #0f172a;
+                }
 
-                .btn-review:hover { background:#1e40af; }
+
+
+                .btn-review {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                    background: #1d4ed8;
+                    color: #fff !important;
+                    font-weight: 600;
+                    text-decoration: none;
+                    font-size: 13px;
+                }
+
+                .btn-review:hover {
+                    background: #1e40af;
+                }
 
 
 
                 /* Stats Grid for Admin/Center */
 
-                .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+                .stats-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 16px;
+                    margin-bottom: 24px;
+                }
 
-                .stat-card { background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; }
+                .stat-card {
+                    background: #f8fafc;
+                    padding: 16px;
+                    border-radius: 12px;
+                    border: 1px solid #e2e8f0;
+                }
 
-                .stat-value { font-size: 24px; font-weight: 700; color: #0f172a; }
+                .stat-value {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #0f172a;
+                }
 
-                .stat-label { font-size: 13px; color: #64748b; font-weight: 500; }
-
+                .stat-label {
+                    font-size: 13px;
+                    color: #64748b;
+                    font-weight: 500;
+                }
             </style>
 
 
@@ -308,7 +423,8 @@
 
                             </div>
 
-                            <div class="dash-actions"><a href="{{ route('manage.review-queue.index') }}" class="btn btn-primary">Xem tất cả</a></div>
+                            <div class="dash-actions"><a href="{{ route('manage.review-queue.index') }}"
+                                    class="btn btn-primary">Xem tất cả</a></div>
 
                         </div>
 
@@ -384,7 +500,10 @@
 
                                     @empty
 
-                                        <tr><td colspan="4" class="muted" style="text-align: center; padding: 20px;">Không có ý tưởng nào cần duyệt.</td></tr>
+                                        <tr>
+                                            <td colspan="4" class="muted" style="text-align: center; padding: 20px;">Không có ý
+                                                tưởng nào cần duyệt.</td>
+                                        </tr>
 
                                     @endforelse
 
@@ -410,7 +529,8 @@
 
                     <div class="card-body">
 
-                        <div style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 20px;">
+                        <div
+                            style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 20px;">
 
                             <div>
 
@@ -424,7 +544,7 @@
 
                         </div>
 
-                        
+
 
                         {{-- [MỚI] Danh sách Challenges & Số lượng submission --}}
 
@@ -432,13 +552,16 @@
 
                             @forelse ($myChallenges as $challenge)
 
-                                <div style="display:flex; align-items:center; justify-content:space-between; padding: 12px; border: 1px solid #f1f5f9; border-radius: 8px;">
+                                <div
+                                    style="display:flex; align-items:center; justify-content:space-between; padding: 12px; border: 1px solid #f1f5f9; border-radius: 8px;">
 
                                     <div>
 
                                         <div style="font-weight: 600; color: #0f172a;">{{ $challenge->title }}</div>
 
-                                        <div class="muted">Hết hạn: {{ \Carbon\Carbon::parse($challenge->valid_until)->format('d/m/Y') }}</div>
+                                        <div class="muted">Hết hạn:
+                                            {{ optional($challenge->deadline)->format('d/m/Y') }}
+                                        </div>
 
                                     </div>
 
@@ -446,13 +569,15 @@
 
                                         <div style="text-align: right;">
 
-                                            <div style="font-weight: 700; font-size: 16px;">{{ $challenge->submissions_count }}</div>
+                                            <div style="font-weight: 700; font-size: 16px;">{{ $challenge->submissions_count }}
+                                            </div>
 
                                             <div class="muted" style="font-size: 10px;">GIẢI PHÁP</div>
 
                                         </div>
 
-                                        <a href="{{ route('enterprise.challenges.show', $challenge->id) }}" class="btn-ghost">Chi tiết</a>
+                                        <a href="{{ route('enterprise.challenges.show', $challenge->id) }}" class="btn-ghost">Chi
+                                            tiết</a>
 
                                     </div>
 
@@ -468,7 +593,8 @@
 
                         <div style="margin-top: 16px; text-align: center;">
 
-                            <a href="{{ route('enterprise.challenges.index') }}" style="font-size: 13px; font-weight: 600; text-decoration: none;">Xem tất cả quản lý &rarr;</a>
+                            <a href="{{ route('enterprise.challenges.index') }}"
+                                style="font-size: 13px; font-weight: 600; text-decoration: none;">Xem tất cả quản lý &rarr;</a>
 
                         </div>
 
@@ -496,17 +622,19 @@
 
                             <div class="dash-subtitle" style="margin-bottom: 12px;">Các nhóm sinh viên bạn đang hỗ trợ</div>
 
-                            
+
 
                             <div class="grid gap-3">
 
                                 @forelse ($mentoredIdeas as $membership)
 
-                                    <div style="display: flex; gap: 10px; align-items: flex-start; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9;">
+                                    <div
+                                        style="display: flex; gap: 10px; align-items: flex-start; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9;">
 
                                         <div style="flex:1;">
 
-                                            <a href="{{ route('my-ideas.show', $membership->idea->id) }}" style="font-weight: 600; color: #0f172a; text-decoration: none; display:block;">
+                                            <a href="{{ route('my-ideas.show', $membership->idea->id) }}"
+                                                style="font-weight: 600; color: #0f172a; text-decoration: none; display:block;">
 
                                                 {{ $membership->idea->title }}
 
@@ -530,7 +658,8 @@
 
                             @if($mentoredIdeas->count() > 0)
 
-                                <div style="margin-top: 12px;"><a href="{{ route('mentor.ideas') }}" class="btn-ghost" style="width:100%; display:block; text-align:center;">Xem tất cả</a></div>
+                                <div style="margin-top: 12px;"><a href="{{ route('mentor.ideas') }}" class="btn-ghost"
+                                        style="width:100%; display:block; text-align:center;">Xem tất cả</a></div>
 
                             @endif
 
@@ -550,7 +679,7 @@
 
                             <div class="dash-subtitle" style="margin-bottom: 12px;">Các yêu cầu chờ bạn phản hồi</div>
 
-                            
+
 
                             <div class="grid gap-3">
 
@@ -558,15 +687,18 @@
 
                                     <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
 
-                                        <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">{{ $inv->idea?->title }}</div>
+                                        <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">{{ $inv->idea?->title }}
+                                        </div>
 
                                         <div class="muted" style="margin-bottom: 8px;">Từ: {{ $inv->inviter?->name }}</div>
 
                                         <div style="display:flex; gap: 8px;">
 
-                                            <a href="{{ route('invitations.accept', $inv->token) }}" class="badge badge-green" style="text-decoration:none; cursor:pointer;">Đồng ý</a>
+                                            <a href="{{ route('invitations.accept', $inv->token) }}" class="badge badge-green"
+                                                style="text-decoration:none; cursor:pointer;">Đồng ý</a>
 
-                                            <a href="{{ route('invitations.decline', $inv->token) }}" class="badge badge-red" style="text-decoration:none; cursor:pointer;">Từ chối</a>
+                                            <a href="{{ route('invitations.decline', $inv->token) }}" class="badge badge-red"
+                                                style="text-decoration:none; cursor:pointer;">Từ chối</a>
 
                                         </div>
 
@@ -598,7 +730,8 @@
 
                     <div class="card-body">
 
-                        <div style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 12px;">
+                        <div
+                            style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 12px;">
 
                             <div>
 
@@ -608,7 +741,8 @@
 
                             </div>
 
-                            <div class="dash-actions"><a href="{{ route('my-ideas.index') }}" class="btn btn-primary">Xem tất cả</a></div>
+                            <div class="dash-actions"><a href="{{ route('my-ideas.index') }}" class="btn btn-primary">Xem tất
+                                    cả</a></div>
 
                         </div>
 
@@ -660,7 +794,8 @@
 
                             @empty
 
-                                <div>Chưa có ý tưởng nào. <a href="{{ route('my-ideas.create') }}" class="text-indigo-600 font-semibold">Tạo ý tưởng mới</a></div>
+                                <div>Chưa có ý tưởng nào. <a href="{{ route('my-ideas.create') }}"
+                                        class="text-indigo-600 font-semibold">Tạo ý tưởng mới</a></div>
 
                             @endforelse
 
@@ -680,7 +815,8 @@
 
                 <div class="card-body">
 
-                    <div style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 12px;">
+                    <div
+                        style="display:flex; justify-content: space-between; align-items:flex-end; gap: 16px; margin-bottom: 12px;">
 
                         <div>
 
@@ -690,7 +826,8 @@
 
                         </div>
 
-                        <div class="dash-actions"><a href="{{ route('my-competitions.index') }}" class="btn btn-primary">Xem tất cả</a></div>
+                        <div class="dash-actions"><a href="{{ route('my-competitions.index') }}" class="btn btn-primary">Xem
+                                tất cả</a></div>
 
                     </div>
 
@@ -716,15 +853,18 @@
 
                                 <div class="flex-1 min-w-0">
 
-                                    <div class="font-bold text-slate-900 truncate">{{ $comp?->title ?? 'Cuộc thi (đã xóa)' }}</div>
+                                    <div class="font-bold text-slate-900 truncate">{{ $comp?->title ?? 'Cuộc thi (đã xóa)' }}
+                                    </div>
 
-                                    <div class="muted truncate">{{ $reg->team_name ?? '(Cá nhân)' }} @if($submitted > 0) <span style="color:#16a34a">• Đã nộp bài</span> @endif</div>
+                                    <div class="muted truncate">{{ $reg->team_name ?? '(Cá nhân)' }} @if($submitted > 0) <span
+                                    style="color:#16a34a">• Đã nộp bài</span> @endif</div>
 
                                 </div>
 
                                 <div>
 
-                                    <span class="badge {{ $isOpen ? 'badge-green' : 'badge-blue' }}">{{ $comp?->status == 'open' ? 'Đang mở' : 'Đã đóng' }}</span>
+                                    <span
+                                        class="badge {{ $isOpen ? 'badge-green' : 'badge-blue' }}">{{ $comp?->status == 'open' ? 'Đang mở' : 'Đã đóng' }}</span>
 
                                 </div>
 
@@ -746,7 +886,8 @@
 
                         @empty
 
-                            <div class="muted">Bạn chưa đăng ký cuộc thi nào. <a href="{{ route('competitions.index') }}" class="text-indigo-600 font-semibold">Khám phá ngay</a></div>
+                            <div class="muted">Bạn chưa đăng ký cuộc thi nào. <a href="{{ route('competitions.index') }}"
+                                    class="text-indigo-600 font-semibold">Khám phá ngay</a></div>
 
                         @endforelse
 
