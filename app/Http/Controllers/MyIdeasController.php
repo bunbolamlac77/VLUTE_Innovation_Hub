@@ -13,6 +13,7 @@ use App\Mail\IdeaInvitationMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Notifications\MentorInvited;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -362,6 +363,16 @@ class MyIdeasController extends Controller
             Mail::to($email)->send(new IdeaInvitationMail($invitation));
         } catch (\Exception $e) {
             \Log::error('Failed to send invitation email: ' . $e->getMessage());
+        }
+
+        // Thông báo realtime trên hệ thống cho Giảng viên (nếu đã có tài khoản)
+        if ($role === 'mentor' && $invitedUser) {
+            try {
+                $invitation->loadMissing('idea');
+                $invitedUser->notify(new MentorInvited($invitation));
+            } catch (\Throwable $e) {
+                // ignore notify errors
+            }
         }
 
         return redirect()->route('my-ideas.show', $idea->id)

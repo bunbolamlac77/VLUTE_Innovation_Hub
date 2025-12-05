@@ -7,6 +7,7 @@ use App\Models\IdeaMember;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\InvitationAccepted;
 
 class IdeaInvitationController extends Controller
 {
@@ -69,6 +70,17 @@ class IdeaInvitationController extends Controller
 
         // Đánh dấu invitation là accepted
         $invitation->markAsAccepted();
+
+        // Thông báo cho chủ ý tưởng (và nhóm) nếu mentor/member chấp nhận
+        try {
+            $invitation->loadMissing('idea.owner');
+            $owner = $invitation->idea?->owner;
+            if ($owner) {
+                $owner->notify(new InvitationAccepted($invitation));
+            }
+        } catch (\Throwable $e) {
+            // ignore notify error
+        }
 
         return redirect()->route('my-ideas.show', $invitation->idea_id)
             ->with('status', 'Bạn đã chấp nhận lời mời tham gia ý tưởng thành công!');
