@@ -172,6 +172,8 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin']
 
         // Admin CRUD: competitions, news, challenges
         Route::resource('competitions', \App\Http\Controllers\Admin\AdminCompetitionController::class);
+        Route::get('/competitions/{competition}/export', [\App\Http\Controllers\Admin\AdminCompetitionController::class, 'exportRegistrations'])
+            ->name('competitions.export');
         Route::resource('news', \App\Http\Controllers\Admin\AdminNewsController::class);
         Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
     });

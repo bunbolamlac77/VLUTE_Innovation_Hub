@@ -35,6 +35,12 @@
               <div class="flex gap-2 justify-end">
                 <a class="btn btn-ghost" href="{{ route('competitions.show', $c->slug) }}" target="_blank">Xem</a>
                 <a class="btn btn-ghost" href="{{ route('admin.competitions.edit', $c) }}">Sửa</a>
+                <a class="btn btn-ghost text-green-600 hover:text-green-900" href="{{ route('admin.competitions.export', $c->id) }}" title="Xuất danh sách đăng ký">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Excel
+                </a>
                 <form method="POST" action="{{ route('admin.competitions.destroy', $c) }}" onsubmit="return confirm('Xoá cuộc thi này?');" class="inline">
                   @csrf
                   @method('DELETE')

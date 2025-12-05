@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Competition;
+use App\Exports\CompetitionRegistrationsExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -65,6 +66,49 @@ class AdminCompetitionController extends Controller
     {
         $competition->delete(); // Soft delete
         return redirect()->route('admin.competitions.index')->with('status', 'Đã xóa cuộc thi');
+    }
+
+    /**
+     * Xuất danh sách đăng ký ra Excel
+     */
+    public function exportRegistrations(Competition $competition)
+    {
+        // Kiểm tra quyền (nếu cần)
+        // $this->authorize('view', $competition);
+
+        $export = new CompetitionRegistrationsExport($competition->id);
+
+        // Nếu thư viện Maatwebsite Excel đã cài đặt, sử dụng nó
+        if (class_exists('Maatwebsite\Excel\Facades\Excel')) {
+            $fileName = 'DS_DangKy_' . $competition->slug . '_' . date('d-m-Y') . '.xlsx';
+            return \Maatwebsite\Excel\Facades\Excel::download($export, $fileName);
+        }
+
+        // Fallback: Xuất ra CSV
+        $fileName = 'DS_DangKy_' . $competition->slug . '_' . date('d-m-Y') . '.csv';
+        $csvData = $export->toCSV();
+
+        // Tạo file CSV
+        $path = storage_path('app/exports/' . $fileName);
+        if (!is_dir(dirname($path))) {
+            mkdir(dirname($path), 0755, true);
+        }
+
+        $file = fopen($path, 'w');
+        
+        // Thiết lập BOM cho UTF-8
+        fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        foreach ($csvData as $row) {
+            fputcsv($file, $row);
+        }
+
+        fclose($file);
+
+        return response()->download($path, $fileName, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ])->deleteFileAfterSend(true);
     }
 }
 
