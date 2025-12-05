@@ -13,6 +13,7 @@
         class="admin-tab {{ $tab === 'taxonomies' ? 'is-active' : '' }}">Phân loại</a>
     <a href="{{ route('admin.home', ['tab' => 'logs']) }}" class="admin-tab {{ $tab === 'logs' ? 'is-active' : '' }}">Nhật
         ký</a>
+    <a href="{{ route('admin.banners.index') }}" class="admin-tab" style="margin-left: auto;">🎨 Quản lý Banner</a>
 </div>
 
 @if (session('status'))

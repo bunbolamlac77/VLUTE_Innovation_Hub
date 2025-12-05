@@ -16,55 +16,95 @@
     </div>
   </div>
 
-  {{-- Hero Section --}}
-  <section class="relative text-white">
-    <div class="absolute inset-0 bg-cover bg-center"
-      style="background-image: url('{{ asset('images/panel-truong.jpg') }}')"></div>
-    <div class="absolute inset-0 bg-gradient-to-tr from-brand-navy/90 to-brand-green/80"></div>
-    <div class="relative">
-      <div class="container grid lg:grid-cols-[1.4fr,0.9fr] gap-8 py-20 min-h-[500px] items-center">
-        <div>
-          <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">VLUTE Innovation Hub</h1>
-          <p class="text-white/95 text-lg leading-relaxed font-medium mb-7 max-w-2xl">
-            Kết nối ý tưởng – cố vấn – doanh nghiệp – ươm tạo. Cổng dành cho sinh viên, giảng viên và đối tác.
-          </p>
-          <div class="flex gap-3 flex-wrap">
-            <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
-              href="#submit">Gửi ý tưởng</a>
-            <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
-              href="{{ route('competitions.index') }}">Đăng ký cuộc thi</a>
-            <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
-              href="#mentors">Đặt lịch mentor</a>
+  {{-- Banner Slider Section --}}
+  <div class="relative w-full overflow-hidden bg-gray-100" style="height: 500px;">
+    @if(isset($banners) && count($banners) > 0)
+      <div class="absolute inset-0 flex transition-transform duration-500 ease-in-out" id="homeSlider">
+        @foreach($banners as $banner)
+          <div class="w-full flex-shrink-0 h-full relative">
+            <img src="{{ Storage::url($banner->image_path) }}" class="w-full h-full object-cover" alt="{{ $banner->title }}">
+            @if($banner->title)
+              <div class="absolute bottom-10 left-10 bg-black/50 p-4 text-white rounded max-w-xl">
+                <h2 class="text-3xl font-bold">{{ $banner->title }}</h2>
+                @if($banner->link_url)
+                  <a href="{{ $banner->link_url }}" class="inline-block mt-2 text-yellow-400 hover:text-yellow-300 font-bold">Xem chi tiết &rarr;</a>
+                @endif
+              </div>
+            @endif
+          </div>
+        @endforeach
+      </div>
+    @else
+      {{-- Fallback nếu chưa có banner nào trong database --}}
+      <section class="relative text-white h-full">
+        <div class="absolute inset-0 bg-cover bg-center"
+          style="background-image: url('{{ asset('images/panel-truong.jpg') }}')"></div>
+        <div class="absolute inset-0 bg-gradient-to-tr from-brand-navy/90 to-brand-green/80"></div>
+        <div class="relative h-full">
+          <div class="container grid lg:grid-cols-[1.4fr,0.9fr] gap-8 py-20 min-h-[500px] items-center">
+            <div>
+              <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">VLUTE Innovation Hub</h1>
+              <p class="text-white/95 text-lg leading-relaxed font-medium mb-7 max-w-2xl">
+                Kết nối ý tưởng – cố vấn – doanh nghiệp – ươm tạo. Cổng dành cho sinh viên, giảng viên và đối tác.
+              </p>
+              <div class="flex gap-3 flex-wrap">
+                <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                  href="#submit">Gửi ý tưởng</a>
+                <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                  href="{{ route('competitions.index') }}">Đăng ký cuộc thi</a>
+                <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                  href="#mentors">Đặt lịch mentor</a>
+              </div>
+            </div>
+
+            <aside class="bg-white/60 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-xl self-start">
+              <h3 class="m-0 mb-5 text-lg font-extrabold text-slate-800">Tổng quan</h3>
+              <ul class="m-0 p-0 grid gap-3">
+                <li
+                  class="flex justify-between items-center text-slate-900 pb-3 border-b border-white/40 font-semibold text-sm">
+                  <span>Ý tưởng đã nộp</span><strong
+                    class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $ideaCount }}</strong>
+                </li>
+                <li
+                  class="flex justify-between items-center text-slate-900 pb-3 border-b border-white/40 font-semibold text-sm">
+                  <span>Mentor</span><strong
+                    class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $mentorCount }}</strong>
+                </li>
+                <li
+                  class="flex justify-between items-center text-slate-900 pb-3 border-b border-white/40 font-semibold text-sm">
+                  <span>Đối tác</span><strong
+                    class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $partnerCount }}</strong>
+                </li>
+                <li class="flex justify-between items-center text-slate-900 font-semibold text-sm">
+                  <span>Cuộc thi đang mở</span><strong
+                    class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $openCompetitionsCount }}</strong>
+                </li>
+              </ul>
+            </aside>
           </div>
         </div>
+      </section>
+    @endif
+  </div>
 
-        <aside class="bg-white/60 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-xl self-start">
-          <h3 class="m-0 mb-5 text-lg font-extrabold text-slate-800">Tổng quan</h3>
-          <ul class="m-0 p-0 grid gap-3">
-            <li
-              class="flex justify-between items-center text-slate-900 pb-3 border-b border-white/40 font-semibold text-sm">
-              <span>Ý tưởng đã nộp</span><strong
-                class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $ideaCount }}</strong>
-            </li>
-            <li
-              class="flex justify-between items-center text-slate-900 pb-3 border-b border-white/40 font-semibold text-sm">
-              <span>Mentor</span><strong
-                class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $mentorCount }}</strong>
-            </li>
-            <li
-              class="flex justify-between items-center text-slate-900 pb-3 border-b border-white/40 font-semibold text-sm">
-              <span>Đối tác</span><strong
-                class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $partnerCount }}</strong>
-            </li>
-            <li class="flex justify-between items-center text-slate-900 font-semibold text-sm">
-              <span>Cuộc thi đang mở</span><strong
-                class="bg-white/80 text-brand-navy px-3 py-1 rounded-full font-bold">{{ $openCompetitionsCount }}</strong>
-            </li>
-          </ul>
-        </aside>
-      </div>
-    </div>
-  </section>
+  {{-- Script JS để chạy slider tự động --}}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const slider = document.getElementById('homeSlider');
+      if(!slider) return;
+      
+      const slides = slider.children;
+      const totalSlides = slides.length;
+      if(totalSlides < 2) return;
+
+      let index = 0;
+      
+      setInterval(() => {
+        index = (index + 1) % totalSlides;
+        slider.style.transform = `translateX(-${index * 100}%)`;
+      }, 5000); // Chuyển slide mỗi 5 giây
+    });
+  </script>
 
   {{-- Roles Section --}}
   <section class="container py-14">

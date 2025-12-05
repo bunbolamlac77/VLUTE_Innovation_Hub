@@ -170,12 +170,13 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin']
         Route::post('/ideas/{idea}/status', [\App\Http\Controllers\Admin\IdeaActionController::class, 'updateStatus'])->name('ideas.status');
         Route::post('/ideas/{idea}/reviewer', [\App\Http\Controllers\Admin\IdeaActionController::class, 'assignReviewer'])->name('ideas.reviewer');
 
-        // Admin CRUD: competitions, news, challenges
+        // Admin CRUD: competitions, news, challenges, banners
         Route::resource('competitions', \App\Http\Controllers\Admin\AdminCompetitionController::class);
         Route::get('/competitions/{competition}/export', [\App\Http\Controllers\Admin\AdminCompetitionController::class, 'exportRegistrations'])
             ->name('competitions.export');
         Route::resource('news', \App\Http\Controllers\Admin\AdminNewsController::class);
         Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
+        Route::resource('banners', \App\Http\Controllers\Admin\AdminBannerController::class);
 
         // TEMP: Debug schema for profiles table (admin-only). Remove after verification.
         Route::get('/_debug/schema/profiles', function () {

@@ -16,6 +16,16 @@ class WelcomeController extends Controller
      */
     public function index()
     {
+        // Lấy banner đang active (an toàn nếu chưa migrate)
+        try {
+            $banners = \App\Models\Banner::where('is_active', true)
+                        ->orderBy('order', 'asc')
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+        } catch (\Throwable $e) {
+            $banners = collect();
+        }
+
         // Lấy các ý tưởng nổi bật (nhiều tim nhất và mới nhất)
         $featuredIdeas = Idea::publicApproved()
             ->with(['faculty', 'category', 'owner', 'likes'])
@@ -59,6 +69,7 @@ class WelcomeController extends Controller
             ->get();
 
         return view('welcome', compact(
+            'banners',
             'featuredIdeas',
             'openCompetitions',
             'openCompetitionsCount',
