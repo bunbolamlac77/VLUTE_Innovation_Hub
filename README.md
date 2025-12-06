@@ -1,6 +1,6 @@
 # VLUTE Innovation Hub
 
-Nền tảng phục vụ Đổi mới Sáng tạo tại Trường Đại học Sư phạm Kỹ thuật Vĩnh Long (VLUTE). Kết nối sinh viên – giảng viên (mentor) – doanh nghiệp/đối tác – trung tâm để hình thành, ươm tạo và triển khai ý tưởng.
+Nền tảng phục vụ Đổi mới Sáng tạo tại Trường Đại học Sư phạm Kỹ thuật Vĩnh Long (VLUTE). Kết nối sinh viên – giảng viên (mentor) – doanh nghiệp/đối tác – trung tâm để hình thành, ươm tạo và triển khai ý tưởng. **Tích hợp 5 tính năng AI sử dụng Google Gemini API.**
 
 ## 1) Kiến trúc & Công nghệ
 
@@ -9,28 +9,79 @@ Nền tảng phục vụ Đổi mới Sáng tạo tại Trường Đại học S
 -   CSS: Tailwind CSS (100% utilities – xem thêm TAILWIND.md)
 -   JS nhẹ: Alpine.js
 -   DB mặc định: SQLite (có tuỳ chọn MySQL Docker)
+-   **AI**: Google Gemini API (Text, Vision, Embedding)
 
 ## 2) Tính năng chính
 
-Công khai
+### 2.1) Công khai
 
 -   Trang chủ với số liệu tổng quan động (ý tưởng công khai đã duyệt, mentor, đối tác, cuộc thi đang mở)
 -   Ngân hàng ý tưởng (danh sách/chi tiết theo slug, like cần đăng nhập)
 -   Cuộc thi & sự kiện (danh sách/chi tiết, đăng ký)
 -   Bản tin Nghiên cứu Khoa học (route: `scientific-news.index`)
 
-Đã đăng nhập
+### 2.2) Đã đăng nhập
 
 -   Hồ sơ cá nhân (avatar, thông tin cơ bản; kiểm tra hoàn thiện hồ sơ)
 -   Ý tưởng của tôi (tạo/cập nhật/xoá, mời thành viên, nhận xét nội bộ, nộp duyệt)
 -   Đăng ký cuộc thi, nộp bài
 
-Quản trị
+### 2.3) Quản trị
 
 -   Phê duyệt tài khoản; Khoá/Mở khoá
 -   Phân quyền/đổi vai (student/staff/center/board/reviewer/admin)
 -   Quản trị Phân loại: Khoa, Danh mục, Thẻ
 -   Gán người phản biện (reviewer), đổi trạng thái ý tưởng
+
+### 2.4) **5 Tính năng AI (Mới)**
+
+#### **1. Review Insight — Phân tích ý tưởng**
+Sử dụng Gemini AI để phân tích nội dung ý tưởng và cung cấp:
+- Điểm mạnh
+- Điểm yếu
+- Tiềm năng phát triển
+- Đánh giá trên thang 10
+
+**Sử dụng**: Giúp sinh viên và giám khảo có nhận xét chuyên nghiệp về ý tưởng.
+
+#### **2. Vision — Phân tích hình ảnh**
+Đánh giá chất lượng Poster, Slide hoặc hình ảnh minh họa:
+- Đánh giá tính thẩm mỹ (màu sắc, bố cục)
+- Phân tích nội dung hiển thị
+- Lời khuyên cải thiện
+
+**Sử dụng**: Giúp sinh viên cải thiện chất lượng trình bày ý tưởng.
+
+#### **3. Check Duplicate — Kiểm tra trùng lặp**
+Phát hiện ý tưởng trùng lặp hoặc tương tự:
+- Tạo Vector Embedding cho ý tưởng
+- So sánh với kho ý tưởng đã duyệt
+- Sử dụng Cosine Similarity (ngưỡng: 75%)
+- Trả về danh sách ý tưởng tương tự
+
+**Sử dụng**: Tự động kiểm tra khi sinh viên nộp ý tưởng mới.
+
+#### **4. Suggest Tech Stack — Đề xuất công nghệ**
+Giúp sinh viên chọn công nghệ phù hợp:
+- Frontend: công nghệ + lý do
+- Backend: công nghệ + lý do
+- Database: công nghệ
+- Mobile: nếu cần
+- Hardware: nếu là dự án IoT
+- Lời khuyên triển khai
+
+**Sử dụng**: Trong trang tạo ý tưởng, giúp sinh viên lựa chọn công nghệ.
+
+#### **5. Scout Solutions — Thợ săn giải pháp**
+Giúp doanh nghiệp tìm ý tưởng phù hợp:
+- Doanh nghiệp nhập vấn đề cần giải quyết
+- Hệ thống tìm kiếm ngữ nghĩa (Semantic Search)
+- Trả về Top 5 ý tưởng phù hợp nhất
+- Hiển thị % độ phù hợp (ngưỡng: 65%)
+
+**Sử dụng**: Trang riêng `/enterprise/scout` cho doanh nghiệp tìm giải pháp.
+
+---
 
 ## 3) Cài đặt nhanh
 
@@ -39,6 +90,7 @@ Quản trị
 -   PHP ≥ 8.2, Composer
 -   Node ≥ 18, npm
 -   SQLite (mặc định) hoặc MySQL Docker (tùy chọn)
+-   **Google Gemini API Key** (để sử dụng tính năng AI)
 
 ### Bước 1. Cài dependencies
 
@@ -82,7 +134,24 @@ DB_USERNAME=sail
 DB_PASSWORD=password
 ```
 
-### Bước 4. Migrate & seed
+### Bước 4. Cấu hình Google Gemini API (Tùy chọn nhưng khuyên dùng)
+
+Thêm vào `.env`:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+**Cách lấy API Key:**
+1. Truy cập https://aistudio.google.com/app/apikeys
+2. Tạo API Key mới
+3. Copy và paste vào file `.env`
+
+**Lưu ý**: 
+- Gemini API có giới hạn request miễn phí hàng tháng
+- Không commit API Key vào git
+
+### Bước 5. Migrate & seed
 
 ```bash
 php artisan migrate --seed
@@ -92,8 +161,9 @@ Seeder sẽ tạo:
 
 -   Roles mặc định
 -   Tài khoản Admin (email: `env(ADMIN_EMAIL,'admin@vlute.edu.vn')`, mật khẩu: `env(ADMIN_PASSWORD,'Admin@123')`)
+-   Embedding Vector cho các ý tưởng mẫu (nếu GEMINI_API_KEY được cấu hình)
 
-### Bước 5. Chạy ứng dụng
+### Bước 6. Chạy ứng dụng
 
 -   Dev 2 cửa sổ:
 
@@ -108,12 +178,16 @@ npm run dev               # Vite dev server
 npm run build
 ```
 
+---
+
 ## 4) Tailwind CSS
 
 -   Dự án đã chuyển hoàn toàn sang Tailwind utilities.
 -   `resources/css/app.css` chỉ giữ @layer base/components cho các tinh chỉnh nhịp layout và lớp tương thích tạm thời cho các trang admin cũ.
 -   Token (màu/đổ bóng/radius/container) đã cấu hình trong `tailwind.config.js`.
 -   Tài liệu nội bộ: xem `TAILWIND.md`.
+
+---
 
 ## 5) Số liệu động trên trang chủ
 
@@ -126,6 +200,8 @@ Controller: `App\Http\Controllers\WelcomeController@index`
 
 > Lưu ý: Các số hiển thị khác (ví dụ khối Counters) cũng đã bind bằng các biến này.
 
+---
+
 ## 6) Luồng xác thực & phê duyệt
 
 Middleware:
@@ -137,33 +213,53 @@ Middleware:
 
 Trang đăng nhập/đăng ký/đặt lại mật khẩu/verify đã được làm lại bằng Tailwind utilities, có modal thông báo cho trường hợp chưa verified/approved.
 
+---
+
 ## 7) Lược đồ CSDL chính
 
 -   `users`, `roles`, `role_user` (pivot)
 -   `ideas`, `idea_members`, `idea_invitations`, `idea_likes`, `attachments`
+    - **Mới**: Cột `embedding_vector` (JSON) để lưu trữ Vector từ Gemini
 -   `reviews`, `review_assignments`, `change_requests`
 -   `faculties`, `categories`, `tags`, `idea_tag`
 -   `competitions`, `competition_registrations`, `competition_submissions`
 -   (Tuỳ chọn) `organizations` cho đối tác
+-   `scientific_news` (Bản tin Nghiên cứu Khoa học)
+
+---
 
 ## 8) Tuyến (routes) tiêu biểu
 
-Công khai
+### 8.1) Công khai
 
 -   `/` Trang chủ (welcome)
 -   `/ideas`, `/ideas/{slug}` Ngân hàng ý tưởng
 -   `/events` & `/competitions` (danh sách/chi tiết)
 -   `/scientific-news` Bản tin Nghiên cứu
+-   `/enterprise/scout` **Thợ săn giải pháp (AI)**
 
-Authenticated
+### 8.2) Authenticated
 
 -   `/dashboard`, `/profile`
 -   `/my-ideas/*` (CRUD ý tưởng, mời, nộp duyệt)
 -   `/my-competitions/*` (đăng ký & nộp bài)
 
-Admin (đã login + verified + approved + is.admin)
+### 8.3) Admin (đã login + verified + approved + is.admin)
 
 -   `/admin` – một trang nhiều tab (approvals, users, ideas, taxonomies, logs)
+
+### 8.4) API Routes (AI Features)
+
+-   `POST /api/ai/review-insight` – Phân tích ý tưởng
+-   `POST /api/ai/analyze-visual` – Phân tích hình ảnh
+-   `POST /api/ai/check-duplicate` – Kiểm tra trùng lặp
+-   `POST /api/ai/suggest-tech-stack` – Đề xuất công nghệ
+-   `POST /api/ai/scout-solutions` – Tìm giải pháp
+-   `POST /api/test/gemini/text` – Test Gemini Text API
+-   `POST /api/test/gemini/image` – Test Gemini Vision API
+-   `GET /api/test/gemini/config` – Kiểm tra cấu hình API
+
+---
 
 ## 9) Email
 
@@ -180,6 +276,8 @@ MAIL_FROM_ADDRESS=noreply@vlute.edu.vn
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
+---
+
 ## 10) Scripts tiện ích
 
 ```bash
@@ -191,15 +289,47 @@ php artisan cache:clear && php artisan config:clear && php artisan view:clear
 
 # Format code (Pint)
 ./vendor/bin/pint
+
+# Test API Gemini
+curl http://localhost:8000/api/test/gemini/config
 ```
+
+---
 
 ## 11) Ghi chú phát triển
 
 -   Nếu triển khai dưới subpath, dùng `asset('...')` cho ảnh nền trong Blade (đã áp dụng ở hero) thay vì bg-[url(...)] để tránh lỗi đường dẫn.
 -   Một số trang quản trị còn dùng lớp tương thích `.card/.btn/.tbl…` trong `app.css`. Khi refactor hoàn tất admin sang utilities thuần, có thể gỡ bỏ các lớp tương thích này.
+-   **AI Features**: 
+  - Embedding Vector được lưu dưới dạng JSON trong cột `embedding_vector` của bảng `ideas`
+  - Các model Gemini được sử dụng: gemini-2.0-flash (ưu tiên), gemini-1.5-flash (fallback)
+  - Cosine Similarity threshold: 75% cho Check Duplicate, 65% cho Scout Solutions
+  - Tất cả API AI không yêu cầu authentication (public endpoints)
 
 ---
 
+## 12) Troubleshooting
+
+### Lỗi API Gemini
+
+**Lỗi 404**: API Key không hợp lệ hoặc model không tồn tại
+- Kiểm tra GEMINI_API_KEY trong .env
+- Truy cập https://aistudio.google.com/app/apikeys để xác nhận API Key
+
+**Lỗi 429**: Quá nhiều yêu cầu
+- Chờ một lúc rồi thử lại
+- Kiểm tra giới hạn request của Gemini API
+
+**Lỗi Embedding Vector**:
+- Chạy `php artisan tinker` rồi gọi `app(\App\Http\Controllers\Api\AIController::class)->seedEmbeddings()`
+- Hoặc chạy seeder lại: `php artisan db:seed --class=SampleIdeaSeeder`
+
+---
+
+## 13) Liên hệ & Hỗ trợ
+
 **Liên hệ**: spktvl@vlute.edu.vn · Website: https://vlute.edu.vn · Địa chỉ: Số 73 Nguyễn Huệ, P. Long Châu, TP. Vĩnh Long
 
-Phát triển bởi sinh viên Khoa Khoa học Máy tính – VLUTE.
+**Phát triển bởi**: Sinh viên Khoa Khoa học Máy tính – VLUTE
+
+**Tính năng AI**: Tích hợp Google Gemini API (Text, Vision, Embedding)
