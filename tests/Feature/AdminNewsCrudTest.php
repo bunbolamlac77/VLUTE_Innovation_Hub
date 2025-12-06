@@ -14,14 +14,13 @@ class AdminNewsCrudTest extends TestCase
 
     private function admin()
     {
-        return User::create([
+        return User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => bcrypt('secret'),
             'role' => 'admin',
             'approval_status' => 'approved',
             'is_active' => true,
-            'email_verified_at' => now(),
         ]);
     }
 
