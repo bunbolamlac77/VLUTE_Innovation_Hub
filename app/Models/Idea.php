@@ -5,10 +5,36 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class Idea extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function booted()
+    {
+        static::created(function (Idea $idea) {
+            try {
+                $apiKey = (string) env('GEMINI_API_KEY');
+                if ($apiKey === '') {
+                    return; // skip if no API key
+                }
+                $gemini = new \App\Services\GeminiService();
+                $text = trim(($idea->title ?? '') . '. ' . ($idea->summary ?? '') . ' ' . ($idea->description ?? '') . ' ' . ($idea->content ?? ''));
+                if ($text === '') return;
+                $vector = $gemini->generateEmbedding($text);
+                if (is_array($vector) && !empty($vector)) {
+                    $idea->embedding_vector = json_encode($vector);
+                    $idea->saveQuietly();
+                }
+            } catch (\Throwable $e) {
+                // avoid breaking user flow; log silently
+                if (class_exists(Log::class)) {
+                    Log::warning('Embedding generation failed for idea '.$idea->id.': '.$e->getMessage());
+                }
+            }
+        });
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +53,7 @@ class Idea extends Model
         'faculty_id',
         'category_id',
         'like_count',
+        'embedding_vector',
     ];
 
     /**

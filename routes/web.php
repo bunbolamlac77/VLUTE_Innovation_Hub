@@ -6,6 +6,7 @@ use App\Http\Controllers\CompetitionRegistrationController;
 use App\Http\Controllers\MyCompetitionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Api\AIController;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 
@@ -71,6 +72,15 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
             ->name('comments.store');
         Route::delete('/{idea}/comments/{comment}', [\App\Http\Controllers\IdeaCommentController::class, 'destroy'])
             ->name('comments.destroy');
+    });
+
+    // AI routes (Authenticated)
+    Route::prefix('ai')->name('ai.')->group(function () {
+        Route::post('/review-insight', [AIController::class, 'reviewInsight'])->name('review');
+        Route::post('/vision', [AIController::class, 'analyzeVisual'])->name('vision');
+        Route::post('/check-duplicate', [AIController::class, 'checkDuplicate'])->name('duplicate');
+        Route::get('/seed', [AIController::class, 'seedEmbeddings'])->name('seed');
+        Route::get('/debug', [AIController::class, 'debugInfo'])->name('debug');
     });
 
     // Review Queue - Hàng chờ phản biện (cho Giảng viên, Trung tâm ĐMST, BGH)

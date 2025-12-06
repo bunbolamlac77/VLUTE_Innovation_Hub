@@ -404,19 +404,36 @@
     {{-- Load thư viện CKEditor từ CDN --}}
     <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
     <script>
-        if (document.querySelector('#editor')) {
+        // Khởi tạo CKEditor và đảm bảo đồng bộ dữ liệu về textarea trước khi submit
+        (function() {
+            const descTextarea = document.querySelector('#editor');
+            if (!descTextarea) return;
+
             ClassicEditor
-                .create(document.querySelector('#editor'), {
+                .create(descTextarea, {
                     toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo' ],
                     placeholder: 'Nhập mô tả chi tiết về ý tưởng của bạn tại đây...'
                 })
                 .then(editor => {
+                    // Đặt min-height cho vùng soạn thảo
                     editor.editing.view.change(writer => {
                         writer.setStyle('min-height', '300px', editor.editing.view.document.getRoot());
                     });
+
+                    // Luôn đồng bộ nội dung CKEditor về textarea mỗi khi thay đổi
+                    editor.model.document.on('change:data', () => {
+                        descTextarea.value = editor.getData();
+                    });
+
+                    // Đồng bộ dữ liệu ngay trước khi submit (phòng hờ)
+                    const form = descTextarea.closest('form');
+                    if (form) {
+                        form.addEventListener('submit', function() {
+                            descTextarea.value = editor.getData();
+                        });
+                    }
                 })
                 .catch(error => { console.error(error); });
-        }
+        })();
     </script>
 @endpush
-

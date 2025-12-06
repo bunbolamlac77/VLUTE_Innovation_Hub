@@ -267,6 +267,37 @@
                             Đánh giá & Phản biện
                         </h3>
 
+                        <div class="space-y-4 mb-6">
+                            <div class="bg-white p-4 rounded-lg shadow border border-red-200">
+                                <h3 class="font-bold text-red-700 flex items-center gap-2">🕵️ Kiểm tra Đạo văn</h3>
+                                <p class="text-xs text-gray-500 mb-2">So sánh với dữ liệu cũ trong hệ thống.</p>
+                                <button type="button" onclick="checkDuplicate()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded text-sm w-full font-semibold transition">
+                                    Quét trùng lặp
+                                </button>
+                                <div id="duplicate-result" class="mt-2 text-sm hidden bg-red-50 p-2 rounded"></div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow border border-blue-200">
+                                <h3 class="font-bold text-blue-700 flex items-center gap-2">🖼️ Phân tích Poster/Slide</h3>
+                                <p class="text-xs text-gray-500 mb-2">Tải ảnh Poster hoặc Slide trang đầu để AI chấm điểm thiết kế.</p>
+                                <input type="file" id="vision-file" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-2"/>
+                                <button type="button" onclick="analyzeVision()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded text-sm w-full font-semibold transition">
+                                    Phân tích hình ảnh
+                                </button>
+                                <div id="vision-result" class="mt-2 text-sm hidden prose prose-sm bg-blue-50 p-2 rounded"></div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow border border-purple-200">
+                                <h3 class="font-bold text-purple-700 flex items-center gap-2">🧠 AI Gợi ý Nhận xét</h3>
+                                <p class="text-xs text-gray-500 mb-2">Đọc nội dung và gợi ý điểm mạnh/yếu.</p>
+                                <button type="button" onclick="reviewInsight()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1 rounded text-sm w-full font-semibold transition">
+                                    Phân tích nội dung
+                                </button>
+                                <div id="insight-result" class="mt-2 text-sm hidden prose prose-sm bg-purple-50 p-2 rounded"></div>
+                            </div>
+                        </div>
+
+                        <textarea id="hidden-idea-content" class="hidden">{{ $idea->title }}. {{ $idea->summary }} {{ $idea->description }} {{ $idea->content }}</textarea>
+                        <input type="hidden" id="hidden-idea-id" value="{{ $idea->id }}">
+
                         <form method="POST" action="{{ route('manage.review.store', $idea) }}">
                             @csrf
 
@@ -305,9 +336,87 @@
 @endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Form validation nếu cần
-        });
-    </script>
+<script>
+    const csrfHeaders = {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json'
+    };
+
+    async function checkDuplicate() {
+        const box = document.getElementById('duplicate-result');
+        const content = document.getElementById('hidden-idea-content').value;
+        const id = document.getElementById('hidden-idea-id').value;
+
+        box.classList.remove('hidden');
+        box.innerHTML = '<i>⏳ Đang quét dữ liệu...</i>';
+        try {
+            const res = await fetch('{{ route("ai.duplicate") }}', {
+                method: 'POST',
+                headers: { ...csrfHeaders, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content, current_id: id })
+            });
+            const data = await res.json();
+
+            if (data.is_duplicate) {
+                let html = '<strong class="text-red-600">⚠️ Có bài tương tự!</strong><ul class="list-disc pl-4 mt-1">';
+                (data.matches || []).forEach(m => html += `<li>${m.title} (${m.score})</li>`);
+                html += '</ul>';
+                box.innerHTML = html;
+            } else if (data.error) {
+                box.innerHTML = `<span class='text-red-600'>${data.error}</span>`;
+            } else {
+                box.innerHTML = '<span class="text-green-600 font-bold">✅ Ý tưởng độc nhất (Chưa trùng > 75%)</span>';
+            }
+        } catch (e) {
+            box.innerHTML = 'Lỗi kết nối.';
+        }
+    }
+
+    async function analyzeVision() {
+        const fileInput = document.getElementById('vision-file');
+        const box = document.getElementById('vision-result');
+
+        if (fileInput.files.length === 0) return alert('Chưa chọn ảnh!');
+
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        box.classList.remove('hidden');
+        box.innerHTML = '<i>⏳ AI đang nhìn ảnh...</i>';
+        try {
+            const res = await fetch('{{ route("ai.vision") }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: formData
+            });
+            const data = await res.json();
+            box.innerHTML = formatMarkdown(data.result || '');
+        } catch (e) {
+            box.innerHTML = 'Lỗi kết nối hoặc ảnh quá lớn.';
+        }
+    }
+
+    async function reviewInsight() {
+        const box = document.getElementById('insight-result');
+        const content = document.getElementById('hidden-idea-content').value;
+        box.classList.remove('hidden');
+        box.innerHTML = '<i>⏳ AI đang đọc bài...</i>';
+        try {
+            const res = await fetch('{{ route("ai.review") }}', {
+                method: 'POST',
+                headers: { ...csrfHeaders, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            });
+            const data = await res.json();
+            box.innerHTML = formatMarkdown(data.result || '');
+        } catch (e) {
+            box.innerHTML = 'Lỗi kết nối.';
+        }
+    }
+
+    function formatMarkdown(text) {
+        return String(text)
+            .replace(/\*\*(.*?)\*\*/g, '<b>$1<\/b>')
+            .replace(/\n/g, '<br>');
+    }
+</script>
 @endpush
