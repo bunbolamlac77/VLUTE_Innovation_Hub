@@ -106,6 +106,76 @@ class AIController extends Controller
         return "Đã cập nhật vector cho {$count} ý tưởng.";
     }
 
+    // --- TÍNH NĂNG A: KIẾN TRÚC SƯ CÔNG NGHỆ (CHO SINH VIÊN) ---
+    public function suggestTechStack(Request $request)
+    {
+        $content = $request->input('content');
+
+        $prompt = "Bạn là một CTO (Giám đốc công nghệ) giàu kinh nghiệm. Sinh viên có ý tưởng sau: \"$content\". \n" .
+                  "Hãy đề xuất một bộ công nghệ (Tech Stack) phù hợp nhất để xây dựng dự án này. \n" .
+                  "Chỉ trả về kết quả dưới dạng JSON (không có markdown) với cấu trúc sau: \n" .
+                  "{" .
+                  "\"frontend\": \"tên công nghệ + lý do ngắn\"," .
+                  "\"backend\": \"tên công nghệ + lý do ngắn\"," .
+                  "\"database\": \"tên công nghệ\"," .
+                  "\"mobile\": \"tên công nghệ (nếu cần)\"," .
+                  "\"hardware\": \"tên thiết bị (nếu là dự án IoT/Phần cứng)\"," .
+                  "\"advice\": \"Lời khuyên triển khai ngắn gọn\"" .
+                  "}";
+
+        $resultRaw = $this->gemini->generateText($prompt);
+
+        // Làm sạch chuỗi JSON (đề phòng AI trả về dạng ```json ... ```)
+        $jsonString = str_replace(['```json', '```'], '', $resultRaw);
+
+        return response()->json(['data' => json_decode($jsonString)]);
+    }
+
+    // --- TÍNH NĂNG B: THỢ SĂN GIẢI PHÁP (CHO DOANH NGHIỆP) ---
+    public function scoutSolutions(Request $request)
+    {
+        $problem = $request->input('problem'); // Doanh nghiệp nhập "Vấn đề cần tìm giải pháp"
+
+        // 1. Tạo vector cho vấn đề của doanh nghiệp
+        $queryVector = $this->gemini->generateEmbedding($problem);
+
+        if (!$queryVector) return response()->json(['message' => 'Lỗi tạo vector.'], 500);
+
+        // 2. Quét toàn bộ kho ý tưởng (Tận dụng cột embedding_vector đã làm ở bài trước)
+        $ideas = Idea::publicApproved()
+                     ->whereNotNull('embedding_vector')
+                     ->get();
+
+        $matches = [];
+        foreach ($ideas as $idea) {
+            $ideaVector = json_decode($idea->embedding_vector);
+            if (is_array($ideaVector)) {
+                // Tái sử dụng hàm cosineSimilarity bạn đã viết ở bài trước
+                $score = $this->cosineSimilarity($queryVector, $ideaVector);
+
+                // Nếu độ phù hợp > 65% (Ngưỡng tìm kiếm ngữ nghĩa)
+                if ($score >= 0.65) {
+                    $matches[] = [
+                        'id' => $idea->id,
+                        'title' => $idea->title,
+                        'slug' => $idea->slug,
+                        'abstract' => \Illuminate\Support\Str::limit(\Illuminate\Support\Str::of(strip_tags($idea->summary ?? $idea->description ?? $idea->content ?? ''))->squish(), 140),
+                        'author' => optional($idea->owner)->name ?? 'Ẩn danh', // Tác giả (owner)
+                        'score' => round($score * 100, 1) // Điểm phù hợp
+                    ];
+                }
+            }
+        }
+
+        // Sắp xếp: Phù hợp nhất lên đầu
+        usort($matches, fn($a, $b) => $b['score'] <=> $a['score']);
+
+        return response()->json([
+            'found' => count($matches),
+            'results' => array_slice($matches, 0, 5) // Trả về top 5
+        ]);
+    }
+
     // DEBUG: Kiểm tra cấu hình API
     public function debugInfo()
     {

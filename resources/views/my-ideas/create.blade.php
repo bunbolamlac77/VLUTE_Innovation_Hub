@@ -152,6 +152,19 @@
                             </div>
                         </div>
 
+                        {{-- Tech Stack Advisor --}}
+                        <div style="margin-bottom: 28px; padding: 24px; background: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 100%); border: 2px solid #c7d2fe; border-radius: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <div>
+                                    <h4 style="margin: 0 0 4px; font-weight: 700; color: #4c1d95; font-size: 16px;">🛠️ Kiến trúc sư Công nghệ AI</h4>
+                                    <p style="margin: 0; font-size: 13px; color: #6b21a8;">Chưa biết dùng công nghệ gì? Hãy nhập mô tả ý tưởng và hỏi AI gợi ý.</p>
+                                </div>
+                                <button type="button" onclick="askTechAdvisor()" style="padding: 10px 18px; background: #7c3aed; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;" onmouseover="this.style.background='#6d28d9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#7c3aed'; this.style.transform='translateY(0)';">✨ Gợi ý Tech Stack</button>
+                            </div>
+                            <div id="tech-loading" class="hidden" style="text-align: center; padding: 16px; color: #7c3aed;"><div style="display: inline-block; width: 20px; height: 20px; border: 2px solid #e9d5ff; border-top-color: #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite;"></div><p style="margin: 8px 0 0; font-size: 13px;">🤖 Đang phân tích yêu cầu kỹ thuật...</p></div>
+                            <div id="tech-stack-result" class="hidden" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px;"></div>
+                        </div>
+
                         {{-- File Attachments --}}
                         <div style="margin-bottom: 28px;">
                             <label for="attachments" style="display: block; margin-bottom: 10px; font-weight: 600; color: #0f172a; font-size: 15px;">
@@ -203,6 +216,81 @@
 
 @push('scripts')
     <script>
+        // Tech Stack Advisor Function
+        function askTechAdvisor() {
+            const descTextarea = document.getElementById('editor');
+            const content = descTextarea ? descTextarea.value : '';
+
+            if (content.length < 20) {
+                alert('Vui lòng mô tả ý tưởng chi tiết hơn (ít nhất 20 ký tự).');
+                return;
+            }
+
+            document.getElementById('tech-loading').classList.remove('hidden');
+            document.getElementById('tech-stack-result').classList.add('hidden');
+
+            fetch('{{ route("ai.tech_stack") }}', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}' 
+                },
+                body: JSON.stringify({ content: content })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(res => {
+                const data = res.data;
+                const container = document.getElementById('tech-stack-result');
+                container.innerHTML = '';
+
+                const createCard = (title, icon, text) => {
+                    if (!text) return '';
+                    return `
+                        <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid #e9d5ff; transition: all 0.2s ease;" 
+                             onmouseover="this.style.boxShadow='0 4px 12px rgba(124, 58, 237, 0.15)'; this.style.transform='translateY(-2px)';"
+                             onmouseout="this.style.boxShadow='none'; this.style.transform='translateY(0)';">
+                            <div style="font-weight: 700; color: #4c1d95; font-size: 12px; text-transform: uppercase; margin-bottom: 6px;">
+                                ${icon} ${title}
+                            </div>
+                            <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">
+                                ${text}
+                            </div>
+                        </div>
+                    `;
+                };
+
+                let html = createCard('Frontend', '💻', data.frontend);
+                html += createCard('Backend', '⚙️', data.backend);
+                html += createCard('Database', '🗄️', data.database);
+                html += createCard('Mobile', '📱', data.mobile);
+                html += createCard('Hardware/IoT', '🔌', data.hardware);
+
+                const adviceHtml = `
+                    <div style="grid-column: 1 / -1; background: #fef3c7; padding: 16px; border-radius: 8px; border: 1px solid #fcd34d;">
+                        <div style="font-weight: 700; color: #92400e; font-size: 12px; text-transform: uppercase; margin-bottom: 6px;">
+                            💡 Lời khuyên
+                        </div>
+                        <div style="font-size: 13px; color: #b45309; line-height: 1.5;">
+                            ${data.advice || 'Không có lời khuyên'}
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML = html + adviceHtml;
+                container.classList.remove('hidden');
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Lỗi kết nối AI: ' + err.message);
+            })
+            .finally(() => {
+                document.getElementById('tech-loading').classList.add('hidden');
+            });
+        }
+
         // Lưu trữ danh sách file đã chọn
         let selectedFiles = [];
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -373,6 +461,12 @@
         });
     </script>
     <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none !important;
+        }
         /* Responsive cho mobile */
         @media (max-width: 768px) {
             .container > div[style*="max-width: 1100px"] {

@@ -79,6 +79,8 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::post('/review-insight', [AIController::class, 'reviewInsight'])->name('review');
         Route::post('/vision', [AIController::class, 'analyzeVisual'])->name('vision');
         Route::post('/check-duplicate', [AIController::class, 'checkDuplicate'])->name('duplicate');
+        Route::post('/suggest-tech', [AIController::class, 'suggestTechStack'])->name('tech_stack');
+        Route::post('/scout-solutions', [AIController::class, 'scoutSolutions'])->name('scout');
         Route::get('/seed', [AIController::class, 'seedEmbeddings'])->name('seed');
         Route::get('/debug', [AIController::class, 'debugInfo'])->name('debug');
     });
@@ -118,6 +120,11 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::post('/challenges/{challenge}/close', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'close'])->name('challenges.close');
         Route::post('/challenges/{challenge}/reopen', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'reopen'])->name('challenges.reopen');
         Route::post('/challenges/{challenge}/submissions/{submission}/review', [\App\Http\Controllers\Enterprise\ChallengeManagerController::class, 'reviewSubmission'])->name('challenges.submissions.review');
+        
+        // Thợ săn Giải pháp
+        Route::get('/scout', function () {
+            return view('enterprise.scout');
+        })->name('scout');
     });
 });
 
@@ -202,6 +209,164 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login', 'is.admin']
                 ], 500);
             }
         })->name('admin.debug.schema.profiles');
+
+        // Admin tool: Seed 10 ideas, 10 competitions, 10 challenges (demo data)
+        Route::get('/_tools/seed-demo', function () {
+            // 0) Ensure students exist
+            $createdStudents = 0;
+            for ($i = 6; $i <= 15; $i++) {
+                $email = "student{$i}@st.vlute.edu.vn";
+                $u = \App\Models\User::firstOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => 'Student '.str_pad((string)$i, 2, '0', STR_PAD_LEFT),
+                        'password' => bcrypt('Password@123'),
+                        'role' => 'student',
+                        'approval_status' => 'approved',
+                        'is_active' => true,
+                        'email_verified_at' => now(),
+                    ]
+                );
+                $u->syncRoles(['student']);
+                if ($u->wasRecentlyCreated) $createdStudents++;
+            }
+            $students = \App\Models\User::where('role', 'student')->get();
+
+            // 1) Ensure faculties & categories
+            $faculties = [
+                ['code' => 'CNTT', 'name' => 'Khoa Công nghệ thông tin', 'description' => 'CNTT', 'sort_order' => 1],
+                ['code' => 'DDT', 'name' => 'Khoa Điện - Điện tử', 'description' => 'Điện - Điện tử', 'sort_order' => 2],
+                ['code' => 'CKD', 'name' => 'Khoa Cơ khí - Động lực', 'description' => 'Cơ khí - Động lực', 'sort_order' => 3],
+                ['code' => 'KT', 'name' => 'Khoa Kinh tế', 'description' => 'Kinh tế', 'sort_order' => 4],
+                ['code' => 'NN', 'name' => 'Khoa Ngoại ngữ', 'description' => 'Ngoại ngữ', 'sort_order' => 5],
+            ];
+            foreach ($faculties as $f) { \App\Models\Faculty::firstOrCreate(['code' => $f['code']], $f); }
+
+            $categories = [
+                ['slug' => 'cong-nghe-thong-tin', 'name' => 'Công nghệ thông tin', 'description' => 'CNTT', 'sort_order' => 1],
+                ['slug' => 'dien-tu-tu-dong-hoa', 'name' => 'Điện tử - Tự động hóa', 'description' => 'IoT/Điện tử', 'sort_order' => 2],
+                ['slug' => 'co-khi-che-tao', 'name' => 'Cơ khí - Chế tạo', 'description' => 'Cơ khí', 'sort_order' => 3],
+                ['slug' => 'kinh-te-quan-ly', 'name' => 'Kinh tế - Quản lý', 'description' => 'Kinh tế', 'sort_order' => 4],
+                ['slug' => 'giao-duc-dao-tao', 'name' => 'Giáo dục - Đào tạo', 'description' => 'Giáo dục', 'sort_order' => 5],
+            ];
+            foreach ($categories as $c) { \App\Models\Category::firstOrCreate(['slug' => $c['slug']], $c); }
+
+            $facultyIds = \App\Models\Faculty::pluck('id')->all();
+            $categoryIds = \App\Models\Category::pluck('id')->all();
+
+            // 2) Seed 10 ideas
+            $ideaTitles = [
+                'Nền tảng chia sẻ tài liệu học tập thông minh',
+                'Ứng dụng theo dõi sức khỏe cho sinh viên',
+                'Hệ thống khảo sát ý kiến giảng viên – sinh viên',
+                'AI gợi ý lộ trình học lập trình',
+                'Cổng thông tin việc làm bán thời gian',
+                'IoT giám sát chất lượng không khí trong lớp',
+                'Website học phát âm tiếng Anh bằng AI',
+                'Quản lý câu lạc bộ và hoạt động ngoại khóa',
+                'Sàn mua bán đồ cũ trong trường',
+                'Chatbot giải đáp thủ tục học vụ',
+                'Bản đồ phòng học và lịch trống theo thời gian thực',
+                'Hệ thống điểm danh bằng nhận diện khuôn mặt',
+            ];
+            $ideasMade = 0;
+            foreach ($ideaTitles as $title) {
+                if ($ideasMade >= 10) break;
+                $owner = $students->random();
+                $slug = \Illuminate\Support\Str::slug($title);
+                $idea = \App\Models\Idea::firstOrCreate([
+                    'slug' => $slug,
+                ], [
+                    'owner_id' => $owner->id,
+                    'title' => $title,
+                    'summary' => 'Tóm tắt: '.$title,
+                    'description' => '<p>Mô tả chi tiết cho ý tưởng: '.e($title).'.</p>',
+                    'content' => 'Các module chức năng, kiến trúc, kế hoạch triển khai...',
+                    'status' => 'approved_final',
+                    'visibility' => 'public',
+                    'faculty_id' => $facultyIds ? $facultyIds[array_rand($facultyIds)] : null,
+                    'category_id' => $categoryIds ? $categoryIds[array_rand($categoryIds)] : null,
+                    'like_count' => rand(0, 200),
+                ]);
+                if ($idea->wasRecentlyCreated) $ideasMade++;
+            }
+
+            // 3) Seed 10 competitions
+            $admin = \App\Models\User::where('role', 'admin')->first() ?? \App\Models\User::first();
+            $compTitles = [
+                'Hackathon Sáng tạo số', 'Cuộc thi Khởi nghiệp xanh', 'Makeathon IoT 2025', 'AI for Education Challenge',
+                'Thiết kế 3D CAD 2025', 'Smart City Innovation', 'Fintech Student Cup', 'Robotics Cup VLUTE',
+                'Digital Marketing Arena', 'Website Accessibility Contest', 'Open Data Hack 2025',
+            ];
+            $compMade = 0;
+            foreach ($compTitles as $t) {
+                if ($compMade >= 10) break;
+                $start = now()->subDays(rand(0, 20));
+                $end = (clone $start)->addDays(rand(15, 60));
+                $status = rand(0, 10) < 8 ? 'open' : 'closed';
+                $comp = \App\Models\Competition::firstOrCreate([
+                    'slug' => \Illuminate\Support\Str::slug($t)
+                ], [
+                    'title' => $t,
+                    'description' => '<p>Mô tả cuộc thi: '.e($t).'</p>',
+                    'banner_url' => '/images/panel-truong.jpg',
+                    'start_date' => $start,
+                    'end_date' => $end,
+                    'status' => $status,
+                    'created_by' => optional($admin)->id,
+                ]);
+                if ($comp->wasRecentlyCreated) $compMade++;
+            }
+
+            // 4) Seed 10 challenges
+            $orgNames = ['ACME Corp','GreenTech VN','EduAI Labs','CityWorks','MediCare'];
+            $orgIds = [];
+            foreach ($orgNames as $n) {
+                $org = \App\Models\Organization::firstOrCreate(['name' => $n], ['type' => 'company']);
+                $orgIds[] = $org->id;
+            }
+            $challengeTitles = [
+                'Tối ưu lịch dạy học và phòng học',
+                'Giảm thất thoát điện năng trong toà nhà',
+                'Theo dõi chuỗi lạnh cho nông sản',
+                'Hệ thống quản lý bãi xe thông minh',
+                'Chatbot hỗ trợ tuyển dụng',
+                'Phân loại rác thải bằng thị giác máy tính',
+                'Giám sát chất lượng nước nuôi trồng',
+                'Dashboard realtime cho nhà máy',
+                'Dự báo nhu cầu vật tư y tế',
+                'Quản lý tài sản số hoá bằng QR/NFC',
+                'Truy xuất nguồn gốc thuỷ sản',
+            ];
+            $chalMade = 0;
+            foreach ($challengeTitles as $ct) {
+                if ($chalMade >= 10) break;
+                $deadline = rand(0, 1) ? now()->addDays(rand(10, 60)) : null;
+                $status = $deadline && $deadline->isFuture() ? 'open' : (rand(0, 1) ? 'closed' : 'draft');
+                $c = \App\Models\Challenge::firstOrCreate([
+                    'title' => $ct,
+                    'organization_id' => $orgIds[array_rand($orgIds)],
+                ], [
+                    'description' => 'Mô tả: '.e($ct).'.',
+                    'problem_statement' => 'Bối cảnh và vấn đề chi tiết cần giải quyết.',
+                    'requirements' => 'Yêu cầu: mô tả giải pháp, lộ trình, sơ đồ kỹ thuật.',
+                    'deadline' => $deadline,
+                    'reward' => rand(0,1) ? (rand(10,50)*1000000).' VND' : null,
+                    'status' => $status,
+                ]);
+                if ($c->wasRecentlyCreated) $chalMade++;
+            }
+
+            return response()->json([
+                'ok' => true,
+                'created' => [
+                    'students' => $createdStudents,
+                    'ideas' => $ideasMade,
+                    'competitions' => $compMade,
+                    'challenges' => $chalMade,
+                ]
+            ]);
+        })->name('admin.tools.seed_demo');
     });
 
 // ---- Khu người dùng (chỉ cần đăng nhập) ----

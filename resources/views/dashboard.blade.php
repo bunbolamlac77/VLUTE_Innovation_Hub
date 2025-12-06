@@ -540,7 +540,10 @@
 
                             </div>
 
-                            <a href="{{ route('enterprise.challenges.create') }}" class="btn-review">+ Đăng Thách thức</a>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <a href="{{ route('enterprise.scout') }}" class="btn-ghost">🎯 Thợ săn Giải pháp</a>
+                                <a href="{{ route('enterprise.challenges.create') }}" class="btn-review">+ Đăng Thách thức</a>
+                            </div>
 
                         </div>
 

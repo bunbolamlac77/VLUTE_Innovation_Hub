@@ -126,9 +126,18 @@
       <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-5">
         <h4 class="text-lg font-bold mb-2">🏢 Doanh nghiệp / Đối tác</h4>
         <p class="text-slate-600">Đăng challenge, shortlist giải pháp, tài trợ & kết nối PoC.</p>
-        <div class="mt-3"><a
+        <div class="mt-3 flex gap-2 flex-wrap">
+          <a
             class="inline-flex items-center gap-2 rounded-full bg-indigo-600 text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            href="#partners">Tạo challenge</a></div>
+            href="#partners">Tạo challenge</a>
+          @auth
+          @if(auth()->user()->hasRole('enterprise'))
+          <a
+            class="inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            href="{{ route('enterprise.scout') }}">🎯 Thợ săn Giải pháp</a>
+          @endif
+          @endauth
+        </div>
       </div>
     </div>
   </section>
