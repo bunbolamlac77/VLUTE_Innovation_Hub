@@ -145,6 +145,15 @@
         data-key="news">Bản tin Nghiên cứu</a>
     </nav>
 
+    {{-- Mobile Menu Button --}}
+    <div class="flex sm:hidden items-center mr-2">
+      <button id="btnMobileMenu" class="p-2 text-slate-300 hover:text-white transition">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
     <div class="ml-auto">
       <form method="GET" action="{{ route('search.index') }}" class="flex items-center gap-2">
         <input type="search" name="q" value="{{ request('q') }}" placeholder="Tìm ý tưởng, cuộc thi, mentor…"
@@ -181,6 +190,22 @@
             menu.classList.add('hidden');
             btn.setAttribute('aria-expanded', 'false');
           }
+        });
+      }
+
+      // Mobile menu toggle
+      const btnMobileMenu = document.getElementById('btnMobileMenu');
+      const menuMain = document.getElementById('menuMain');
+      if (btnMobileMenu && menuMain) {
+        btnMobileMenu.addEventListener('click', function () {
+          menuMain.classList.toggle('hidden');
+          menuMain.classList.toggle('absolute');
+          menuMain.classList.toggle('top-full');
+          menuMain.classList.toggle('left-0');
+          menuMain.classList.toggle('w-full');
+          menuMain.classList.toggle('bg-brand-navy');
+          menuMain.classList.toggle('flex-col');
+          menuMain.classList.toggle('p-4');
         });
       }
 

@@ -152,7 +152,8 @@ class ReviewFormController extends Controller
             try {
                 $notificationStatus = $validated['action'] === 'approve' ? 'approved' : 'needs_change';
                 if ($idea?->owner) {
-                    $idea->owner->notify(new IdeaStatusChanged($idea, $notificationStatus));
+                    $comment = $validated['comment'] ?? null;
+                    $idea->owner->notify(new IdeaStatusChanged($idea, $notificationStatus, $comment));
                 }
             } catch (\Throwable $e) {
                 // Không để lỗi notify làm hỏng luồng chính
