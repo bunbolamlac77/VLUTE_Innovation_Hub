@@ -154,4 +154,9 @@
     /* Ideas panel refinements */
     .ideas-actions { @apply grid gap-2 justify-end; grid-template-columns: repeat(1,minmax(0,1fr)); }
     @screen md { .ideas-actions { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+
+    /* Auth page password strength meter */
+    .pw-ok { @apply text-emerald-700; }
+    .pw-bad { @apply text-rose-700; }
+    .error-field { @apply border-red-500 ring-2 ring-red-200; }
 }
