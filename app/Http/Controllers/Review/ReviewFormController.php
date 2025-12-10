@@ -97,23 +97,23 @@ class ReviewFormController extends Controller
             // 4. Xử lý hành động
             if ($validated['action'] === 'approve') {
                 // Nếu Duyệt: Cập nhật status của Idea để chuyển lên cấp tiếp theo
+            $newStatus = null;
                 if ($reviewLevel === 'center') {
-                    // Trung tâm duyệt: hoặc approved_center, hoặc duyệt cuối nếu không yêu cầu BGH
-                    if (config('ideas.require_board_approval')) {
-                        $idea?->update(['status' => 'approved_center']);
-                    } else {
-                        $idea?->update(['status' => 'approved_final']);
-                    }
+                // Trung tâm duyệt: nếu cần BGH thì chuyển sang submitted_board; nếu không thì duyệt cuối
+                $newStatus = config('ideas.require_board_approval') ? 'submitted_board' : 'approved_final';
                 } elseif ($reviewLevel === 'board') {
-                    $idea?->update(['status' => 'approved_final']);
+                $newStatus = 'approved_final';
                 } else {
                     // Fallback an toàn: coi như cấp Trung tâm
-                    if (config('ideas.require_board_approval')) {
-                        $idea?->update(['status' => 'approved_center']);
-                    } else {
-                        $idea?->update(['status' => 'approved_final']);
-                    }
+                $newStatus = config('ideas.require_board_approval') ? 'submitted_board' : 'approved_final';
                 }
+
+            // Nếu duyệt cuối, tự động công khai để lên Ngân hàng ý tưởng
+            $payload = ['status' => $newStatus];
+            if ($newStatus === 'approved_final') {
+                $payload['visibility'] = 'public';
+            }
+            $idea?->update($payload);
 
                 // Đánh dấu assignment là completed
                 $assignment?->markAsCompleted();

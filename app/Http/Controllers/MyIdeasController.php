@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Notifications\MentorInvited;
+use App\Notifications\IdeaStatusChanged;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -275,6 +276,16 @@ class MyIdeasController extends Controller
         }
 
         $idea->save();
+
+        // Gửi thông báo cho Trung tâm/BGH/Reviewer để biết có bài mới
+        try {
+            $reviewers = User::whereIn('role', ['center', 'board', 'reviewer'])->get();
+            foreach ($reviewers as $reviewer) {
+                $reviewer->notify(new IdeaStatusChanged($idea, 'submitted'));
+            }
+        } catch (\Throwable $e) {
+            // Không để lỗi notify chặn luồng nộp bài
+        }
 
         return redirect()->route('my-ideas.show', $idea->id)
             ->with('status', 'Nộp ý tưởng thành công! Hồ sơ đã được gửi đến Trung tâm ĐMST.');

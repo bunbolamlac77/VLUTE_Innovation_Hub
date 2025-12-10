@@ -114,8 +114,7 @@ class RegisteredUserController extends Controller
         // Đăng nhập tạm để vào trang "verify-email" (chuẩn flow của Laravel/Breeze)
         Auth::login($user);
 
-        // Chuyển tới trang nhắc xác thực email (verification.notice)
-        // Lưu ý: Sau khi bấm link verify (public verify), bạn đã cấu hình để quay về /login.
-        return redirect()->route('verification.notice');
+        // Sau đăng ký luôn về trang chủ (tránh chuyển vào trang quản trị)
+        return redirect('/')->with('status', 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.');
     }
 }

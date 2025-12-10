@@ -28,7 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/');
+        // Luôn chuyển về trang chủ thay vì trang quản trị
+        return redirect('/');
     }
 
     /**

@@ -314,11 +314,18 @@
                                 @enderror
                             </div>
 
+                            @php
+                                $viewer = auth()->user();
+                                $isBoardOnly = $viewer && $viewer->hasRole('board') && !$viewer->hasRole('center');
+                                $approveLabel = $isBoardOnly
+                                    ? '✓ Duyệt (Phê duyệt cuối - BGH)'
+                                    : '✓ Duyệt (Chuyển lên BGH)';
+                            @endphp
                             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
                                 <button type="submit" name="action" value="approve" class="btn btn-primary"
                                     style="width: 100%; padding: 12px 20px; font-weight: 600; background: #10b981; border-color: #10b981; justify-content: center;"
                                     onclick="return confirm('Bạn có chắc chắn muốn duyệt ý tưởng này?');">
-                                    ✓ Duyệt (Chuyển lên cấp Trung tâm)
+                                    {{ $approveLabel }}
                                 </button>
 
                                 <button type="submit" name="action" value="request_changes" class="btn btn-ghost"
