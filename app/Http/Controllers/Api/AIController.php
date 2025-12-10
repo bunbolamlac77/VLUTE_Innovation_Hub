@@ -111,24 +111,66 @@ class AIController extends Controller
     {
         $content = $request->input('content');
 
-        $prompt = "Bạn là một CTO (Giám đốc công nghệ) giàu kinh nghiệm. Sinh viên có ý tưởng sau: \"$content\". \n" .
-                  "Hãy đề xuất một bộ công nghệ (Tech Stack) phù hợp nhất để xây dựng dự án này. \n" .
-                  "Chỉ trả về kết quả dưới dạng JSON (không có markdown) với cấu trúc sau: \n" .
-                  "{" .
-                  "\"frontend\": \"tên công nghệ + lý do ngắn\"," .
-                  "\"backend\": \"tên công nghệ + lý do ngắn\"," .
-                  "\"database\": \"tên công nghệ\"," .
-                  "\"mobile\": \"tên công nghệ (nếu cần)\"," .
-                  "\"hardware\": \"tên thiết bị (nếu là dự án IoT/Phần cứng)\"," .
-                  "\"advice\": \"Lời khuyên triển khai ngắn gọn\"" .
-                  "}";
+        $prompt = "Bạn là một CTO (Giám đốc công nghệ) giàu kinh nghiệm. Sinh viên có ý tưởng sau: \"$content\". \n\n" .
+                  "Hãy đề xuất một bộ công nghệ (Tech Stack) phù hợp nhất để xây dựng dự án này. \n\n" .
+                  "QUAN TRỌNG: Bạn PHẢI trả về ĐÚNG định dạng JSON thuần túy (không có markdown, không có backticks).\n\n" .
+                  "Cấu trúc JSON bắt buộc:\n" .
+                  "{\n" .
+                  "  \"frontend\": \"tên công nghệ + lý do ngắn gọn\",\n" .
+                  "  \"backend\": \"tên công nghệ + lý do ngắn gọn\",\n" .
+                  "  \"database\": \"tên cơ sở dữ liệu + lý do\",\n" .
+                  "  \"mobile\": \"tên công nghệ mobile (nếu cần, nếu không cần thì để chuỗi rỗng)\",\n" .
+                  "  \"hardware\": \"tên thiết bị IoT/Phần cứng (nếu cần, nếu không cần thì để chuỗi rỗng)\",\n" .
+                  "  \"advice\": \"Lời khuyên triển khai ngắn gọn 1-2 câu\"\n" .
+                  "}\n\n" .
+                  "Ví dụ đầu ra hợp lệ:\n" .
+                  "{\"frontend\":\"React - Linh hoạt, component-based\",\"backend\":\"Node.js - JavaScript fullstack\",\"database\":\"MongoDB\",\"mobile\":\"\",\"hardware\":\"\",\"advice\":\"Bắt đầu với MVP đơn giản\"}";
 
         $resultRaw = $this->gemini->generateText($prompt);
 
-        // Làm sạch chuỗi JSON (đề phòng AI trả về dạng ```json ... ```)
-        $jsonString = str_replace(['```json', '```'], '', $resultRaw);
+        // Kiểm tra nếu AI trả về lỗi
+        if (str_starts_with($resultRaw, 'Lỗi')) {
+            return response()->json([
+                'error' => true,
+                'message' => $resultRaw
+            ], 500);
+        }
 
-        return response()->json(['data' => json_decode($jsonString)]);
+        // Làm sạch chuỗi JSON (đề phòng AI trả về dạng ```json ... ```)
+        $jsonString = trim(str_replace(['```json', '```', '`'], '', $resultRaw));
+
+        // Parse JSON và kiểm tra
+        $data = json_decode($jsonString, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
+            // Log lỗi để debug
+            \Illuminate\Support\Facades\Log::error('AI Tech Stack JSON Parse Error', [
+                'raw_response' => $resultRaw,
+                'cleaned_json' => $jsonString,
+                'json_error' => json_last_error_msg()
+            ]);
+            
+            return response()->json([
+                'error' => true,
+                'message' => 'AI không trả về định dạng JSON hợp lệ. Vui lòng thử lại.',
+                'debug' => [
+                    'raw_response' => substr($resultRaw, 0, 200),
+                    'json_error' => json_last_error_msg()
+                ]
+            ], 500);
+        }
+
+        // Đảm bảo tất cả các field bắt buộc tồn tại
+        $data = array_merge([
+            'frontend' => '',
+            'backend' => '',
+            'database' => '',
+            'mobile' => '',
+            'hardware' => '',
+            'advice' => ''
+        ], $data);
+
+        return response()->json(['data' => $data]);
     }
 
     // --- TÍNH NĂNG B: THỢ SĂN GIẢI PHÁP (CHO DOANH NGHIỆP) ---

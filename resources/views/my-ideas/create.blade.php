@@ -242,7 +242,18 @@
                 return res.json();
             })
             .then(res => {
+                // Kiểm tra nếu có lỗi từ server
+                if (res.error) {
+                    throw new Error(res.message || 'AI không thể xử lý yêu cầu');
+                }
+
                 const data = res.data;
+                
+                // Kiểm tra data có tồn tại và là object
+                if (!data || typeof data !== 'object') {
+                    throw new Error('AI trả về dữ liệu không hợp lệ. Vui lòng thử lại.');
+                }
+
                 const container = document.getElementById('tech-stack-result');
                 container.innerHTML = '';
 
@@ -284,7 +295,10 @@
             })
             .catch(err => {
                 console.error('Error:', err);
-                alert('Lỗi kết nối AI: ' + err.message);
+                
+                // Hiển thị thông báo lỗi chi tiết hơn
+                const errorMsg = err.message || 'Không thể kết nối với AI';
+                alert('❌ Lỗi kết nối AI: ' + errorMsg + '\n\nVui lòng thử lại sau ít phút.');
             })
             .finally(() => {
                 document.getElementById('tech-loading').classList.add('hidden');

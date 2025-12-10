@@ -18,11 +18,11 @@ class GeminiService
     // TÍNH NĂNG 3: Phân tích văn bản (Review Insight)
     public function generateText(string $prompt): string
     {
-        // Thử nhiều model khác nhau
+        // Thử nhiều model khác nhau (ưu tiên model ít bị giới hạn quota)
         $models = [
-            'gemini-2.0-flash',
-            'gemini-1.5-flash',
-            'gemini-pro'
+            'gemini-1.5-flash',      // Thử model này trước
+            'gemini-1.5-pro',        // Backup
+            'gemini-pro'             // Fallback cuối cùng
         ];
         
         foreach ($models as $model) {
@@ -50,8 +50,8 @@ class GeminiService
 
         // Thử nhiều model khác nhau
         $models = [
-            'gemini-2.0-flash',
             'gemini-1.5-flash',
+            'gemini-1.5-pro',
             'gemini-pro-vision'
         ];
         
