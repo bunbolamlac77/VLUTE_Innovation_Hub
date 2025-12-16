@@ -88,7 +88,8 @@ class ChallengeManagerController extends Controller
             'requirements' => 'nullable|string',
             'reward' => 'required|string|max:255',
             'deadline' => 'required|date|after:now',
-            'image' => 'nullable|image|max:2048', // 2MB
+            'image_file' => 'nullable|image|max:5120', // 5MB
+            'image_url' => 'nullable|url',
             'attachments' => 'nullable',
             'attachments.*' => 'file|mimes:pdf,csv,xls,xlsx,zip,doc,docx,ppt,pptx,txt,json|max:51200', // 50MB mỗi tệp
         ]);
@@ -104,13 +105,13 @@ class ChallengeManagerController extends Controller
             'status' => 'open',
         ]);
 
-        // Upload ảnh bìa (lưu public)
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('public/challenges', $filename, 'local');
-            // Lưu đường dẫn rút gọn để sử dụng asset('storage/...')
-            $challenge->image = str_replace('public/', '', $path);
+        // Upload ảnh bìa (lưu public) hoặc dùng URL
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $path = $file->store('challenges', 'public');
+            $challenge->image = $path;
+        } elseif ($request->filled('image_url')) {
+            $challenge->image = $request->input('image_url');
         }
 
         $challenge->save();

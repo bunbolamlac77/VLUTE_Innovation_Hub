@@ -36,6 +36,12 @@
                         onclick="window.location.href='{{ route('my-ideas.show', $idea->id) }}'"
                         onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.1)';"
                         onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                        <div class="h-[160px] bg-slate-100 relative mb-3">
+                            <img src="{{ $idea->thumbnail_url }}"
+                                 alt="{{ $idea->title }}"
+                                 class="w-full h-full object-cover"
+                                 onerror="this.src='{{ asset('images/default-idea.png') }}'">
+                        </div>
                         <div class="card-body" style="padding: 24px;">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                                 <div style="flex: 1;">

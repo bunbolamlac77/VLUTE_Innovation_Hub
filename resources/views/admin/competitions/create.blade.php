@@ -19,9 +19,32 @@
         @error('description')<div class="err">{{ $message }}</div>@enderror
       </div>
 
-      <div class="md:col-span-2">
-        <label class="lbl">Banner URL</label>
-        <input class="ipt" type="url" name="banner_url" value="{{ old('banner_url') }}" placeholder="https://..." />
+      <div class="md:col-span-2" x-data="{ type: '{{ old('image_type', 'url') }}' }">
+        <label class="lbl">Banner cuộc thi</label>
+
+        <div class="flex gap-4 mb-2 mt-1">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="image_type" value="file" x-model="type" class="text-indigo-600">
+            <span class="text-sm font-medium text-slate-700">Tải ảnh lên</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="image_type" value="url" x-model="type" class="text-indigo-600">
+            <span class="text-sm font-medium text-slate-700">Dùng Link ảnh online</span>
+          </label>
+        </div>
+
+        {{-- Upload file --}}
+        <div x-show="type === 'file'">
+          <input class="ipt" type="file" name="banner_file" accept="image/*" />
+          <p class="text-xs text-slate-500 mt-1">Khuyến nghị tỉ lệ 16:9, dung lượng ≤ 2MB.</p>
+        </div>
+
+        {{-- URL --}}
+        <div x-show="type === 'url'" style="display:none;">
+          <input class="ipt" type="url" name="banner_url" value="{{ old('banner_url') }}" placeholder="https://..." />
+        </div>
+
+        @error('banner_file')<div class="err">{{ $message }}</div>@enderror
         @error('banner_url')<div class="err">{{ $message }}</div>@enderror
       </div>
 

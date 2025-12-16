@@ -1,81 +1,101 @@
 @extends('layouts.main')
 
-@section('title', ($challenge->title ?? 'Challenge') . ' - VLUTE Innovation Hub')
+@section('title', $challenge->title)
 
 @section('content')
-  {{-- Hero --}}
-  @php($hero = $challenge->image ? asset('storage/' . $challenge->image) : asset('images/panel-truong.jpg'))
-  <section class="relative text-white">
-    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ $hero }}')"></div>
-    <div class="absolute inset-0 bg-gradient-to-tr from-brand-navy/90 to-brand-green/85"></div>
-    <div class="relative">
-      <div class="container py-12">
-        <a href="{{ route('challenges.index') }}" class="inline-flex items-center gap-2 mb-4 text-white/90 hover:text-white">← Quay lại Challenges</a>
-        <h1 class="m-0 text-3xl md:text-4xl font-extrabold max-w-4xl">{{ $challenge->title }}</h1>
-        <div class="mt-3 text-white/90 text-sm flex flex-wrap items-center gap-3">
-          <span class="inline-block bg-white/20 rounded-full px-3 py-1">{{ $challenge->organization->name ?? 'Doanh nghiệp' }}</span>
-          <span class="inline-block bg-white/20 rounded-full px-3 py-1">Trạng thái: {{ $challenge->status }}</span>
-          <span>Hạn: {{ optional($challenge->deadline)->format('d/m/Y H:i') ?: '—' }}</span>
-          @if($challenge->reward)
-            <span>Thưởng: {{ $challenge->reward }}</span>
-          @endif
-        </div>
-      </div>
-    </div>
-  </section>
+<div class="container py-10">
+    <div class="grid md:grid-cols-3 gap-8">
+        {{-- CỘT TRÁI: Nội dung thách thức --}}
+        <div class="md:col-span-2 space-y-8">
+            {{-- Ảnh bìa --}}
+            @if($challenge->image)
+                <img src="{{ asset('storage/' . $challenge->image) }}" class="w-full h-72 object-cover rounded-2xl shadow-sm">
+            @endif
 
-  {{-- Content --}}
-  <section class="container py-10 grid lg:grid-cols-[1fr,320px] gap-8">
-    <article class="bg-white border border-slate-200 rounded-2xl shadow-card overflow-hidden">
-      <div class="p-6 prose max-w-none">
-        @if($challenge->problem_statement)
-          <h2>Bối cảnh & vấn đề</h2>
-          {!! $challenge->problem_statement !!}
-        @endif
-        @if($challenge->requirements)
-          <h2>Yêu cầu & phạm vi</h2>
-          {!! $challenge->requirements !!}
-        @endif
-        @if(!$challenge->problem_statement && !$challenge->requirements)
-        {!! nl2br(e($challenge->description)) !!}
-        @endif
-      </div>
-    </article>
-    <aside class="space-y-4">
-      @if($challenge->status === 'open')
-        <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-4">
-          <h3 class="m-0 mb-3 text-lg font-extrabold text-slate-900">Tham gia Challenge</h3>
-          @auth
-            <a href="{{ route('challenges.submit.create', $challenge) }}" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition">Nộp bài</a>
-          @else
-            <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 font-bold hover:bg-slate-50">Đăng nhập để nộp bài</a>
-          @endauth
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 mb-2">{{ $challenge->title }}</h1>
+                <p class="text-slate-500 mb-6">
+                    Đăng bởi: 
+                    <span class="font-semibold text-blue-600">{{ $challenge->organization->name ?? 'Doanh nghiệp ẩn danh' }}</span>
+                </p>
+                
+                <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm prose max-w-none">
+                    <h3 class="text-xl font-bold text-slate-800">Mô tả vấn đề</h3>
+                    {!! $challenge->problem_statement !!}
+
+                    @if($challenge->requirements)
+                        <div class="my-6 border-t border-slate-100"></div>
+                        <h3 class="text-xl font-bold text-slate-800">Yêu cầu giải pháp</h3>
+                        {!! $challenge->requirements !!}
+                    @endif
+                </div>
+            </div>
         </div>
-      @endif
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-4">
-        <h3 class="m-0 mb-3 text-lg font-extrabold text-slate-900">Thông tin</h3>
-        <ul class="m-0 p-0 text-sm text-slate-700 space-y-2">
-          <li><strong>Doanh nghiệp:</strong> {{ $challenge->organization->name ?? '—' }}</li>
-          <li><strong>Trạng thái:</strong> {{ $challenge->status }}</li>
-          <li><strong>Hạn:</strong> {{ optional($challenge->deadline)->format('d/m/Y H:i') ?: '—' }}</li>
-          <li><strong>Thưởng:</strong> {{ $challenge->reward ?: '—' }}</li>
-        </ul>
-      </div>
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-4">
-        <h3 class="m-0 mb-3 text-lg font-extrabold text-slate-900">Tài liệu/Đề bài</h3>
-        @if($challenge->attachments->isNotEmpty())
-          <ul class="m-0 p-0 text-sm space-y-2">
-            @foreach($challenge->attachments as $file)
-              <li>
-                <a class="inline-flex items-center gap-2 text-indigo-600 hover:underline" href="{{ route('attachments.download', $file->id) }}">📎 {{ $file->filename }}</a>
-              </li>
-            @endforeach
-          </ul>
-        @else
-          <p class="m-0 text-sm text-slate-600">Chưa có tệp đính kèm.</p>
-        @endif
-      </div>
-    </aside>
-  </section>
+
+        {{-- CỘT PHẢI: Panel Thông tin & Actions --}}
+        <div class="md:col-span-1">
+            <div class="sticky top-24 space-y-6">
+                {{-- Panel Giải thưởng (Nổi bật) --}}
+                <div class="bg-gradient-to-br from-indigo-900 to-blue-800 p-6 rounded-2xl text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mr-4 -mt-4 opacity-10">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">Tổng giải thưởng</div>
+                        <div class="text-3xl font-extrabold text-yellow-400">{{ $challenge->reward ?? 'Thỏa thuận' }}</div>
+                    </div>
+                </div>
+
+                {{-- Panel Hành động --}}
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between mb-4 pb-4 border-b border-slate-100">
+                        <span class="text-slate-500 text-sm">Hạn nộp bài</span>
+                        <span class="font-bold text-slate-800">
+                            {{ \Carbon\Carbon::parse($challenge->valid_until)->format('d/m/Y') }}
+                        </span>
+                    </div>
+
+                    @auth
+                        @if(auth()->user()->hasRole('student'))
+                            <a href="{{ route('challenges.submit.create', $challenge->id) }}" 
+                               class="flex items-center justify-center w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-lg shadow-blue-200">
+                                🚀 Gửi giải pháp ngay
+                            </a>
+                        @else
+                            <div class="text-center text-sm text-slate-500 bg-slate-50 p-3 rounded-lg">
+                                Chỉ tài khoản <b>Sinh viên</b> mới có thể nộp bài.
+                            </div>
+                        @endif
+                    @else
+                        <a href="{{ route('login') }}" class="block w-full py-3 bg-slate-100 text-slate-600 font-bold text-center rounded-xl">
+                            Đăng nhập để nộp bài
+                        </a>
+                    @endauth
+                </div>
+
+                {{-- Panel File đính kèm --}}
+                @if($challenge->attachments && $challenge->attachments->count() > 0)
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-slate-800 mb-3">Tài liệu tham khảo</h4>
+                    <div class="space-y-2">
+                        @foreach($challenge->attachments as $file)
+                            <a href="#" class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+                                <span class="text-2xl">📂</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-medium text-slate-900 truncate">{{ $file->filename }}</div>
+                                    <div class="text-xs text-slate-500">{{ round($file->size / 1024, 1) }} KB</div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
 

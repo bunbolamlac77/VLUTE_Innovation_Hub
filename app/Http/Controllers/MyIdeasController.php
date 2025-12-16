@@ -65,6 +65,8 @@ class MyIdeasController extends Controller
             'visibility' => ['required', Rule::in(['private', 'public'])],
             'faculty_id' => ['nullable', 'exists:faculties,id'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'image_file' => ['nullable', 'image', 'max:5120'], // 5MB
+            'image_url' => ['nullable', 'url'],
             'attachments' => ['nullable', 'array'],
             'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,doc,docx,zip', 'max:10240'], // 10MB = 10240 KB
         ]);
@@ -80,6 +82,14 @@ class MyIdeasController extends Controller
             $counter++;
         }
 
+        // Xử lý ảnh đại diện
+        $imagePath = null;
+        if ($request->hasFile('image_file')) {
+            $imagePath = $request->file('image_file')->store('ideas', 'public');
+        } elseif ($request->filled('image_url')) {
+            $imagePath = $request->input('image_url');
+        }
+
         $idea = Idea::create([
             'owner_id' => Auth::id(),
             'title' => $validated['title'],
@@ -90,6 +100,7 @@ class MyIdeasController extends Controller
             'faculty_id' => $validated['faculty_id'] ?? null,
             'category_id' => $validated['category_id'] ?? null,
             'status' => 'draft', // Mặc định là Draft
+            'image' => $imagePath,
         ]);
 
         // Xử lý upload file đính kèm

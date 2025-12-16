@@ -83,7 +83,12 @@
                     <article
                         class="cursor-pointer flex flex-col border border-slate-200 bg-white rounded-2xl shadow-card overflow-hidden"
                         onclick="window.location.href='{{ route('ideas.show', $idea->slug) }}'">
-                        <div class="h-[180px] bg-gradient-to-br from-blue-300 to-emerald-200"></div>
+                        <div class="h-[180px] bg-slate-100 relative group">
+                            <img src="{{ $idea->thumbnail_url }}"
+                                 alt="{{ $idea->title }}"
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                 onerror="this.src='{{ asset('images/default-idea.png') }}'">
+                        </div>
                         <div class="p-4 flex-1 flex flex-col">
                             <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
                                 <span

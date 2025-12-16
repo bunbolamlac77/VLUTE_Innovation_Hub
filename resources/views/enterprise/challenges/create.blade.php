@@ -61,10 +61,37 @@
                     </div>
 
                     <div class="grid" style="display:grid; grid-template-columns: 1fr; gap: 16px;">
-                        <div>
-                            <label for="image" class="form-label">Ảnh bìa (Banner/Thumbnail)</label>
-                            <input id="image" name="image" type="file" class="form-input" accept="image/*">
-                            <div class="muted" style="margin-top:6px; font-size:12px;">Khuyến nghị tỉ lệ 16:9, dung lượng ≤ 2MB.</div>
+                        <div x-data="{ type: '{{ old('image_type', 'file') }}' }">
+                            <label class="form-label">Ảnh bìa (Banner/Thumbnail)</label>
+
+                            <div class="flex gap-4 mb-2 mt-1">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="image_type" value="file" x-model="type" class="text-indigo-600">
+                                    <span class="text-sm font-medium text-slate-700">Tải ảnh lên</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="image_type" value="url" x-model="type" class="text-indigo-600">
+                                    <span class="text-sm font-medium text-slate-700">Dùng Link ảnh online</span>
+                                </label>
+                            </div>
+
+                            {{-- Input Upload --}}
+                            <div x-show="type === 'file'">
+                                <input id="image_file" name="image_file" type="file" class="form-input" accept="image/*">
+                                <div class="muted" style="margin-top:6px; font-size:12px;">Khuyến nghị tỉ lệ 16:9, dung lượng ≤ 2MB.</div>
+                            </div>
+
+                            {{-- Input URL --}}
+                            <div x-show="type === 'url'" style="display:none;">
+                                <input id="image_url" name="image_url" type="url" value="{{ old('image_url') }}" class="form-input" placeholder="https://example.com/image.jpg">
+                            </div>
+
+                            @error('image_file')
+                                <div class="err">{{ $message }}</div>
+                            @enderror
+                            @error('image_url')
+                                <div class="err">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div>
                             <label for="attachments" class="form-label">Tệp đính kèm (Excel/CSV/PDF...)</label>

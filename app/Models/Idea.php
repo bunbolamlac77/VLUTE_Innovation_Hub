@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Idea extends Model
 {
@@ -54,6 +55,7 @@ class Idea extends Model
         'category_id',
         'like_count',
         'embedding_vector',
+        'image',
     ];
 
     /**
@@ -235,5 +237,27 @@ class Idea extends Model
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
+    }
+
+    /**
+     * Thumbnail thông minh cho ý tưởng:
+     * - Nếu không có image: dùng ảnh mặc định
+     * - Nếu trường image là URL http(s): trả về trực tiếp
+     * - Nếu là path nội bộ: dùng asset('storage/...')
+     */
+    public function getThumbnailUrlAttribute(): string
+    {
+        if (!$this->image) {
+            return asset('images/default-idea.png');
+        }
+
+        // Chuẩn hóa chuỗi để tránh khoảng trắng
+        $image = trim((string) $this->image);
+
+        if (Str::startsWith($image, ['http://', 'https://'])) {
+            return $image;
+        }
+
+        return asset('storage/' . ltrim($image, '/'));
     }
 }

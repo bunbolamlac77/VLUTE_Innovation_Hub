@@ -152,6 +152,45 @@
                             </div>
                         </div>
 
+                        {{-- Image Banner: Upload hoặc Link --}}
+                        <div class="mb-4" x-data="{ type: '{{ old('image_type', 'file') }}' }">
+                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#0f172a;">
+                                Hình ảnh đại diện (Banner)
+                            </label>
+
+                            <div class="flex gap-4 mb-2 mt-1">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="image_type" value="file" x-model="type" class="text-indigo-600">
+                                    <span class="text-sm font-medium text-slate-700">Tải ảnh lên</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="image_type" value="url" x-model="type" class="text-indigo-600">
+                                    <span class="text-sm font-medium text-slate-700">Dùng Link ảnh online</span>
+                                </label>
+                            </div>
+
+                            {{-- Input Upload --}}
+                            <div x-show="type === 'file'">
+                                <input type="file" name="image_file"
+                                       class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                       accept="image/*">
+                            </div>
+
+                            {{-- Input URL --}}
+                            <div x-show="type === 'url'" style="display: none;">
+                                <input type="url" name="image_url" value="{{ old('image_url') }}"
+                                       class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                                       placeholder="https://example.com/image.jpg">
+                            </div>
+
+                            @error('image_file')
+                                <div style="color:#ef4444; font-size:14px; margin-top:4px;">{{ $message }}</div>
+                            @enderror
+                            @error('image_url')
+                                <div style="color:#ef4444; font-size:14px; margin-top:4px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         {{-- Tech Stack Advisor --}}
                         <div style="margin-bottom: 28px; padding: 24px; background: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 100%); border: 2px solid #c7d2fe; border-radius: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">

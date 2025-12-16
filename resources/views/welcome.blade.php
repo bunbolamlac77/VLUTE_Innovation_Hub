@@ -151,7 +151,12 @@
     <div class="grid md:grid-cols-4 gap-4">
       @forelse($openCompetitions as $c)
         <article class="flex flex-col border border-slate-200 bg-white rounded-2xl shadow-card overflow-hidden">
-          <div class="h-[180px] bg-gradient-to-br from-indigo-200 to-emerald-200"></div>
+          <div class="h-[180px] bg-slate-100 relative group">
+            <img src="{{ $c->thumbnail_url }}"
+                 alt="{{ $c->title }}"
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                 onerror="this.src='{{ asset('images/default-competition.png') }}'">
+          </div>
           <div class="p-4 flex-1 flex flex-col">
             <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
               <span class="inline-block bg-brand-gray-100 text-slate-700 px-2.5 py-1 rounded-full">Cuộc thi</span>
@@ -184,7 +189,12 @@
       @forelse($featuredIdeas as $idea)
         <article onclick="window.location.href='{{ route('ideas.show', $idea->slug) }}'"
           class="cursor-pointer border border-slate-200 rounded-2xl shadow-card overflow-hidden">
-          <div class="h-[180px] bg-gradient-to-br from-blue-300 to-emerald-200"></div>
+          <div class="h-[180px] bg-slate-100 relative group">
+            <img src="{{ $idea->thumbnail_url }}"
+                 alt="{{ $idea->title }}"
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                 onerror="this.src='{{ asset('images/default-idea.png') }}'">
+          </div>
           <div class="p-4">
             <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
               <span

@@ -26,16 +26,33 @@ class AdminCompetitionController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'banner_file' => 'nullable|image|max:5120',
             'banner_url' => 'nullable|url',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'required|in:draft,open,judging,closed,archived',
         ]);
 
-        $data['slug'] = Str::slug($data['title']) . '-' . substr(Str::uuid()->toString(), 0, 8);
-        $data['created_by'] = $request->user()->id;
+        $payload = [
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'start_date' => $data['start_date'] ?? null,
+            'end_date' => $data['end_date'] ?? null,
+            'status' => $data['status'],
+        ];
 
-        Competition::create($data);
+        // Xử lý banner: ưu tiên file, nếu không có thì dùng URL
+        if ($request->hasFile('banner_file')) {
+            $path = $request->file('banner_file')->store('competitions', 'public');
+            $payload['banner_url'] = $path;
+        } elseif (!empty($data['banner_url'])) {
+            $payload['banner_url'] = $data['banner_url'];
+        }
+
+        $payload['slug'] = Str::slug($data['title']) . '-' . substr(Str::uuid()->toString(), 0, 8);
+        $payload['created_by'] = $request->user()->id;
+
+        Competition::create($payload);
 
         return redirect()->route('admin.competitions.index')->with('status', 'Tạo cuộc thi thành công');
     }
