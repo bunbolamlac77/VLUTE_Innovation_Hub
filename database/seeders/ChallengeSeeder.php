@@ -69,6 +69,46 @@ class ChallengeSeeder extends Seeder
                 'reward' => '10.000.000 VND',
                 'status' => 'draft',
             ],
+            [
+                'title' => 'Nền tảng phân tích dữ liệu khách hàng cho cửa hàng bán lẻ nhỏ',
+                'description' => 'Thiết kế giải pháp thu thập và phân tích dữ liệu bán hàng, hành vi khách hàng cho các cửa hàng vừa và nhỏ.',
+                'organization_id' => $orgIds[0],
+                'deadline' => Carbon::now()->addDays(60),
+                'reward' => 'Gói tư vấn triển khai miễn phí',
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Giải pháp quản lý rác thải thông minh cho khuôn viên trường',
+                'description' => 'Ứng dụng IoT và phân loại rác thông minh, giúp thống kê lượng rác, tối ưu lộ trình thu gom.',
+                'organization_id' => $orgIds[1],
+                'deadline' => Carbon::now()->addDays(15),
+                'reward' => 'Hỗ trợ thử nghiệm thực tế tại trường',
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Trợ lý ảo hỗ trợ cố vấn học tập cho sinh viên',
+                'description' => 'Xây dựng chatbot giúp sinh viên theo dõi tiến độ học tập, nhắc lịch, gợi ý học phần và hoạt động ngoại khóa.',
+                'organization_id' => $orgIds[2],
+                'deadline' => Carbon::now()->addDays(90),
+                'reward' => 'Cơ hội hợp tác phát triển sản phẩm',
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Hệ thống đặt phòng họp, phòng học và thiết bị dùng chung',
+                'description' => 'Giải quyết bài toán đặt, quản lý tài nguyên dùng chung (phòng, thiết bị) trong trường đại học.',
+                'organization_id' => $orgIds[0],
+                'deadline' => null,
+                'reward' => '15.000.000 VND',
+                'status' => 'draft',
+            ],
+            [
+                'title' => 'Giải pháp hỗ trợ sức khỏe tinh thần cho sinh viên',
+                'description' => 'Xây dựng nền tảng tư vấn, tự đánh giá và theo dõi sức khỏe tinh thần dành cho sinh viên.',
+                'organization_id' => $orgIds[2],
+                'deadline' => Carbon::now()->subDays(5),
+                'reward' => null,
+                'status' => 'closed',
+            ],
         ];
 
         foreach ($samples as $s) {

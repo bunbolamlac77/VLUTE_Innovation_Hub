@@ -24,6 +24,12 @@ class DatabaseSeeder extends Seeder
         $this->call(ScientificNewsSeeder::class);
         $this->call(ChallengeSeeder::class);
 
+        // Seeder demo tạo thêm dữ liệu bulk:
+        // - Bổ sung nhiều sinh viên
+        // - Mỗi tài khoản sinh viên có 3 ý tưởng công khai, trạng thái đã duyệt
+        // - Thêm nhiều cuộc thi và thử thách mẫu
+        $this->call(DemoBulkSeeder::class);
+
         // (Tuỳ chọn) tạo user mẫu bằng factory
         // User::factory(10)->create();
 

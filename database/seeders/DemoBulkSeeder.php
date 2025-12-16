@@ -37,8 +37,8 @@ class DemoBulkSeeder extends Seeder
         }
 
         $students = User::where('role', 'student')->get();
-        if ($students->count() < 5) {
-            $this->command->warn('Chưa có đủ tài khoản sinh viên để gán cho ý tưởng.');
+        if ($students->isEmpty()) {
+            $this->command->warn('Chưa có tài khoản sinh viên nào để gán ý tưởng.');
         }
 
         // 1) Ensure faculties and categories exist (reuse from FeaturedIdeasSeeder logic)
@@ -63,45 +63,37 @@ class DemoBulkSeeder extends Seeder
         $facultyIds = Faculty::pluck('id')->all();
         $categoryIds = Category::pluck('id')->all();
 
-        // 2) Seed 10 Ideas (approved + public) owned by various students
-        $ideaTitles = [
-            'Nền tảng chia sẻ tài liệu học tập thông minh',
-            'Ứng dụng theo dõi sức khỏe cho sinh viên',
-            'Hệ thống khảo sát ý kiến giảng viên – sinh viên',
-            'AI gợi ý lộ trình học lập trình',
-            'Cổng thông tin việc làm bán thời gian',
-            'IoT giám sát chất lượng không khí trong lớp',
-            'Website học phát âm tiếng Anh bằng AI',
-            'Quản lý câu lạc bộ và hoạt động ngoại khóa',
-            'Sàn mua bán đồ cũ trong trường',
-            'Chatbot giải đáp thủ tục học vụ',
-            'Bản đồ phòng học và lịch trống theo thời gian thực',
-            'Hệ thống điểm danh bằng nhận diện khuôn mặt',
-        ];
+        // 2) Với MỖI tài khoản sinh viên: tạo 3 ý tưởng công khai, trạng thái đã duyệt
+        $totalCreatedIdeas = 0;
+        foreach ($students as $student) {
+            for ($i = 1; $i <= 3; $i++) {
+                // Đảm bảo slug là duy nhất theo từng sinh viên
+                $baseSlug = 'y-tuong-sinh-vien-'.$student->id.'-'.$i;
+                $slug = Str::slug($baseSlug);
+                $title = 'Ý tưởng '.$i.' của '.$student->name;
 
-        $createdIdeas = 0;
-        foreach (array_slice($ideaTitles, 0, 12) as $i => $title) {
-            if ($createdIdeas >= 10) break;
-            $owner = $students->random();
-            $slug = Str::slug($title);
-            $idea = Idea::firstOrCreate(
-                ['slug' => $slug],
-                [
-                    'owner_id' => $owner->id,
-                    'title' => $title,
-                    'summary' => 'Tóm tắt: ' . $title,
-                    'description' => '<p>Mô tả chi tiết cho ý tưởng: '.e($title).'. Ứng dụng công nghệ hiện đại để giải quyết vấn đề thực tiễn của sinh viên.</p>',
-                    'content' => 'Các module chức năng, kiến trúc hệ thống, kế hoạch triển khai và mở rộng...',
-                    'status' => 'approved_final',
-                    'visibility' => 'public',
-                    'faculty_id' => $facultyIds ? $facultyIds[array_rand($facultyIds)] : null,
-                    'category_id' => $categoryIds ? $categoryIds[array_rand($categoryIds)] : null,
-                    'like_count' => rand(0, 200),
-                ]
-            );
-            $createdIdeas++;
+                $idea = Idea::firstOrCreate(
+                    ['slug' => $slug],
+                    [
+                        'owner_id' => $student->id,
+                        'title' => $title,
+                        'summary' => 'Ý tưởng số '.$i.' trong ngân hàng ý tưởng của sinh viên '.$student->name,
+                        'description' => '<p>Ý tưởng '.$i.' do sinh viên '.e($student->name).' đề xuất trong ngân hàng ý tưởng.</p>',
+                        'content' => 'Mô tả chi tiết về mục tiêu, tính mới, phạm vi áp dụng và kế hoạch triển khai của ý tưởng.',
+                        'status' => 'approved_final',
+                        'visibility' => 'public',
+                        'faculty_id' => $facultyIds ? $facultyIds[array_rand($facultyIds)] : null,
+                        'category_id' => $categoryIds ? $categoryIds[array_rand($categoryIds)] : null,
+                        'like_count' => rand(0, 50),
+                    ]
+                );
+
+                if ($idea->wasRecentlyCreated) {
+                    $totalCreatedIdeas++;
+                }
+            }
         }
-        $this->command->info("✓ Đã tạo thêm {$createdIdeas} ý tưởng.");
+        $this->command->info("✓ Đã tạo thêm {$totalCreatedIdeas} ý tưởng (3 ý tưởng công khai cho mỗi tài khoản sinh viên).");
 
         // 3) Seed 10 Competitions
         $admin = User::where('role', 'admin')->first() ?? User::first();

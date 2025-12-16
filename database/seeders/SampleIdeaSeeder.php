@@ -133,7 +133,7 @@ class SampleIdeaSeeder extends Seeder
         $categoryKT = Category::where('slug', 'kinh-te-quan-ly')->first();
         $categoryGD = Category::where('slug', 'giao-duc-dao-tao')->first();
 
-        // Tạo 6 ý tưởng mẫu (bao gồm ý tưởng đầu tiên đã có)
+        // Tạo ít nhất 10 ý tưởng mẫu trong \"ngân hàng ý tưởng\"
         $ideas = [
             [
                 'title' => 'Hệ thống quản lý đổi mới sáng tạo dựa trên AI và Big Data cho các trường đại học',
@@ -346,6 +346,50 @@ Nền tảng kết nối sinh viên với doanh nghiệp là cầu nối quan tr
 - **Gamification**: Hệ thống điểm, badge, achievement',
                 'faculty' => $facultyNN,
                 'category' => $categoryGD,
+            ],
+            [
+                'title' => 'Nền tảng quản lý câu lạc bộ và hoạt động ngoại khóa trong trường đại học',
+                'summary' => 'Xây dựng hệ thống giúp quản lý câu lạc bộ, sự kiện, điểm rèn luyện và tham gia hoạt động ngoại khóa của sinh viên.',
+                'description' => 'Giải quyết bài toán phân tán thông tin về hoạt động ngoại khóa, giúp nhà trường và sinh viên theo dõi được mức độ tham gia, minh bạch điểm rèn luyện.',
+                'content' => '## Mục tiêu
+
+Hỗ trợ phòng công tác sinh viên và các câu lạc bộ quản lý toàn bộ vòng đời sự kiện: tạo sự kiện, đăng ký, điểm danh, đánh giá và tổng hợp báo cáo.',
+                'faculty' => $facultyKT,
+                'category' => $categoryKT,
+            ],
+            [
+                'title' => 'Hệ thống gợi ý lộ trình học tập cá nhân hóa cho sinh viên',
+                'summary' => 'Ứng dụng phân tích kết quả học tập, sở thích và mục tiêu nghề nghiệp để gợi ý lộ trình học phù hợp.',
+                'description' => 'Sử dụng dữ liệu kết quả học tập, phản hồi của sinh viên và yêu cầu thị trường lao động để đề xuất học phần, kỹ năng và hoạt động nên tham gia.',
+                'content' => '## Tính năng chính
+
+- Gợi ý học phần theo năng lực
+- Gợi ý khóa học online, chứng chỉ bổ trợ
+- Dashboard theo dõi tiến độ và mục tiêu cá nhân',
+                'faculty' => $facultyCNTT,
+                'category' => $categoryGD,
+            ],
+            [
+                'title' => 'Ứng dụng quản lý chi tiêu và tài chính cá nhân cho sinh viên',
+                'summary' => 'Phát triển ứng dụng mobile hỗ trợ sinh viên quản lý chi tiêu, lập ngân sách, tiết kiệm và theo dõi mục tiêu tài chính.',
+                'description' => 'Tập trung vào nhóm sinh viên có thu nhập hạn chế, giúp hình thành thói quen tài chính lành mạnh, hạn chế nợ xấu và chi tiêu mất kiểm soát.',
+                'content' => '## Chức năng chính
+
+- Ghi chép chi tiêu nhanh
+- Phân loại chi tiêu theo nhóm
+- Báo cáo trực quan và nhắc nhở vượt ngân sách',
+                'faculty' => $facultyKT,
+                'category' => $categoryKT,
+            ],
+            [
+                'title' => 'Hệ thống chia sẻ tài liệu học tập giữa sinh viên các khoa',
+                'summary' => 'Xây dựng kho tài liệu số nơi sinh viên có thể chia sẻ slide, đề cương, đề thi và ghi chú học tập.',
+                'description' => 'Giải quyết vấn đề tài liệu bị phân tán trên nhiều nhóm mạng xã hội, khó tìm kiếm và khó kiểm soát chất lượng.',
+                'content' => '## Ý tưởng
+
+Tạo một nền tảng có phân quyền, gợi ý tài liệu liên quan, hệ thống đánh giá và báo cáo nội dung vi phạm.',
+                'faculty' => $facultyCNTT,
+                'category' => $categoryCNTT,
             ],
         ];
 
