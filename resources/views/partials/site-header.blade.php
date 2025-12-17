@@ -1,3 +1,5 @@
+{{-- Header Wrapper (Sticky Container) --}}
+<div class="sticky top-0 z-50 w-full bg-white">
 {{-- Header (Tailwind utilities only) --}}
 <div class="bg-brand-navy text-white" role="banner">
   <div class="container flex items-center justify-between gap-6 py-5">
@@ -127,21 +129,20 @@
     @endauth
   </div>
 </div>
-</div>
 
 {{-- Menubar --}}
-<header class="sticky top-0 z-40 bg-white border-b border-slate-200" role="navigation" aria-label="Thanh menu">
+<header x-data="{ mobileMenuOpen: false }" class="w-full bg-white border-b border-slate-200 shadow-sm transition-all duration-300" role="navigation" aria-label="Thanh menu">
   <div class="container flex items-center gap-6 py-3">
     <nav id="menuMain" aria-label="Menu chính" class="hidden sm:flex items-center gap-2">
-      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="/" data-key="home">Trang chủ</a>
-      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="/about" data-key="about">Giới thiệu</a>
-      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="{{ route('ideas.index') }}"
+      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" href="/" data-key="home">Trang chủ</a>
+      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" href="/about" data-key="about">Giới thiệu</a>
+      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" href="{{ route('ideas.index') }}"
         data-key="ideas">Ý tưởng</a>
-      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="/events" data-key="events">Cuộc thi &amp;
+      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" href="/events" data-key="events">Cuộc thi &amp;
         Sự kiện</a>
-      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="{{ route('challenges.index') }}"
+      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" href="{{ route('challenges.index') }}"
         data-key="challenges">Challenges</a>
-      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50" href="{{ route('scientific-news.index') }}"
+      <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" href="{{ route('scientific-news.index') }}"
         data-key="news">Bản tin Nghiên cứu</a>
     </nav>
 
@@ -154,16 +155,66 @@
           </a>
         @endif
       @endauth
-      <form method="GET" action="{{ route('search.index') }}" class="flex items-center gap-2">
+      <form method="GET" action="{{ route('search.index') }}" class="hidden sm:flex items-center gap-2">
         <input type="search" name="q" value="{{ request('q') }}" placeholder="Tìm ý tưởng, cuộc thi, mentor…"
-          class="w-64 rounded-full border border-slate-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-64 rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           aria-label="Ô tìm kiếm" />
         <button type="submit"
-          class="rounded-full border border-slate-300 bg-white font-bold px-4 py-2 text-sm hover:bg-slate-50">Tìm</button>
+          class="rounded-full bg-brand-navy text-white px-4 py-2 text-sm font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2">Tìm</button>
       </form>
+      
+      {{-- Mobile menu button --}}
+      <button @click="mobileMenuOpen = !mobileMenuOpen" class="sm:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition" aria-label="Mở menu">
+        <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
     </div>
   </div>
+
+  {{-- Mobile menu dropdown --}}
+  <div x-show="mobileMenuOpen" 
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0 -translate-y-1"
+       x-transition:enter-end="opacity-100 translate-y-0"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100 translate-y-0"
+       x-transition:leave-end="opacity-0 -translate-y-1"
+       class="sm:hidden border-t border-slate-200 bg-white/98 backdrop-blur-md p-4 space-y-2 shadow-lg">
+    <a href="/" class="block font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" @click="mobileMenuOpen = false">Trang chủ</a>
+    <a href="/about" class="block font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" @click="mobileMenuOpen = false">Giới thiệu</a>
+    <a href="{{ route('ideas.index') }}" class="block font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" @click="mobileMenuOpen = false">Ý tưởng</a>
+    <a href="/events" class="block font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" @click="mobileMenuOpen = false">Cuộc thi &amp; Sự kiện</a>
+    <a href="{{ route('challenges.index') }}" class="block font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" @click="mobileMenuOpen = false">Challenges</a>
+    <a href="{{ route('scientific-news.index') }}" class="block font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" @click="mobileMenuOpen = false">Bản tin Nghiên cứu</a>
+    
+    {{-- Mobile search form --}}
+    <form method="GET" action="{{ route('search.index') }}" class="pt-2 border-t border-slate-200">
+      <div class="flex items-center gap-2">
+        <input type="search" name="q" value="{{ request('q') }}" placeholder="Tìm ý tưởng, cuộc thi, mentor…"
+          class="flex-1 rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          aria-label="Ô tìm kiếm" />
+        <button type="submit"
+          class="rounded-full bg-brand-navy text-white px-4 py-2 text-sm font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2">Tìm</button>
+      </div>
+    </form>
+    
+    @auth
+      @if(auth()->user()->hasRole('enterprise'))
+        <a href="{{ route('enterprise.scout') }}"
+          class="block mt-2 text-center rounded-full bg-brand-navy text-white px-4 py-2 text-sm font-bold shadow hover:shadow-lg transition"
+          @click="mobileMenuOpen = false">
+          🎯 Thợ săn Giải pháp
+        </a>
+      @endif
+    @endauth
+  </div>
 </header>
+</div>
+{{-- End Sticky Header Wrapper --}}
 
 @push('scripts')
   <script>
