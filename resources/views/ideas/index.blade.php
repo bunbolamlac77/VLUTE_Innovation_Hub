@@ -26,7 +26,7 @@
     {{-- Filter & Search Section --}}
     <section class="container py-8">
         <form method="GET" action="{{ route('ideas.index') }}" id="filterForm">
-            <div class="grid md:grid-cols-3 gap-4 mb-4">
+            <div class="grid md:grid-cols-4 gap-4 mb-4">
                 {{-- Search Box --}}
                 <div>
                     <label for="search" class="block mb-2 font-semibold text-slate-900">Tìm kiếm</label>
@@ -58,13 +58,23 @@
                         @endforeach
                     </select>
                 </div>
+                {{-- Sort Filter --}}
+                <div>
+                    <label for="sort" class="block mb-2 font-semibold text-slate-900">Sắp xếp</label>
+                    <select name="sort" id="sort"
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-[15px] bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Mới nhất</option>
+                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Cũ nhất</option>
+                        <option value="most_liked" {{ request('sort') == 'most_liked' ? 'selected' : '' }}>Nhiều lượt thích nhất</option>
+                    </select>
+                </div>
             </div>
 
             <div class="flex items-end gap-3">
                 <button type="submit"
                     class="inline-flex items-center gap-2 rounded-full bg-white text-brand-navy px-5 py-3 font-bold border border-transparent hover:brightness-95">🔍
                     Tìm kiếm</button>
-                @if (request()->hasAny(['search', 'faculty', 'category']))
+                @if (request()->hasAny(['search', 'faculty', 'category', 'sort']))
                     <a href="{{ route('ideas.index') }}"
                         class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-3 font-bold hover:bg-slate-50">✕
                         Xóa bộ lọc</a>
@@ -176,8 +186,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const facultySelect = document.getElementById('faculty');
             const categorySelect = document.getElementById('category');
+            const sortSelect = document.getElementById('sort');
             if (facultySelect) facultySelect.addEventListener('change', () => document.getElementById('filterForm').submit());
             if (categorySelect) categorySelect.addEventListener('change', () => document.getElementById('filterForm').submit());
+            if (sortSelect) sortSelect.addEventListener('change', () => document.getElementById('filterForm').submit());
         });
 
         function likeIdea(ideaId) {

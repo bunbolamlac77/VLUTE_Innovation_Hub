@@ -58,6 +58,9 @@
     @include('partials.site-footer')
 
     {{-- Scripts --}}
+    {{-- SweetAlert2 CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         function changeLanguage(lang) {
             alert("Chức năng chuyển sang ngôn ngữ " + lang.toUpperCase() + " đang được phát triển.");
@@ -86,6 +89,59 @@
                 setTimeout(() => { toast.remove(); }, 300);
             }
         }
+
+        // Kiểm tra Session Flash Message từ Controller
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: "{{ session('success') }}",
+                confirmButtonColor: '#3085d6',
+                timer: 3000
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#d33',
+            });
+        @endif
+
+        @if(session('status'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: "{{ session('status') }}",
+                confirmButtonColor: '#3085d6',
+                timer: 3000
+            });
+        @endif
+        
+        // Script xác nhận xóa chung cho toàn trang
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.closest('.btn-delete-confirm')) {
+                e.preventDefault();
+                let form = e.target.closest('form');
+                
+                Swal.fire({
+                    title: 'Bạn chắc chắn chứ?',
+                    text: "Dữ liệu sẽ không thể khôi phục!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Vâng, xóa nó!',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            }
+        });
     </script>
     @stack('scripts')
 </body>

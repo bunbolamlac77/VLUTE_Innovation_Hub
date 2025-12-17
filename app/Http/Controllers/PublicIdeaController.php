@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Idea;
+use App\Models\IdeaComment;
 use App\Models\Faculty;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PublicIdeaController extends Controller
 {
@@ -40,6 +42,25 @@ class PublicIdeaController extends Controller
             });
         }
 
+        // Sắp xếp
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'most_liked':
+                $query->orderBy('like_count', 'desc');
+                break;
+            case 'most_viewed':
+                // Nếu có view_count field thì dùng, nếu không thì dùng created_at
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
+        }
+
         $ideas = $query->paginate(12)->withQueryString();
 
         // Lấy danh sách khoa và danh mục để hiển thị trong filter
@@ -56,7 +77,7 @@ class PublicIdeaController extends Controller
     {
         $idea = Idea::publicApproved()
             ->where('slug', $slug)
-            ->with(['owner', 'faculty', 'category', 'members.user', 'likes'])
+            ->with(['owner', 'faculty', 'category', 'members.user', 'likes', 'comments.user'])
             ->withCount('likes')
             ->firstOrFail();
 
@@ -100,6 +121,34 @@ class PublicIdeaController extends Controller
             'liked' => $liked,
             'like_count' => $idea->like_count
         ]);
+    }
+
+    /**
+     * Lưu bình luận công khai cho ý tưởng (cần đăng nhập)
+     */
+    public function storeComment(Request $request, $id)
+    {
+        $idea = Idea::publicApproved()->findOrFail($id);
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')
+                ->with('error', 'Vui lòng đăng nhập để bình luận.');
+        }
+
+        $validated = $request->validate([
+            'content' => ['required', 'string', 'min:2', 'max:5000'],
+        ]);
+
+        $comment = IdeaComment::create([
+            'idea_id' => $idea->id,
+            'user_id' => $user->id,
+            'body' => $validated['content'],
+            'visibility' => 'public',
+        ]);
+
+        return redirect()->route('ideas.show', $idea->slug)
+            ->with('success', 'Đã gửi bình luận thành công!');
     }
 }
 

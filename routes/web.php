@@ -37,6 +37,7 @@ Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController
 Route::get('/ideas', [\App\Http\Controllers\PublicIdeaController::class, 'index'])->name('ideas.index');
 Route::get('/ideas/{slug}', [\App\Http\Controllers\PublicIdeaController::class, 'show'])->name('ideas.show');
 Route::middleware('auth')->post('/ideas/{id}/like', [\App\Http\Controllers\PublicIdeaController::class, 'like'])->name('ideas.like');
+Route::middleware('auth')->post('/ideas/{id}/comments', [\App\Http\Controllers\PublicIdeaController::class, 'storeComment'])->name('ideas.comments.store');
 
 // ---- Khu nội bộ (đã đăng nhập + đã verify + đã approved) ----
 Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(function () {

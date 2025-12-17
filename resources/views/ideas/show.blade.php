@@ -37,10 +37,60 @@
                 </div>
             </div>
 
-            {{-- Phần Bình luận (Placeholder) --}}
-            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 mb-4">Bình luận & Thảo luận</h3>
-                <p class="text-slate-500 text-sm italic">Tính năng bình luận đang được phát triển...</p>
+            {{-- Phần Bình luận --}}
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 mt-8" id="comments">
+                <h3 class="font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+                    Bình luận ({{ $idea->comments->where('visibility', 'public')->count() }})
+                </h3>
+
+                {{-- Form bình luận --}}
+                @auth
+                    <form action="{{ route('ideas.comments.store', $idea->id) }}" method="POST" class="mb-8">
+                        @csrf
+                        <div class="flex gap-4">
+                            <img src="{{ auth()->user()->avatar_url ?? asset('images/avatar-default.svg') }}" class="w-10 h-10 rounded-full border">
+                            <div class="flex-1">
+                                <textarea name="content" rows="3" class="w-full rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm" placeholder="Chia sẻ suy nghĩ hoặc góp ý của bạn..." required></textarea>
+                                <div class="mt-2 text-right">
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg text-sm shadow-md transition">Gửi bình luận</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                @else
+                    <div class="bg-blue-50 text-blue-700 p-4 rounded-lg mb-6 text-center">
+                        Vui lòng <a href="{{ route('login') }}" class="font-bold underline">đăng nhập</a> để tham gia thảo luận.
+                    </div>
+                @endauth
+
+                {{-- Danh sách bình luận --}}
+                <div class="space-y-6">
+                    @forelse($idea->comments->where('visibility', 'public') as $comment)
+                        <div class="flex gap-4">
+                            <img src="{{ $comment->user->avatar_url ?? asset('images/avatar-default.svg') }}" class="w-10 h-10 rounded-full border bg-white">
+                            <div class="flex-1">
+                                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <span class="font-bold text-slate-900">{{ $comment->user->name }}</span>
+                                            <span class="text-xs text-slate-500 ml-2">{{ $comment->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        {{-- Role Badge --}}
+                                        @if($comment->user->hasRole('staff'))
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700">MENTOR</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-slate-700 text-sm leading-relaxed">
+                                        {!! nl2br(e($comment->body)) !!}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-slate-400 py-4">Chưa có bình luận nào. Hãy là người đầu tiên!</div>
+                    @endforelse
+                </div>
             </div>
         </div>
 

@@ -180,7 +180,7 @@ class Idea extends Model
      */
     public function comments()
     {
-        return $this->hasMany(IdeaComment::class);
+        return $this->hasMany(IdeaComment::class)->orderBy('created_at', 'desc');
     }
 
     /**
