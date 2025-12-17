@@ -13,8 +13,17 @@
         --border: #e5e7eb;
     }
 
-    /* Prevent global horizontal scrolling */
-    html, body { max-width: 100%; overflow-x: hidden; }
+    /* Prevent global horizontal scrolling - but allow vertical scrolling for sticky */
+    html { 
+        max-width: 100%; 
+        overflow-x: hidden; 
+    }
+    body { 
+        max-width: 100%; 
+        overflow-x: hidden; 
+        /* Ensure body can scroll vertically for sticky to work */
+        min-height: 100vh;
+    }
     
     /* Smooth scrolling for better UX */
     html {
@@ -40,6 +49,15 @@
     [role="banner"] .container { @apply py-5; }
     header[role="navigation"] .container { @apply py-4; }
     main > section { @apply py-12; }
+    
+    /* Force sticky positioning for header wrapper */
+    .sticky.top-0,
+    div.sticky.top-0,
+    [class*="sticky"][class*="top-0"] {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 50 !important;
+    }
 }
 
 @layer components {

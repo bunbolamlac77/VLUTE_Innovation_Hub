@@ -1,5 +1,5 @@
 {{-- Header Wrapper (Sticky Container) --}}
-<div class="sticky top-0 z-50 w-full bg-white">
+<div class="sticky top-0 z-50 w-full bg-white" style="position: sticky; top: 0; z-index: 50;">
 {{-- Header (Tailwind utilities only) --}}
 <div class="bg-brand-navy text-white" role="banner">
   <div class="container flex items-center justify-between gap-6 py-5">
