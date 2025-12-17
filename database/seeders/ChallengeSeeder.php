@@ -36,6 +36,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->addDays(30),
                 'reward' => '30.000.000 VND + thực tập 3 tháng',
                 'status' => 'open',
+                'image_url' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Giải pháp giám sát năng lượng cho toà nhà',
@@ -44,6 +45,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->addDays(20),
                 'reward' => 'Thiết bị IoT + Hỗ trợ thương mại hoá',
                 'status' => 'open',
+                'image_url' => 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'AI trợ lý học tập cho sinh viên',
@@ -52,6 +54,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->addDays(45),
                 'reward' => '20.000.000 VND',
                 'status' => 'open',
+                'image_url' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Truy vết chất lượng sản phẩm nông nghiệp',
@@ -60,6 +63,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->subDays(2),
                 'reward' => null,
                 'status' => 'closed',
+                'image_url' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Hệ thống quản lý bãi đỗ xe thông minh',
@@ -68,6 +72,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => null,
                 'reward' => '10.000.000 VND',
                 'status' => 'draft',
+                'image_url' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Nền tảng phân tích dữ liệu khách hàng cho cửa hàng bán lẻ nhỏ',
@@ -76,6 +81,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->addDays(60),
                 'reward' => 'Gói tư vấn triển khai miễn phí',
                 'status' => 'open',
+                'image_url' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Giải pháp quản lý rác thải thông minh cho khuôn viên trường',
@@ -84,6 +90,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->addDays(15),
                 'reward' => 'Hỗ trợ thử nghiệm thực tế tại trường',
                 'status' => 'open',
+                'image_url' => 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Trợ lý ảo hỗ trợ cố vấn học tập cho sinh viên',
@@ -92,6 +99,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->addDays(90),
                 'reward' => 'Cơ hội hợp tác phát triển sản phẩm',
                 'status' => 'open',
+                'image_url' => 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Hệ thống đặt phòng họp, phòng học và thiết bị dùng chung',
@@ -100,6 +108,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => null,
                 'reward' => '15.000.000 VND',
                 'status' => 'draft',
+                'image_url' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Giải pháp hỗ trợ sức khỏe tinh thần cho sinh viên',
@@ -108,6 +117,7 @@ class ChallengeSeeder extends Seeder
                 'deadline' => Carbon::now()->subDays(5),
                 'reward' => null,
                 'status' => 'closed',
+                'image_url' => 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=600&fit=crop',
             ],
         ];
 

@@ -152,35 +152,41 @@
                             </div>
                         </div>
 
-                        {{-- Image Banner: Upload hoặc Link --}}
-                        <div class="mb-4" x-data="{ type: '{{ old('image_type', 'file') }}' }">
-                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#0f172a;">
+                        {{-- Image Banner: Upload hoặc Link (đơn giản giống File đính kèm) --}}
+                        <div style="margin-bottom: 28px;" x-data="{ type: '{{ old('image_type', 'file') }}' }">
+                            <label style="display:block; margin-bottom:10px; font-weight:600; color:#0f172a; font-size:15px;">
                                 Hình ảnh đại diện (Banner)
                             </label>
 
-                            <div class="flex gap-4 mb-2 mt-1">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="image_type" value="file" x-model="type" class="text-indigo-600">
-                                    <span class="text-sm font-medium text-slate-700">Tải ảnh lên</span>
+                            <div style="display:flex; gap:16px; margin-bottom:8px; font-size:14px; color:#4b5563;">
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                                    <input type="radio" name="image_type" value="file" x-model="type">
+                                    <span>Tải ảnh lên</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="image_type" value="url" x-model="type" class="text-indigo-600">
-                                    <span class="text-sm font-medium text-slate-700">Dùng Link ảnh online</span>
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                                    <input type="radio" name="image_type" value="url" x-model="type">
+                                    <span>Dùng link ảnh online</span>
                                 </label>
                             </div>
 
                             {{-- Input Upload --}}
                             <div x-show="type === 'file'">
                                 <input type="file" name="image_file"
-                                       class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                       accept="image/*">
+                                       accept="image/*"
+                                       style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:14px; background:#f9fafb;">
+                                <div style="margin-top:6px; font-size:12px; color:var(--muted);">
+                                    Khuyến nghị tỉ lệ ngang (16:9), dung lượng ≤ 5MB.
+                                </div>
                             </div>
 
                             {{-- Input URL --}}
-                            <div x-show="type === 'url'" style="display: none;">
+                            <div x-show="type === 'url'" style="display:none; margin-top:4px;">
                                 <input type="url" name="image_url" value="{{ old('image_url') }}"
-                                       class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                                       placeholder="https://example.com/image.jpg">
+                                       placeholder="https://example.com/image.jpg"
+                                       style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:14px;">
+                                <div style="margin-top:6px; font-size:12px; color:var(--muted);">
+                                    Dán liên kết ảnh từ Google Drive, Imgur, v.v...
+                                </div>
                             </div>
 
                             @error('image_file')

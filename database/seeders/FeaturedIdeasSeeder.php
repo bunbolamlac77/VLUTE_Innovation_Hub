@@ -66,6 +66,7 @@ class FeaturedIdeasSeeder extends Seeder
                 'faculty' => $facultyCNTT,
                 'category' => $categoryCNTT,
                 'like_count' => 128,
+                'image_url' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Hệ thống bãi giữ xe thông minh bằng thị giác máy tính',
@@ -75,6 +76,7 @@ class FeaturedIdeasSeeder extends Seeder
                 'faculty' => $facultyDDT,
                 'category' => $categoryDDT,
                 'like_count' => 96,
+                'image_url' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Robot giao nhận tài liệu nội bộ tự hành',
@@ -84,6 +86,7 @@ class FeaturedIdeasSeeder extends Seeder
                 'faculty' => $facultyCKD,
                 'category' => $categoryCKD,
                 'like_count' => 87,
+                'image_url' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Nền tảng kết nối dự án doanh nghiệp với nhóm sinh viên thực hiện',
@@ -93,6 +96,7 @@ class FeaturedIdeasSeeder extends Seeder
                 'faculty' => $facultyKT,
                 'category' => $categoryKT,
                 'like_count' => 142,
+                'image_url' => 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop',
             ],
             [
                 'title' => 'Ứng dụng luyện phát âm tiếng Anh với phản hồi thời gian thực',
@@ -102,6 +106,7 @@ class FeaturedIdeasSeeder extends Seeder
                 'faculty' => $facultyNN,
                 'category' => $categoryGD,
                 'like_count' => 153,
+                'image_url' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop',
             ],
         ];
 
@@ -120,6 +125,7 @@ class FeaturedIdeasSeeder extends Seeder
                     'faculty_id' => optional($data['faculty'])->id,
                     'category_id' => optional($data['category'])->id,
                     'like_count' => $data['like_count'] ?? 0,
+                    'image_url' => $data['image_url'] ?? null,
                 ]
             );
 

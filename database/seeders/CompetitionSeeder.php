@@ -42,7 +42,7 @@ class CompetitionSeeder extends Seeder
                     <li>Giải Nhì: 30.000.000 VNĐ</li>
                     <li>Giải Ba: 20.000.000 VNĐ</li>
                 </ul>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->subDays(5),
                 'end_date' => Carbon::now()->addDays(30),
                 'status' => 'open',
@@ -50,6 +50,7 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Hackathon Công nghệ Thông tin 2025',
                 'slug' => 'hackathon-cong-nghe-thong-tin-2025',
+                'banner_url' => 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&h=600&fit=crop',
                 'description' => '<p>Hackathon Công nghệ Thông tin 2025 là cuộc thi lập trình marathon dành cho các lập trình viên, sinh viên CNTT. Tham gia để phát triển các giải pháp công nghệ sáng tạo trong 48 giờ.</p>
                 <h3>Chủ đề:</h3>
                 <ul>
@@ -64,7 +65,7 @@ class CompetitionSeeder extends Seeder
                     <li>Code tại chỗ trong 48 giờ</li>
                     <li>Demo sản phẩm cuối cùng</li>
                 </ul>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->addDays(15),
                 'end_date' => Carbon::now()->addDays(45),
                 'status' => 'open',
@@ -72,6 +73,7 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Thiết kế Sản phẩm Sáng tạo',
                 'slug' => 'cuoc-thi-thiet-ke-san-pham-sang-tao',
+                'banner_url' => 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&h=600&fit=crop',
                 'description' => '<p>Cuộc thi tìm kiếm các thiết kế sản phẩm sáng tạo, có tính ứng dụng cao trong đời sống. Dành cho sinh viên các ngành thiết kế, kỹ thuật, và các ngành liên quan.</p>
                 <h3>Hạng mục:</h3>
                 <ul>
@@ -80,7 +82,7 @@ class CompetitionSeeder extends Seeder
                     <li>Thiết kế nội thất</li>
                     <li>Thiết kế thời trang</li>
                 </ul>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->addDays(7),
                 'end_date' => Carbon::now()->addDays(60),
                 'status' => 'open',
@@ -88,6 +90,7 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Nghiên cứu Khoa học Sinh viên',
                 'slug' => 'cuoc-thi-nghien-cuu-khoa-hoc-sinh-vien',
+                'banner_url' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&h=600&fit=crop',
                 'description' => '<p>Cuộc thi khuyến khích sinh viên tham gia nghiên cứu khoa học, phát triển các đề tài nghiên cứu có giá trị khoa học và thực tiễn.</p>
                 <h3>Lĩnh vực:</h3>
                 <ul>
@@ -96,7 +99,7 @@ class CompetitionSeeder extends Seeder
                     <li>Kỹ thuật và Công nghệ</li>
                     <li>Y tế và Sức khỏe</li>
                 </ul>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->subDays(60),
                 'end_date' => Carbon::now()->subDays(30),
                 'status' => 'closed',
@@ -104,6 +107,7 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Sáng tạo Video Marketing',
                 'slug' => 'cuoc-thi-sang-tao-video-marketing',
+                'banner_url' => 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&h=600&fit=crop',
                 'description' => '<p>Cuộc thi tìm kiếm các video marketing sáng tạo, có khả năng lan tỏa và tạo tác động tích cực đến cộng đồng.</p>
                 <h3>Yêu cầu:</h3>
                 <ul>
@@ -111,7 +115,7 @@ class CompetitionSeeder extends Seeder
                     <li>Nội dung tích cực, có ý nghĩa</li>
                     <li>Chất lượng HD trở lên</li>
                 </ul>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->addDays(20),
                 'end_date' => Carbon::now()->addDays(50),
                 'status' => 'draft',
@@ -119,8 +123,9 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Ý tưởng Chuyển đổi số trong Giáo dục',
                 'slug' => 'cuoc-thi-y-tuong-chuyen-doi-so-trong-giao-duc',
+                'banner_url' => 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=1200&h=600&fit=crop',
                 'description' => '<p>Tìm kiếm các ý tưởng, giải pháp chuyển đổi số giúp nâng cao chất lượng giảng dạy, học tập và quản lý trong nhà trường.</p>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->addDays(10),
                 'end_date' => Carbon::now()->addDays(40),
                 'status' => 'open',
@@ -128,8 +133,9 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Ứng dụng Trí tuệ nhân tạo trong Đời sống',
                 'slug' => 'cuoc-thi-ung-dung-tri-tue-nhan-tao-trong-doi-song',
+                'banner_url' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=600&fit=crop',
                 'description' => '<p>Khuyến khích sinh viên xây dựng các ứng dụng AI giải quyết bài toán thực tế trong y tế, giao thông, nông nghiệp, dịch vụ công.</p>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->addDays(5),
                 'end_date' => Carbon::now()->addDays(35),
                 'status' => 'open',
@@ -137,8 +143,9 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Đổi mới sáng tạo vì Cộng đồng',
                 'slug' => 'cuoc-thi-doi-moi-sang-tao-vi-cong-dong',
+                'banner_url' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=600&fit=crop',
                 'description' => '<p>Các dự án, mô hình giải quyết vấn đề xã hội: môi trường, giáo dục, bình đẳng, an toàn giao thông,…</p>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->subDays(10),
                 'end_date' => Carbon::now()->addDays(15),
                 'status' => 'open',
@@ -146,8 +153,9 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Thiết kế UI/UX cho Nền tảng Số',
                 'slug' => 'cuoc-thi-thiet-ke-ui-ux-cho-nen-tang-so',
+                'banner_url' => 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&h=600&fit=crop',
                 'description' => '<p>Thiết kế giao diện và trải nghiệm người dùng cho các sản phẩm số trong giáo dục, thương mại điện tử, quản lý thông minh.</p>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->addDays(3),
                 'end_date' => Carbon::now()->addDays(25),
                 'status' => 'draft',
@@ -155,8 +163,9 @@ class CompetitionSeeder extends Seeder
             [
                 'title' => 'Cuộc thi Sáng tạo Nội dung Số cho Sinh viên',
                 'slug' => 'cuoc-thi-sang-tao-noi-dung-so-cho-sinh-vien',
+                'banner_url' => 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=600&fit=crop',
                 'description' => '<p>Khuyến khích sinh viên sản xuất podcast, video, infographic, blog chia sẻ kiến thức, kỹ năng và câu chuyện truyền cảm hứng.</p>',
-                'banner_url' => '/images/panel-truong.jpg',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
                 'start_date' => Carbon::now()->subDays(20),
                 'end_date' => Carbon::now()->subDays(1),
                 'status' => 'closed',

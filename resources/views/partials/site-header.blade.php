@@ -145,7 +145,15 @@
         data-key="news">Bản tin Nghiên cứu</a>
     </nav>
 
-    <div class="ml-auto">
+    <div class="ml-auto flex items-center gap-3">
+      @auth
+        @if(auth()->user()->hasRole('enterprise'))
+          <a href="{{ route('enterprise.scout') }}"
+            class="hidden md:inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 text-sm font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2">
+            🎯 Thợ săn Giải pháp
+          </a>
+        @endif
+      @endauth
       <form method="GET" action="{{ route('search.index') }}" class="flex items-center gap-2">
         <input type="search" name="q" value="{{ request('q') }}" placeholder="Tìm ý tưởng, cuộc thi, mentor…"
           class="w-64 rounded-full border border-slate-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"

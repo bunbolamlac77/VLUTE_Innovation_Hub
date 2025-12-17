@@ -139,6 +139,7 @@ class SampleIdeaSeeder extends Seeder
                 'title' => 'Hệ thống quản lý đổi mới sáng tạo dựa trên AI và Big Data cho các trường đại học',
                 'summary' => 'Xây dựng nền tảng quản lý và hỗ trợ các hoạt động đổi mới sáng tạo trong trường đại học bằng công nghệ AI và phân tích dữ liệu lớn.',
                 'description' => 'Ý tưởng tập trung vào việc phát triển một hệ thống tích hợp sử dụng trí tuệ nhân tạo và phân tích dữ liệu lớn để quản lý, đánh giá và hỗ trợ các dự án đổi mới sáng tạo trong môi trường giáo dục đại học.',
+                'image_url' => 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=600&fit=crop',
                 'content' => '## Tổng quan dự án
 
 Hệ thống quản lý đổi mới sáng tạo dựa trên AI và Big Data là một nền tảng toàn diện được thiết kế để hỗ trợ các trường đại học trong việc quản lý, đánh giá và phát triển các ý tưởng đổi mới sáng tạo từ sinh viên và giảng viên.
@@ -174,6 +175,7 @@ Hệ thống quản lý đổi mới sáng tạo dựa trên AI và Big Data là
                 'title' => 'Hệ thống giám sát và điều khiển thông minh cho nhà kính nông nghiệp công nghệ cao',
                 'summary' => 'Phát triển hệ thống tự động hóa quản lý nhiệt độ, độ ẩm, ánh sáng và tưới tiêu cho nhà kính sử dụng IoT và trí tuệ nhân tạo.',
                 'description' => 'Ý tưởng về một hệ thống giám sát thông minh tích hợp cảm biến IoT, điều khiển tự động và ứng dụng AI để tối ưu hóa điều kiện môi trường cho cây trồng trong nhà kính.',
+                'image_url' => 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop',
                 'content' => '## Tổng quan dự án
 
 Hệ thống giám sát và điều khiển thông minh cho nhà kính là giải pháp tích hợp IoT, AI và tự động hóa để quản lý tối ưu môi trường canh tác trong nhà kính nông nghiệp công nghệ cao.
@@ -208,6 +210,7 @@ Hệ thống giám sát và điều khiển thông minh cho nhà kính là giả
                 'title' => 'Máy cắt cỏ tự động sử dụng năng lượng mặt trời cho khu vực công cộng',
                 'summary' => 'Thiết kế và chế tạo robot cắt cỏ tự động chạy bằng năng lượng mặt trời, tích hợp GPS và cảm biến để làm việc độc lập tại các khu vực công cộng.',
                 'description' => 'Phát triển một hệ thống robot cắt cỏ thông minh với khả năng tự động định vị, lập kế hoạch đường đi và hoạt động hoàn toàn bằng năng lượng mặt trời.',
+                'image_url' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop',
                 'content' => '## Tổng quan dự án
 
 Máy cắt cỏ tự động là một giải pháp thân thiện với môi trường, sử dụng năng lượng mặt trời để vận hành, giúp giảm chi phí và bảo vệ môi trường trong việc chăm sóc cảnh quan công cộng.
@@ -242,6 +245,7 @@ Máy cắt cỏ tự động là một giải pháp thân thiện với môi tr�
                 'title' => 'Hệ thống quản lý sức khỏe và phòng bệnh cho gia súc, gia cầm sử dụng IoT và AI',
                 'summary' => 'Phát triển hệ thống giám sát sức khỏe động vật thông minh sử dụng cảm biến IoT và trí tuệ nhân tạo để phát hiện sớm bệnh tật, theo dõi tăng trưởng và tối ưu hóa chế độ chăn nuôi.',
                 'description' => 'Ý tưởng về một hệ thống tích hợp cảm biến IoT, AI và mobile app để quản lý sức khỏe đàn gia súc, gia cầm một cách hiệu quả, giúp người chăn nuôi phát hiện và xử lý bệnh tật kịp thời.',
+                'image_url' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
                 'content' => '## Tổng quan dự án
 
 Hệ thống quản lý sức khỏe và phòng bệnh cho gia súc, gia cầm là giải pháp công nghệ toàn diện giúp người chăn nuôi quản lý đàn vật nuôi hiệu quả hơn, giảm thiểu rủi ro bệnh tật và tăng năng suất chăn nuôi.
@@ -282,6 +286,7 @@ Hệ thống quản lý sức khỏe và phòng bệnh cho gia súc, gia cầm l
                 'title' => 'Nền tảng kết nối sinh viên với doanh nghiệp để thực tập và việc làm',
                 'summary' => 'Xây dựng nền tảng số kết nối sinh viên với các doanh nghiệp địa phương, hỗ trợ tìm kiếm cơ hội thực tập, việc làm bán thời gian và việc làm chính thức.',
                 'description' => 'Phát triển một hệ thống matching thông minh sử dụng AI để kết nối sinh viên phù hợp với các vị trí thực tập và việc làm tại các doanh nghiệp trong khu vực Đồng bằng sông Cửu Long.',
+                'image_url' => 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop',
                 'content' => '## Tổng quan dự án
 
 Nền tảng kết nối sinh viên với doanh nghiệp là cầu nối quan trọng giúp sinh viên tìm được cơ hội thực tập và việc làm phù hợp, đồng thời giúp doanh nghiệp tìm được nhân tài tiềm năng.
@@ -317,6 +322,7 @@ Nền tảng kết nối sinh viên với doanh nghiệp là cầu nối quan tr
                 'title' => 'Ứng dụng học tiếng Anh thông qua trò chơi và AI cho sinh viên kỹ thuật',
                 'summary' => 'Phát triển ứng dụng mobile học tiếng Anh chuyên ngành kỹ thuật thông qua gamification và trợ lý AI, giúp sinh viên cải thiện kỹ năng ngôn ngữ một cách thú vị và hiệu quả.',
                 'description' => 'Ứng dụng tích hợp game-based learning, AI conversation practice và từ vựng chuyên ngành kỹ thuật để giúp sinh viên kỹ thuật học tiếng Anh hiệu quả hơn.',
+                'image_url' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop',
                 'content' => '## Tổng quan dự án
 
 Ứng dụng học tiếng Anh chuyên ngành kỹ thuật là công cụ hỗ trợ sinh viên kỹ thuật cải thiện khả năng tiếng Anh thông qua phương pháp học tập thú vị và tương tác.
@@ -351,6 +357,7 @@ Nền tảng kết nối sinh viên với doanh nghiệp là cầu nối quan tr
                 'title' => 'Nền tảng quản lý câu lạc bộ và hoạt động ngoại khóa trong trường đại học',
                 'summary' => 'Xây dựng hệ thống giúp quản lý câu lạc bộ, sự kiện, điểm rèn luyện và tham gia hoạt động ngoại khóa của sinh viên.',
                 'description' => 'Giải quyết bài toán phân tán thông tin về hoạt động ngoại khóa, giúp nhà trường và sinh viên theo dõi được mức độ tham gia, minh bạch điểm rèn luyện.',
+                'image_url' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
                 'content' => '## Mục tiêu
 
 Hỗ trợ phòng công tác sinh viên và các câu lạc bộ quản lý toàn bộ vòng đời sự kiện: tạo sự kiện, đăng ký, điểm danh, đánh giá và tổng hợp báo cáo.',
@@ -361,6 +368,7 @@ Hỗ trợ phòng công tác sinh viên và các câu lạc bộ quản lý toà
                 'title' => 'Hệ thống gợi ý lộ trình học tập cá nhân hóa cho sinh viên',
                 'summary' => 'Ứng dụng phân tích kết quả học tập, sở thích và mục tiêu nghề nghiệp để gợi ý lộ trình học phù hợp.',
                 'description' => 'Sử dụng dữ liệu kết quả học tập, phản hồi của sinh viên và yêu cầu thị trường lao động để đề xuất học phần, kỹ năng và hoạt động nên tham gia.',
+                'image_url' => 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=600&fit=crop',
                 'content' => '## Tính năng chính
 
 - Gợi ý học phần theo năng lực
@@ -373,6 +381,7 @@ Hỗ trợ phòng công tác sinh viên và các câu lạc bộ quản lý toà
                 'title' => 'Ứng dụng quản lý chi tiêu và tài chính cá nhân cho sinh viên',
                 'summary' => 'Phát triển ứng dụng mobile hỗ trợ sinh viên quản lý chi tiêu, lập ngân sách, tiết kiệm và theo dõi mục tiêu tài chính.',
                 'description' => 'Tập trung vào nhóm sinh viên có thu nhập hạn chế, giúp hình thành thói quen tài chính lành mạnh, hạn chế nợ xấu và chi tiêu mất kiểm soát.',
+                'image_url' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
                 'content' => '## Chức năng chính
 
 - Ghi chép chi tiêu nhanh
@@ -385,6 +394,7 @@ Hỗ trợ phòng công tác sinh viên và các câu lạc bộ quản lý toà
                 'title' => 'Hệ thống chia sẻ tài liệu học tập giữa sinh viên các khoa',
                 'summary' => 'Xây dựng kho tài liệu số nơi sinh viên có thể chia sẻ slide, đề cương, đề thi và ghi chú học tập.',
                 'description' => 'Giải quyết vấn đề tài liệu bị phân tán trên nhiều nhóm mạng xã hội, khó tìm kiếm và khó kiểm soát chất lượng.',
+                'image_url' => 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=600&fit=crop',
                 'content' => '## Ý tưởng
 
 Tạo một nền tảng có phân quyền, gợi ý tài liệu liên quan, hệ thống đánh giá và báo cáo nội dung vi phạm.',
@@ -407,6 +417,7 @@ Tạo một nền tảng có phân quyền, gợi ý tài liệu liên quan, h�
                     'visibility' => 'public',
                     'faculty_id' => $ideaData['faculty']->id,
                     'category_id' => $ideaData['category']->id,
+                    'image_url' => $ideaData['image_url'] ?? null,
                 ]
             );
 

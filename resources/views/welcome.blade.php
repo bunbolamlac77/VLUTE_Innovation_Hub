@@ -48,12 +48,27 @@
                 Kết nối ý tưởng – cố vấn – doanh nghiệp – ươm tạo. Cổng dành cho sinh viên, giảng viên và đối tác.
               </p>
               <div class="flex gap-3 flex-wrap">
-                <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
-                  href="#submit">Gửi ý tưởng</a>
+                @auth
+                  <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                    href="{{ route('my-ideas.create') }}">Gửi ý tưởng</a>
+                @else
+                  <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                    href="{{ route('login') }}">Gửi ý tưởng</a>
+                @endauth
                 <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
                   href="{{ route('competitions.index') }}">Đăng ký cuộc thi</a>
-                <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
-                  href="#mentors">Đặt lịch mentor</a>
+                @auth
+                  @if(auth()->user()->hasRole('staff'))
+                    <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                      href="{{ route('mentor.ideas') }}">Đặt lịch mentor</a>
+                  @else
+                    <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                      href="{{ route('dashboard') }}">Đặt lịch mentor</a>
+                  @endif
+                @else
+                  <a class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent hover:bg-white/15 px-4 py-2 font-semibold"
+                    href="{{ route('login') }}">Đặt lịch mentor</a>
+                @endauth
               </div>
             </div>
 
@@ -112,30 +127,51 @@
       <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-5">
         <h4 class="text-lg font-bold mb-2">🎓 Sinh viên</h4>
         <p class="text-slate-600">Tạo đội, gửi ý tưởng, theo dõi phản hồi & đăng ký cuộc thi.</p>
-        <div class="mt-3"><a
-            class="inline-flex items-center gap-2 rounded-full bg-indigo-600 text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            href="#submit">Bắt đầu</a></div>
+        <div class="mt-3">
+          @auth
+            <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+              href="{{ route('my-ideas.create') }}">Bắt đầu</a>
+          @else
+            <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+              href="{{ route('login') }}">Bắt đầu</a>
+          @endauth
+        </div>
       </div>
       <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-5">
         <h4 class="text-lg font-bold mb-2">👩‍🏫 Giảng viên / Mentor</h4>
         <p class="text-slate-600">Chấm theo rubric, yêu cầu bổ sung, nhận cố vấn & quản lý lịch.</p>
-        <div class="mt-3"><a
-            class="inline-flex items-center gap-2 rounded-full bg-indigo-600 text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            href="#review">Vào hàng chờ</a></div>
+        <div class="mt-3">
+          @auth
+            @if(auth()->user()->hasRole('staff') || auth()->user()->hasRole('center') || auth()->user()->hasRole('board') || auth()->user()->hasRole('reviewer'))
+              <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+                href="{{ route('manage.review-queue.index') }}">Vào hàng chờ</a>
+            @else
+              <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+                href="{{ route('dashboard') }}">Vào hàng chờ</a>
+            @endif
+          @else
+            <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+              href="{{ route('login') }}">Vào hàng chờ</a>
+          @endauth
+        </div>
       </div>
       <div class="bg-white border border-slate-200 rounded-2xl shadow-card p-5">
         <h4 class="text-lg font-bold mb-2">🏢 Doanh nghiệp / Đối tác</h4>
         <p class="text-slate-600">Đăng challenge, shortlist giải pháp, tài trợ & kết nối PoC.</p>
         <div class="mt-3 flex gap-2 flex-wrap">
-          <a
-            class="inline-flex items-center gap-2 rounded-full bg-indigo-600 text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            href="#partners">Tạo challenge</a>
           @auth
-          @if(auth()->user()->hasRole('enterprise'))
-          <a
-            class="inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            href="{{ route('enterprise.scout') }}">🎯 Thợ săn Giải pháp</a>
-          @endif
+            @if(auth()->user()->hasRole('enterprise'))
+              <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+                href="{{ route('enterprise.challenges.create') }}">Tạo challenge</a>
+              <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+                href="{{ route('enterprise.scout') }}">🎯 Thợ săn Giải pháp</a>
+            @else
+              <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+                href="{{ route('dashboard') }}">Tạo challenge</a>
+            @endif
+          @else
+            <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-4 py-2 font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
+              href="{{ route('login') }}">Tạo challenge</a>
           @endauth
         </div>
       </div>
@@ -168,7 +204,7 @@
             <div class="mt-auto pt-3 flex gap-2">
               <a class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold hover:bg-slate-50"
                 href="{{ route('competitions.show', $c->slug) }}">Xem chi tiết</a>
-              <a class="inline-flex items-center gap-2 rounded-full bg-indigo-600 text-white px-3 py-1.5 text-sm font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              <a class="inline-flex items-center gap-2 rounded-full bg-brand-navy text-white px-3 py-1.5 text-sm font-bold shadow hover:shadow-lg hover:-translate-y-px transition focus:outline-none focus:ring-2 focus:ring-brand-navy focus:ring-offset-2"
                 href="{{ route('competitions.show', $c->slug) }}">Đăng ký</a>
             </div>
           </div>

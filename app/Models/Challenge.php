@@ -17,6 +17,7 @@ class Challenge extends Model
         'problem_statement',
         'requirements',
         'image',
+        'image_url',
         'deadline',
         'reward',
         'status',
@@ -50,11 +51,14 @@ class Challenge extends Model
      */
     public function getThumbnailUrlAttribute(): string
     {
-        if (!$this->image) {
+        // Ưu tiên image_url, nếu không có thì dùng image
+        $image = $this->image_url ?? $this->image;
+        
+        if (!$image) {
             return asset('images/default-challenge.png');
         }
 
-        $image = trim((string) $this->image);
+        $image = trim((string) $image);
 
         if (Str::startsWith($image, ['http://', 'https://'])) {
             return $image;
