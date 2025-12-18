@@ -36,6 +36,7 @@ class ReviewFormController extends Controller
             'reviews.assignment.reviewer',
             'reviews.changeRequests',
             'changeRequests.review',
+            'auditLogs.actor',
         ]);
 
         return view('manage.review-form.show', [

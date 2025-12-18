@@ -16,8 +16,9 @@ Nền tảng phục vụ Đổi mới Sáng tạo tại Trường Đại học S
 ### 2.1) Công khai
 
 -   Trang chủ với số liệu tổng quan động (ý tưởng công khai đã duyệt, mentor, đối tác, cuộc thi đang mở)
--   Ngân hàng ý tưởng (danh sách/chi tiết theo slug, like cần đăng nhập)
+-   Ngân hàng ý tưởng (danh sách/chi tiết theo slug, like cần đăng nhập, bình luận)
 -   Cuộc thi & sự kiện (danh sách/chi tiết, đăng ký)
+-   Thử thách (Challenges) - Doanh nghiệp đăng thử thách, sinh viên nộp giải pháp
 -   Bản tin Nghiên cứu Khoa học (route: `scientific-news.index`)
 
 ### 2.2) Đã đăng nhập
@@ -25,6 +26,9 @@ Nền tảng phục vụ Đổi mới Sáng tạo tại Trường Đại học S
 -   Hồ sơ cá nhân (avatar, thông tin cơ bản; kiểm tra hoàn thiện hồ sơ)
 -   Ý tưởng của tôi (tạo/cập nhật/xoá, mời thành viên, nhận xét nội bộ, nộp duyệt)
 -   Đăng ký cuộc thi, nộp bài
+-   Nộp giải pháp cho thử thách từ doanh nghiệp
+-   Xem dự án đang hướng dẫn (cho giảng viên)
+-   Quản lý thử thách (cho doanh nghiệp)
 
 ### 2.3) Quản trị
 
@@ -32,6 +36,7 @@ Nền tảng phục vụ Đổi mới Sáng tạo tại Trường Đại học S
 -   Phân quyền/đổi vai (student/staff/center/board/reviewer/admin)
 -   Quản trị Phân loại: Khoa, Danh mục, Thẻ
 -   Gán người phản biện (reviewer), đổi trạng thái ý tưởng
+-   Quản lý Cuộc thi, Thử thách, Bản tin NCKH, Banner
 
 ### 2.4) **5 Tính năng AI (Mới)**
 
@@ -159,8 +164,17 @@ php artisan migrate --seed
 
 Seeder sẽ tạo:
 
--   Roles mặc định
+-   Roles mặc định (student, staff, center, board, enterprise, reviewer, admin)
 -   Tài khoản Admin (email: `env(ADMIN_EMAIL,'admin@vlute.edu.vn')`, mật khẩu: `env(ADMIN_PASSWORD,'Admin@123')`)
+-   Tài khoản mẫu đã duyệt:
+    -   5+ tài khoản sinh viên (mật khẩu: `Password@123`)
+    -   5 giảng viên theo 5 khoa (mật khẩu: `Password@123`)
+    -   Trung tâm ĐMST, Ban giám hiệu, Doanh nghiệp (mật khẩu: `Password@123`)
+-   Dữ liệu mẫu:
+    -   Mỗi tài khoản sinh viên có 3 ý tưởng công khai, đã duyệt
+    -   10+ cuộc thi mẫu
+    -   10+ thử thách (challenges) mẫu
+    -   10 bản tin nghiên cứu khoa học
 -   Embedding Vector cho các ý tưởng mẫu (nếu GEMINI_API_KEY được cấu hình)
 
 ### Bước 6. Chạy ứng dụng
@@ -223,8 +237,10 @@ Trang đăng nhập/đăng ký/đặt lại mật khẩu/verify đã được l�
 -   `reviews`, `review_assignments`, `change_requests`
 -   `faculties`, `categories`, `tags`, `idea_tag`
 -   `competitions`, `competition_registrations`, `competition_submissions`
+-   `challenges`, `challenge_submissions` (Thử thách từ doanh nghiệp)
 -   (Tuỳ chọn) `organizations` cho đối tác
 -   `scientific_news` (Bản tin Nghiên cứu Khoa học)
+-   `banners` (Banner quảng cáo)
 
 ---
 
@@ -235,6 +251,7 @@ Trang đăng nhập/đăng ký/đặt lại mật khẩu/verify đã được l�
 -   `/` Trang chủ (welcome)
 -   `/ideas`, `/ideas/{slug}` Ngân hàng ý tưởng
 -   `/events` & `/competitions` (danh sách/chi tiết)
+-   `/challenges` Thử thách từ doanh nghiệp (danh sách/chi tiết)
 -   `/scientific-news` Bản tin Nghiên cứu
 -   `/enterprise/scout` **Thợ săn giải pháp (AI)**
 
@@ -243,6 +260,10 @@ Trang đăng nhập/đăng ký/đặt lại mật khẩu/verify đã được l�
 -   `/dashboard`, `/profile`
 -   `/my-ideas/*` (CRUD ý tưởng, mời, nộp duyệt)
 -   `/my-competitions/*` (đăng ký & nộp bài)
+-   `/challenges/{challenge}/submit` (nộp giải pháp cho thử thách)
+-   `/manage/review-queue` (hàng chờ phản biện)
+-   `/mentored-ideas` (dự án đang hướng dẫn - cho giảng viên)
+-   `/enterprise/*` (quản lý thử thách - cho doanh nghiệp)
 
 ### 8.3) Admin (đã login + verified + approved + is.admin)
 
@@ -250,11 +271,15 @@ Trang đăng nhập/đăng ký/đặt lại mật khẩu/verify đã được l�
 
 ### 8.4) API Routes (AI Features)
 
--   `POST /api/ai/review-insight` – Phân tích ý tưởng
--   `POST /api/ai/analyze-visual` – Phân tích hình ảnh
--   `POST /api/ai/check-duplicate` – Kiểm tra trùng lặp
--   `POST /api/ai/suggest-tech-stack` – Đề xuất công nghệ
--   `POST /api/ai/scout-solutions` – Tìm giải pháp
+**Authenticated Routes** (yêu cầu đăng nhập):
+-   `POST /ai/review-insight` – Phân tích ý tưởng
+-   `POST /ai/vision` – Phân tích hình ảnh
+-   `POST /ai/check-duplicate` – Kiểm tra trùng lặp
+-   `POST /ai/suggest-tech` – Đề xuất công nghệ
+-   `POST /ai/scout-solutions` – Tìm giải pháp
+-   `GET /ai/seed` – Tạo embedding vector cho ý tưởng
+
+**Public Test Routes** (không cần đăng nhập):
 -   `POST /api/test/gemini/text` – Test Gemini Text API
 -   `POST /api/test/gemini/image` – Test Gemini Vision API
 -   `GET /api/test/gemini/config` – Kiểm tra cấu hình API

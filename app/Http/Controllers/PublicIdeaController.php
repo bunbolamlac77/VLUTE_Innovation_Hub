@@ -87,16 +87,20 @@ class PublicIdeaController extends Controller
     /**
      * Like/Unlike ý tưởng (cần đăng nhập)
      */
-    public function like($id)
+    public function like(Request $request, $id)
     {
         $idea = Idea::publicApproved()->findOrFail($id);
         $user = auth()->user();
 
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Vui lòng đăng nhập để thực hiện chức năng này'
-            ], 401);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng đăng nhập để thực hiện chức năng này'
+                ], 401);
+            }
+            return redirect()->route('login')
+                ->with('error', 'Vui lòng đăng nhập để thực hiện chức năng này');
         }
 
         // Kiểm tra user đã like chưa
@@ -113,14 +117,24 @@ class PublicIdeaController extends Controller
         }
 
         // Cập nhật like_count trong bảng ideas để đồng bộ
-        $idea->like_count = $idea->likes()->count();
+        $idea->refresh();
+        $likeCount = $idea->likes()->count();
+        $idea->like_count = $likeCount;
         $idea->save();
 
-        return response()->json([
-            'success' => true,
-            'liked' => $liked,
-            'like_count' => $idea->like_count
-        ]);
+        // Nếu là AJAX request thì trả về JSON
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'liked' => $liked,
+                'like_count' => $likeCount,
+                'likes_count' => $likeCount // Đảm bảo tương thích với view
+            ]);
+        }
+
+        // Nếu là form submit thông thường thì redirect về trang chi tiết
+        return redirect()->route('ideas.show', $idea->slug)
+            ->with('success', $liked ? 'Đã thích ý tưởng này!' : 'Đã bỏ thích ý tưởng này!');
     }
 
     /**

@@ -106,4 +106,18 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Đánh dấu đã đóng banner cảnh báo profile chưa đầy đủ
+     */
+    public function dismissToast(Request $request)
+    {
+        $request->session()->put('profile_toast_shown', true);
+        
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+        
+        return back();
+    }
 }

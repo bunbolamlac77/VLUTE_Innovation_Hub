@@ -192,6 +192,14 @@ class Idea extends Model
     }
 
     /**
+     * Lịch sử audit log (polymorphic)
+     */
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'target')->orderBy('created_at', 'desc');
+    }
+
+    /**
      * Kiểm tra user đã like ý tưởng này chưa
      */
     public function isLikedBy(?User $user): bool

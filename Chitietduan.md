@@ -51,17 +51,25 @@ Thư mục chính:
 -   Danh sách, chi tiết, đăng ký, nộp bài
 -   Khu "Cuộc thi của tôi" cho sinh viên
 
-### 2.5) Bản tin Nghiên cứu Khoa học
+### 2.5) Thử thách (Challenges)
+
+-   Doanh nghiệp đăng thử thách (vấn đề cần giải quyết)
+-   Sinh viên xem danh sách thử thách công khai
+-   Sinh viên nộp giải pháp cho thử thách
+-   Doanh nghiệp xem và đánh giá giải pháp
+-   Quản trị viên quản lý thử thách
+
+### 2.6) Bản tin Nghiên cứu Khoa học
 
 -   Danh sách + lọc theo chủ đề + tìm kiếm (title/description/content)
 -   Chi tiết bản tin, ảnh, ngày đăng, tác giả, nguồn; sidebar bản tin mới
 -   Trang chủ hiển thị lưới 4 bản tin mới nhất
 
-### 2.6) Tìm kiếm tổng hợp
+### 2.7) Tìm kiếm tổng hợp
 
 -   Ô tìm kiếm trên header: route search.index
 
-### 2.7) **5 Tính năng AI (Mới - Tích hợp Google Gemini)**
+### 2.8) **5 Tính năng AI (Mới - Tích hợp Google Gemini)**
 
 #### **Tính năng 1: Review Insight (Phân tích ý tưởng)**
 - **Mục đích**: Giúp sinh viên và giám khảo phân tích ý tưởng một cách chuyên nghiệp
@@ -126,7 +134,7 @@ Thư mục chính:
   - % độ phù hợp
 - **Sử dụng**: Trang riêng cho doanh nghiệp (Enterprise Scout)
 
-### 2.8) Quản trị (Admin)
+### 2.9) Quản trị (Admin)
 
 -   Duyệt tài khoản, gán quyền
 -   Quản lý taxonomies (Khoa, Lĩnh vực, Tags)
@@ -204,6 +212,22 @@ Admin seeder sử dụng ENV:
 -   ADMIN_EMAIL (mặc định: admin@vlute.edu.vn)
 -   ADMIN_PASSWORD (mặc định: Admin@123)
 
+**Tài khoản mẫu được seed:**
+
+-   **Admin**: admin@vlute.edu.vn / Admin@123
+-   **Sinh viên**: student1@st.vlute.edu.vn đến student15@st.vlute.edu.vn / Password@123
+-   **Giảng viên**: gv.cntt@vlute.edu.vn, gv.ddt@vlute.edu.vn, gv.ckd@vlute.edu.vn, gv.kt@vlute.edu.vn, gv.nn@vlute.edu.vn / Password@123
+-   **Trung tâm ĐMST**: center@vlute.edu.vn / Password@123
+-   **Ban giám hiệu**: board@vlute.edu.vn / Password@123
+-   **Doanh nghiệp**: hr@acme.example / Password@123
+
+**Dữ liệu mẫu:**
+
+-   Mỗi tài khoản sinh viên có **3 ý tưởng công khai, đã duyệt**
+-   **10+ cuộc thi** mẫu
+-   **10+ thử thách (challenges)** mẫu
+-   **10 bản tin nghiên cứu khoa học** mẫu
+
 ---
 
 ## 5) Cài đặt & chạy
@@ -252,10 +276,17 @@ Lưu ý: Nếu môi trường bị coi là production, thêm cờ --force cho mi
 
 ## 6) Dữ liệu mẫu mặc định
 
--   Admin: theo ADMIN_EMAIL/ADMIN_PASSWORD
--   ApprovedUsersSeeder: tạo sẵn một số tài khoản/phân quyền được duyệt
--   Ý tưởng nổi bật, cuộc thi mẫu, 10 bản tin nghiên cứu khoa học mẫu
--   Embedding Vector: Tự động tạo cho các ý tưởng khi seed
+**Tài khoản:**
+-   Admin: theo ADMIN_EMAIL/ADMIN_PASSWORD (mặc định: admin@vlute.edu.vn / Admin@123)
+-   ApprovedUsersSeeder: tạo sẵn 5+ sinh viên, 5 giảng viên, center, board, enterprise (mật khẩu: Password@123)
+-   DemoBulkSeeder: tạo thêm sinh viên student6 đến student15 (mật khẩu: Password@123)
+
+**Dữ liệu:**
+-   Mỗi tài khoản sinh viên có **3 ý tưởng công khai, đã duyệt** (tổng cộng 45+ ý tưởng)
+-   **10+ cuộc thi** mẫu (FeaturedIdeasSeeder + DemoBulkSeeder)
+-   **10+ thử thách (challenges)** mẫu (ChallengeSeeder + DemoBulkSeeder)
+-   **10 bản tin nghiên cứu khoa học** mẫu (ScientificNewsSeeder)
+-   Embedding Vector: Tự động tạo cho các ý tưởng khi seed (nếu GEMINI_API_KEY được cấu hình)
 
 ---
 
@@ -283,11 +314,16 @@ Lưu ý: Nếu môi trường bị coi là production, thêm cờ --force cho mi
 -   competition_registrations (competition_id, user_id, status, team_name)
 -   competition_submissions (registration_id, title, abstract, submitted_at)
 
-### 7.4) Bản tin NCKH:
+### 7.4) Thử thách (Challenges):
+
+-   challenges (title, description, organization_id, deadline, status, created_by)
+-   challenge_submissions (challenge_id, user_id, title, description, solution, score, reviewed_at)
+
+### 7.5) Bản tin NCKH:
 
 -   scientific_news: id, title, description, content, author, source, image_url, published_date(date), category, timestamps
 
-### 7.5) Tài khoản & hồ sơ:
+### 7.6) Tài khoản & hồ sơ:
 
 -   users (role, approval_status/is_approved, is_active, email_verified_at, ...)
 -   roles, role_user
@@ -304,30 +340,42 @@ Lưu ý: Nếu môi trường bị coi là production, thêm cờ --force cho mi
 -   GET /ideas/{slug} → PublicIdeaController@show
 -   POST /ideas/{id}/like → PublicIdeaController@like (auth)
 -   GET /competitions → CompetitionController@index; /competitions/{competition:slug} → show
+-   GET /challenges → ChallengeController@index; /challenges/{challenge} → show
 -   GET /events → EventsController@index
 -   GET /scientific-news → ScientificNewsController@index
 -   GET /scientific-news/{news} → ScientificNewsController@show
 -   GET /search → SearchController@index
 -   GET /enterprise/scout → Enterprise Scout (tìm giải pháp)
+-   POST /newsletter/subscribe → NewsletterController@subscribe
 
 ### 8.2) Nội bộ (đăng nhập + verified + approved):
 
 -   /dashboard
 -   /my-ideas (MyIdeasController) CRUD + submit + invite + comments
+-   /my-competitions (MyCompetitionsController) đăng ký & nộp bài
+-   /challenges/{challenge}/submit (ChallengeSubmissionController) nộp giải pháp
 -   /manage/review-queue, /manage/review/{idea} (Review*)
+-   /mentored-ideas (MentorController) dự án đang hướng dẫn (cho giảng viên)
+-   /enterprise/* (Enterprise\ChallengeManagerController) quản lý thử thách (cho doanh nghiệp)
+-   /ai/* (AIController) các tính năng AI (authenticated)
 
 ### 8.3) Admin (/admin, middleware is.admin):
 
 -   AdminHomeController@index, Approvals, Users, Taxonomies, Ideas (actions)
--   Resource: competitions, news (bản tin KH)
+-   Resource: competitions, news (bản tin KH), challenges, banners
 
 ### 8.4) API Routes (AI Features):
 
--   POST /api/ai/review-insight → Phân tích ý tưởng
--   POST /api/ai/analyze-visual → Phân tích hình ảnh
--   POST /api/ai/check-duplicate → Kiểm tra trùng lặp
--   POST /api/ai/suggest-tech-stack → Đề xuất công nghệ
--   POST /api/ai/scout-solutions → Tìm giải pháp cho doanh nghiệp
+**Authenticated Routes** (yêu cầu đăng nhập):
+-   POST /ai/review-insight → Phân tích ý tưởng
+-   POST /ai/vision → Phân tích hình ảnh
+-   POST /ai/check-duplicate → Kiểm tra trùng lặp
+-   POST /ai/suggest-tech → Đề xuất công nghệ
+-   POST /ai/scout-solutions → Tìm giải pháp cho doanh nghiệp
+-   GET /ai/seed → Tạo embedding vector cho ý tưởng
+-   GET /ai/debug → Debug thông tin AI
+
+**Public Test Routes** (không cần đăng nhập):
 -   POST /api/test/gemini/text → Test Gemini Text API
 -   POST /api/test/gemini/image → Test Gemini Vision API
 -   GET /api/test/gemini/config → Kiểm tra cấu hình API
@@ -362,15 +410,21 @@ Cơ sở: http://localhost:8000 (có thể dùng http://127.0.0.1:8000 tương �
 -   Đăng ký (POST): http://localhost:8000/competitions/{id}/register
 -   Trang Sự kiện: http://localhost:8000/events
 
-### 8.1.5) Tìm kiếm
+### 8.1.5) Thử thách (Challenges)
+
+-   Danh sách thử thách: http://localhost:8000/challenges
+-   Chi tiết thử thách: http://localhost:8000/challenges/{id}
+-   Nộp giải pháp: http://localhost:8000/challenges/{challenge}/submit
+
+### 8.1.6) Tìm kiếm
 
 -   http://localhost:8000/search?q=tu+khoa
 
-### 8.1.6) Tính năng AI (Enterprise Scout)
+### 8.1.7) Tính năng AI (Enterprise Scout)
 
 -   Trang thợ săn giải pháp: http://localhost:8000/enterprise/scout
 
-### 8.1.7) Khu nội bộ (đăng nhập + xác minh + được duyệt)
+### 8.1.8) Khu nội bộ (đăng nhập + xác minh + được duyệt)
 
 -   Dashboard: http://localhost:8000/dashboard
 -   Hồ sơ cá nhân: http://localhost:8000/profile
@@ -384,18 +438,20 @@ Cơ sở: http://localhost:8000 (có thể dùng http://127.0.0.1:8000 tương �
     -   Biểu mẫu: http://localhost:8000/manage/review/{idea}
 -   Đính kèm (tải): http://localhost:8000/attachments/{id}/download
 -   Dự án đang hướng dẫn (Giảng viên): http://localhost:8000/mentored-ideas
+-   Nộp giải pháp thử thách: http://localhost:8000/challenges/{challenge}/submit
+-   Quản lý thử thách (Doanh nghiệp): http://localhost:8000/enterprise/challenges
 
-### 8.1.8) Cuộc thi của tôi (Sinh viên)
+### 8.1.9) Cuộc thi của tôi (Sinh viên)
 
 -   Danh sách: http://localhost:8000/my-competitions
 -   Nộp bài: http://localhost:8000/my-competitions/{registration}/submit
 
-### 8.1.9) Lời mời tham gia ý tưởng
+### 8.1.10) Lời mời tham gia ý tưởng
 
 -   Chấp nhận: http://localhost:8000/invitations/accept/{token}
 -   Từ chối: http://localhost:8000/invitations/decline/{token}
 
-### 8.1.10) Khu Admin (/admin)
+### 8.1.11) Khu Admin (/admin)
 
 -   Bảng quản trị: http://localhost:8000/admin
 -   Duyệt tài khoản: http://localhost:8000/admin/approvals
@@ -408,8 +464,16 @@ Cơ sở: http://localhost:8000 (có thể dùng http://127.0.0.1:8000 tương �
     -   Danh sách: http://localhost:8000/admin/news
     -   Tạo mới: http://localhost:8000/admin/news/create
     -   Sửa: http://localhost:8000/admin/news/{id}/edit
+-   Thử thách (resource):
+    -   Danh sách: http://localhost:8000/admin/challenges
+    -   Tạo mới: http://localhost:8000/admin/challenges/create
+    -   Sửa: http://localhost:8000/admin/challenges/{id}/edit
+-   Banner (resource):
+    -   Danh sách: http://localhost:8000/admin/banners
+    -   Tạo mới: http://localhost:8000/admin/banners/create
+    -   Sửa: http://localhost:8000/admin/banners/{id}/edit
 
-### 8.1.11) Xác thực (Breeze)
+### 8.1.12) Xác thực (Breeze)
 
 -   Đăng nhập: http://localhost:8000/login
 -   Đăng ký: http://localhost:8000/register
@@ -463,38 +527,65 @@ Cơ sở: http://localhost:8000 (có thể dùng http://127.0.0.1:8000 tương �
 
 ### 10.2) Cách sử dụng API AI
 
-**Test Review Insight:**
+**Lưu ý**: Các route AI chính yêu cầu đăng nhập. Để test, bạn cần đăng nhập trước và gửi kèm session cookie hoặc CSRF token.
+
+**Test Review Insight** (authenticated):
 ```bash
-curl -X POST http://localhost:8000/api/ai/review-insight \
+curl -X POST http://localhost:8000/ai/review-insight \
   -H "Content-Type: application/json" \
+  -H "X-CSRF-TOKEN: {token}" \
+  -b "laravel_session={session}" \
   -d '{"content":"Ý tưởng của tôi là..."}'
 ```
 
-**Test Vision:**
+**Test Vision** (authenticated):
 ```bash
-curl -X POST http://localhost:8000/api/ai/analyze-visual \
-  -F "image=@/path/to/image.jpg"
+curl -X POST http://localhost:8000/ai/vision \
+  -F "image=@/path/to/image.jpg" \
+  -H "X-CSRF-TOKEN: {token}" \
+  -b "laravel_session={session}"
 ```
 
-**Test Check Duplicate:**
+**Test Check Duplicate** (authenticated):
 ```bash
-curl -X POST http://localhost:8000/api/ai/check-duplicate \
+curl -X POST http://localhost:8000/ai/check-duplicate \
   -H "Content-Type: application/json" \
+  -H "X-CSRF-TOKEN: {token}" \
+  -b "laravel_session={session}" \
   -d '{"content":"Nội dung ý tưởng...","current_id":1}'
 ```
 
-**Test Suggest Tech Stack:**
+**Test Suggest Tech Stack** (authenticated):
 ```bash
-curl -X POST http://localhost:8000/api/ai/suggest-tech-stack \
+curl -X POST http://localhost:8000/ai/suggest-tech \
   -H "Content-Type: application/json" \
+  -H "X-CSRF-TOKEN: {token}" \
+  -b "laravel_session={session}" \
   -d '{"content":"Ý tưởng của tôi là..."}'
 ```
 
-**Test Scout Solutions:**
+**Test Scout Solutions** (authenticated):
 ```bash
-curl -X POST http://localhost:8000/api/ai/scout-solutions \
+curl -X POST http://localhost:8000/ai/scout-solutions \
   -H "Content-Type: application/json" \
+  -H "X-CSRF-TOKEN: {token}" \
+  -b "laravel_session={session}" \
   -d '{"problem":"Chúng tôi cần giải pháp để..."}'
+```
+
+**Public Test Routes** (không cần đăng nhập):
+```bash
+# Test Gemini Text
+curl -X POST http://localhost:8000/api/test/gemini/text \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Xin chào"}'
+
+# Test Gemini Image
+curl -X POST http://localhost:8000/api/test/gemini/image \
+  -F "image=@/path/to/image.jpg"
+
+# Check Config
+curl http://localhost:8000/api/test/gemini/config
 ```
 
 ### 10.3) Tích hợp Frontend
@@ -552,6 +643,7 @@ Trạng thái: draft → submitted_center → approved_center → submitted_boar
 -   [ ] Kiểm tra: Ngân hàng Ý tưởng, Cuộc thi, Bản tin NCKH, Tìm kiếm
 -   [ ] Test API AI: GET /api/test/gemini/config
 -   [ ] Test tính năng AI: Review Insight, Vision, Check Duplicate, Tech Stack, Scout Solutions
+-   [ ] Kiểm tra: Thử thách (Challenges), Quản lý thử thách cho doanh nghiệp
 
 ---
 

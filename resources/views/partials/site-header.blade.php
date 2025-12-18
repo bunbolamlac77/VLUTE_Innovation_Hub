@@ -1,5 +1,5 @@
 {{-- Header Wrapper (Sticky Container) --}}
-<div class="sticky top-0 z-50 w-full bg-white" style="position: sticky; top: 0; z-index: 50;">
+<div x-data="{ mobileMenuOpen: false }" class="sticky top-0 z-50 w-full bg-white" style="position: sticky; top: 0; z-index: 50;">
 {{-- Header (Tailwind utilities only) --}}
 <div class="bg-brand-navy text-white" role="banner">
   <div class="container flex items-center justify-between gap-6 py-5">
@@ -131,7 +131,7 @@
 </div>
 
 {{-- Menubar --}}
-<header x-data="{ mobileMenuOpen: false }" class="w-full bg-white border-b border-slate-200 shadow-sm transition-all duration-300" role="navigation" aria-label="Thanh menu">
+<header class="w-full bg-white border-b border-slate-200 shadow-sm transition-all duration-300" role="navigation" aria-label="Thanh menu">
   <div class="container flex items-center gap-6 py-3">
     <nav id="menuMain" aria-label="Menu chính" class="hidden sm:flex items-center gap-2">
       <a class="font-bold px-3 py-2 rounded-lg hover:bg-brand-gray-50 text-slate-900" href="/" data-key="home">Trang chủ</a>

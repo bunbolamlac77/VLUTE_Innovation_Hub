@@ -35,7 +35,11 @@
 
     {{-- Profile Incomplete Toast --}}
     @auth
-        @if (!Auth::user()->isProfileComplete() && request()->routeIs('profile.edit') === false)
+        @php
+            // Chỉ hiển thị banner 1 lần mỗi session (khi đăng nhập)
+            $profileToastShown = session('profile_toast_shown', false);
+        @endphp
+        @if (!Auth::user()->isProfileComplete() && request()->routeIs('profile.edit') === false && !$profileToastShown)
             <div id="profile-toast" role="alert" aria-live="polite"
                  class="fixed top-32 right-5 z-[9999] min-w-[320px] max-w-[500px] animate-slide-in-right">
                 <div class="flex items-center gap-3 rounded-xl px-5 py-4 shadow border border-amber-200 bg-amber-50">
@@ -70,7 +74,20 @@
             const flashToast = document.getElementById('flash-toast');
             if (flashToast) setTimeout(() => { closeFlashToast(); }, 5000);
             const profileToast = document.getElementById('profile-toast');
-            if (profileToast) setTimeout(() => { closeProfileToast(); }, 8000);
+            if (profileToast) {
+                // Tự động ẩn sau 8 giây và lưu vào session
+                setTimeout(() => { 
+                    closeProfileToast(); 
+                    // Lưu vào session để không hiển thị lại
+                    fetch('{{ route("profile.toast.dismiss") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                    }}).catch(err => console.error('Error dismissing toast:', err));
+                }, 8000);
+            }
         });
 
         function closeFlashToast() {
@@ -87,6 +104,16 @@
                 toast.classList.remove('animate-slide-in-right');
                 toast.classList.add('animate-slide-out-right');
                 setTimeout(() => { toast.remove(); }, 300);
+                
+                // Lưu vào session để không hiển thị lại
+                fetch('{{ route("profile.toast.dismiss") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                }).catch(err => console.error('Error dismissing toast:', err));
             }
         }
 

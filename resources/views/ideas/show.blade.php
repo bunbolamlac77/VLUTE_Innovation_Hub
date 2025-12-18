@@ -14,10 +14,21 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {{-- CỘT TRÁI: NỘI DUNG --}}
         <div class="lg:col-span-2 space-y-6">
-            {{-- Ảnh bìa (nếu có) --}}
-            @if($idea->image)
-                <img src="{{ asset('storage/' . $idea->image) }}" class="w-full h-80 object-cover rounded-2xl shadow-sm">
-            @endif
+            {{-- --- BẮT ĐẦU PHẦN SỬA: HIỂN THỊ ẢNH/LOGO --- --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="w-full bg-slate-100 flex items-center justify-center">
+                    @if($idea->image)
+                        <img src="{{ str_starts_with($idea->image, 'http') ? $idea->image : asset('storage/' . $idea->image) }}" 
+                             class="w-full object-cover max-h-[500px]" alt="{{ $idea->title }}">
+                    @else
+                        {{-- Hiển thị Logo trường nếu không có ảnh --}}
+                        <div class="py-12">
+                            <img src="{{ asset('images/logotruong.jpg') }}" class="h-48 object-contain opacity-70" alt="Logo Mặc định">
+                        </div>
+                    @endif
+                </div>
+            </div>
+            {{-- --- KẾT THÚC PHẦN SỬA --- --}}
 
             <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
                 <h1 class="text-3xl font-bold text-slate-900 mb-4 leading-tight">{{ $idea->title }}</h1>
@@ -130,18 +141,18 @@
                 </div>
 
                 {{-- Panel Hành động --}}
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" id="like-panel">
                     <div class="text-center mb-6">
-                        <div class="text-5xl font-bold text-blue-600 mb-1">{{ $idea->likes_count ?? 0 }}</div>
+                        <div class="text-5xl font-bold text-blue-600 mb-1" id="like-count">{{ $idea->likes_count ?? 0 }}</div>
                         <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Lượt thích</div>
                     </div>
                     
                     @auth
-                        <form action="{{ route('ideas.like', $idea->id) }}" method="POST">
+                        <form action="{{ route('ideas.like', $idea->id) }}" method="POST" id="like-form">
                             @csrf
-                            <button class="w-full py-3 rounded-lg font-bold text-white transition shadow-lg shadow-blue-200 
-                                {{ $idea->isLikedBy(auth()->user()) ? 'bg-slate-400 hover:bg-slate-500' : 'bg-blue-600 hover:bg-blue-700' }}">
-                                {{ $idea->isLikedBy(auth()->user()) ? 'Đã thích' : '❤ Yêu thích ý tưởng này' }}
+                            <button type="submit" class="w-full py-3 rounded-lg font-bold text-white transition shadow-lg shadow-blue-200 
+                                {{ $idea->isLikedBy(auth()->user()) ? 'bg-slate-400 hover:bg-slate-500' : 'bg-blue-600 hover:bg-blue-700' }}" id="like-button">
+                                <span id="like-text">{{ $idea->isLikedBy(auth()->user()) ? 'Đã thích' : '❤ Yêu thích ý tưởng này' }}</span>
                             </button>
                         </form>
                     @else
@@ -150,6 +161,67 @@
                         </a>
                     @endauth
                 </div>
+
+                @auth
+                @push('scripts')
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const likeForm = document.getElementById('like-form');
+                        if (likeForm) {
+                            likeForm.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                
+                                const button = document.getElementById('like-button');
+                                const likeText = document.getElementById('like-text');
+                                const likeCount = document.getElementById('like-count');
+                                const originalText = likeText.textContent;
+                                
+                                // Disable button while processing
+                                button.disabled = true;
+                                button.style.opacity = '0.6';
+                                
+                                fetch(this.action, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                                        'Accept': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    },
+                                    body: JSON.stringify({})
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        // Update like count
+                                        likeCount.textContent = data.like_count;
+                                        
+                                        // Update button text and style
+                                        if (data.liked) {
+                                            likeText.textContent = 'Đã thích';
+                                            button.className = 'w-full py-3 rounded-lg font-bold text-white transition shadow-lg shadow-blue-200 bg-slate-400 hover:bg-slate-500';
+                                        } else {
+                                            likeText.textContent = '❤ Yêu thích ý tưởng này';
+                                            button.className = 'w-full py-3 rounded-lg font-bold text-white transition shadow-lg shadow-blue-200 bg-blue-600 hover:bg-blue-700';
+                                        }
+                                    } else {
+                                        alert(data.message || 'Có lỗi xảy ra');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Có lỗi xảy ra khi thực hiện thao tác');
+                                })
+                                .finally(() => {
+                                    button.disabled = false;
+                                    button.style.opacity = '1';
+                                });
+                            });
+                        }
+                    });
+                </script>
+                @endpush
+                @endauth
             </div>
         </div>
     </div>
