@@ -25,17 +25,21 @@
 - **Frontend**: Blade Templates · Vite
 - **CSS Framework**: Tailwind CSS (100% utilities)
 - **JavaScript**: Alpine.js
-- **Database**: MySQL (hoặc SQLite cho development)
-- **AI Integration**: Google Gemini API (Text, Vision, Embedding)
+- **Database**: SQLite (mặc định) hoặc MySQL (Docker)
+- **AI Integration**: 
+  - Groq API (Text, Vision) - Model: llama-3.1-70b-versatile
+  - Google Gemini API (Embedding) - Model: text-embedding-004
+  - OpenAI API (Embedding fallback) - Model: text-embedding-3-small
 
 ### Tính Năng Chính
 
 - ✅ Ngân hàng ý tưởng công khai
 - ✅ Quản lý ý tưởng cá nhân (tạo, chỉnh sửa, mời thành viên)
 - ✅ Cuộc thi & sự kiện
+- ✅ Thử thách từ doanh nghiệp
 - ✅ Bản tin Nghiên cứu Khoa học
 - ✅ Quản trị người dùng và phân quyền
-- ✅ **5 Tính năng AI tích hợp Google Gemini**
+- ✅ **5 Tính năng AI tích hợp Groq + Gemini/OpenAI**
 
 ---
 
@@ -46,6 +50,7 @@
 - **Git**: Để clone repository
 - **PHP 8.2+** với các extension:
   - `pdo_mysql`
+  - `pdo_sqlite`
   - `fileinfo`
   - `openssl`
   - `mbstring`
@@ -190,8 +195,15 @@ DB_DATABASE=vlute_innovation_hub
 DB_USERNAME=sail
 DB_PASSWORD=password
 
-# Google Gemini API (Khuyến nghị)
+# Groq API (Bắt buộc cho Text/Vision)
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.1-70b-versatile
+
+# Gemini API (Khuyến nghị cho Embedding)
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# Hoặc OpenAI API (Fallback cho Embedding)
+OPENAI_API_KEY=your_openai_api_key_here
 
 # Admin Account (Tùy chọn)
 ADMIN_EMAIL=admin@vlute.edu.vn
@@ -254,7 +266,24 @@ npm run build
 php artisan serve
 ```
 
-### Phương Pháp 2: Sử Dụng XAMPP (Nếu Không Dùng Docker)
+### Phương Pháp 2: Sử Dụng SQLite (Đơn Giản Hơn)
+
+#### Bước 1: Cấu Hình .env cho SQLite
+
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
+
+#### Bước 2: Tạo File Database
+
+```powershell
+New-Item -Path "database" -Name "database.sqlite" -ItemType File -Force
+```
+
+#### Bước 3: Tiếp Tục Từ Bước 5 Của Phương Pháp 1
+
+### Phương Pháp 3: Sử Dụng XAMPP (Nếu Không Dùng Docker)
 
 #### Bước 1: Cài Đặt XAMPP
 
@@ -289,9 +318,22 @@ DB_PASSWORD=
 
 ## ⚙️ Cấu Hình Môi Trường
 
-### Cấu Hình Google Gemini API
+### Cấu Hình Groq API
 
-Để sử dụng các tính năng AI, bạn cần cấu hình Google Gemini API Key:
+Để sử dụng các tính năng AI Text/Vision, bạn cần cấu hình Groq API Key:
+
+1. Truy cập: https://console.groq.com/keys
+2. Tạo API Key mới
+3. Copy API Key và thêm vào file `.env`:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.1-70b-versatile
+```
+
+### Cấu Hình Gemini API (Cho Embedding)
+
+Để sử dụng tính năng Embedding (Check Duplicate, Scout Solutions), bạn cần cấu hình Google Gemini API Key:
 
 1. Truy cập: https://aistudio.google.com/app/apikeys
 2. Tạo API Key mới
@@ -301,9 +343,22 @@ DB_PASSWORD=
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
+### Cấu Hình OpenAI API (Fallback cho Embedding)
+
+Nếu không có Gemini API Key, bạn có thể dùng OpenAI API:
+
+1. Truy cập: https://platform.openai.com/api-keys
+2. Tạo API Key mới
+3. Copy API Key và thêm vào file `.env`:
+
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
 **Lưu ý**: 
+- Groq API có giới hạn request miễn phí hàng ngày
 - Gemini API có giới hạn request miễn phí hàng tháng
-- Không commit API Key vào git
+- Không commit API Keys vào git
 - Nếu không cấu hình, các tính năng AI sẽ không hoạt động
 
 ### Cấu Hình Email (Tùy Chọn)
@@ -350,10 +405,6 @@ Tất cả tài khoản sinh viên có **mật khẩu mặc định**: `Password
 | `student4@st.vlute.edu.vn` | Student Four | Student | Đã duyệt, đã xác thực |
 | `student5@st.vlute.edu.vn` | Student Five | Student | Đã duyệt, đã xác thực |
 | `student6@st.vlute.edu.vn` | Student 06 | Student | Đã duyệt, đã xác thực |
-| `student7@st.vlute.edu.vn` | Student 07 | Student | Đã duyệt, đã xác thực |
-| `student8@st.vlute.edu.vn` | Student 08 | Student | Đã duyệt, đã xác thực |
-| `student9@st.vlute.edu.vn` | Student 09 | Student | Đã duyệt, đã xác thực |
-| `student10@st.vlute.edu.vn` | Student 10 | Student | Đã duyệt, đã xác thực |
 | ... | ... | ... | ... |
 | `student15@st.vlute.edu.vn` | Student 15 | Student | Đã duyệt, đã xác thực |
 
@@ -425,16 +476,22 @@ Tất cả tài khoản giảng viên có **mật khẩu mặc định**: `Passw
    - Lĩnh vực
    - Thẻ (tags)
    - File đính kèm (nếu có)
-5. Lưu dưới dạng **Draft** hoặc **Submit** ngay
-6. Nếu Submit, ý tưởng sẽ chờ phê duyệt
+5. Sử dụng tính năng AI:
+   - **Đề xuất công nghệ**: Click nút "Đề xuất công nghệ" để AI gợi ý tech stack
+   - **Tạo kế hoạch kinh doanh**: Click nút "Tạo kế hoạch kinh doanh" để AI tạo thuyết minh dự án
+   - **Phân tích hình ảnh**: Upload poster/slide và click "Phân tích AI"
+6. Lưu dưới dạng **Draft** hoặc **Submit** ngay
+7. Nếu Submit, ý tưởng sẽ chờ phê duyệt
 
 #### 2. Giảng Viên/Reviewer - Phản Biện Ý Tưởng
 
 1. Đăng nhập với tài khoản giảng viên hoặc reviewer
 2. Vào **"Hàng chờ phản biện"** (nếu có quyền)
 3. Xem danh sách ý tưởng chờ duyệt
-4. Đọc và đánh giá ý tưởng
-5. Chọn trạng thái: **Duyệt** hoặc **Từ chối**
+4. Sử dụng tính năng AI:
+   - **Review Insight**: Click nút "Phân tích AI" để nhận đánh giá chuyên nghiệp về ý tưởng
+5. Đọc và đánh giá ý tưởng
+6. Chọn trạng thái: **Duyệt** hoặc **Từ chối**
 
 #### 3. Admin - Quản Trị Hệ Thống
 
@@ -445,6 +502,10 @@ Tất cả tài khoản giảng viên có **mật khẩu mặc định**: `Passw
    - **Quản lý người dùng**: Xem, chỉnh sửa, khóa/mở khóa tài khoản
    - **Quản lý ý tưởng**: Xem, duyệt, từ chối ý tưởng
    - **Phân loại**: Quản lý Khoa, Danh mục, Thẻ
+   - **Quản lý cuộc thi**: CRUD cuộc thi, export danh sách đăng ký
+   - **Quản lý thử thách**: CRUD thử thách
+   - **Quản lý bản tin**: CRUD bản tin nghiên cứu khoa học
+   - **Quản lý banner**: CRUD banner quảng cáo
    - **Nhật ký**: Xem log hoạt động
 
 #### 4. Doanh Nghiệp - Tìm Giải Pháp (AI Scout)
@@ -455,6 +516,13 @@ Tất cả tài khoản giảng viên có **mật khẩu mặc định**: `Passw
 4. Hệ thống AI sẽ tìm Top 5 ý tưởng phù hợp nhất
 5. Xem chi tiết và liên hệ với chủ ý tưởng
 
+#### 5. Doanh Nghiệp - Quản Lý Thử Thách
+
+1. Đăng nhập với tài khoản doanh nghiệp
+2. Vào **"/enterprise/challenges"**
+3. Tạo thử thách mới hoặc quản lý thử thách hiện có
+4. Xem và đánh giá giải pháp của sinh viên
+
 ### Các Trang Chính
 
 | Trang | URL | Mô Tả |
@@ -464,6 +532,7 @@ Tất cả tài khoản giảng viên có **mật khẩu mặc định**: `Passw
 | Chi tiết ý tưởng | `/ideas/{slug}` | Xem chi tiết một ý tưởng |
 | Cuộc thi | `/competitions` | Danh sách cuộc thi |
 | Sự kiện | `/events` | Danh sách sự kiện |
+| Thử thách | `/challenges` | Danh sách thử thách từ doanh nghiệp |
 | Bản tin NCKH | `/scientific-news` | Bản tin nghiên cứu khoa học |
 | Dashboard | `/dashboard` | Trang cá nhân (sau khi đăng nhập) |
 | Ý tưởng của tôi | `/my-ideas` | Quản lý ý tưởng cá nhân |
@@ -475,55 +544,64 @@ Tất cả tài khoản giảng viên có **mật khẩu mặc định**: `Passw
 
 ## 🤖 Tính Năng AI
 
-Dự án tích hợp **5 tính năng AI** sử dụng Google Gemini API:
+Dự án tích hợp **5 tính năng AI** sử dụng Groq API và Google Gemini API / OpenAI API:
 
 ### 1. Review Insight - Phân Tích Ý Tưởng
 
 **Mô tả**: Phân tích nội dung ý tưởng và cung cấp đánh giá chuyên nghiệp.
 
 **Tính năng**:
-- Điểm mạnh
-- Điểm yếu
-- Tiềm năng phát triển
-- Đánh giá trên thang 10
+- Điểm mạnh (3-5 điểm)
+- Điểm yếu & Rủi ro (3-5 điểm)
+- Tiềm năng thị trường (TAM, SAM, SOM)
+- Khả thi công nghệ
+- Điểm số trên thang 50
 
 **Sử dụng**: 
-- Trong trang tạo/chỉnh sửa ý tưởng
+- Trong trang review ý tưởng
 - Giúp sinh viên cải thiện ý tưởng
 - Giúp giám khảo có nhận xét chuyên nghiệp
 
-**API Endpoint**: `POST /api/ai/review-insight`
+**API Endpoint**: `POST /ai/review-insight`
+
+**Yêu cầu**: Groq API Key
 
 ### 2. Vision - Phân Tích Hình Ảnh
 
 **Mô tả**: Đánh giá chất lượng Poster, Slide hoặc hình ảnh minh họa.
 
 **Tính năng**:
-- Đánh giá tính thẩm mỹ (màu sắc, bố cục)
+- Đánh giá tính thẩm mỹ (màu sắc, bố cục, typography)
 - Phân tích nội dung hiển thị
-- Lời khuyên cải thiện
+- Đánh giá hiệu quả truyền đạt
+- Lời khuyên cải thiện (5-7 điểm cụ thể)
+- Điểm số trên thang 30
 
 **Sử dụng**: 
 - Upload hình ảnh trong trang tạo ý tưởng
 - Giúp sinh viên cải thiện chất lượng trình bày
 
-**API Endpoint**: `POST /api/ai/analyze-visual`
+**API Endpoint**: `POST /ai/vision`
+
+**Yêu cầu**: Groq API Key
 
 ### 3. Check Duplicate - Kiểm Tra Trùng Lặp
 
 **Mô tả**: Phát hiện ý tưởng trùng lặp hoặc tương tự.
 
 **Cơ chế**:
-- Tạo Vector Embedding cho ý tưởng
+- Tạo Vector Embedding cho ý tưởng (Gemini/OpenAI)
 - So sánh với kho ý tưởng đã duyệt
-- Sử dụng Cosine Similarity (ngưỡng: 75%)
-- Trả về danh sách ý tưởng tương tự
+- Sử dụng Cosine Similarity (ngưỡng: 85%)
+- Trả về danh sách top 3 ý tưởng tương tự
 
 **Sử dụng**: 
 - Tự động kiểm tra khi sinh viên nộp ý tưởng mới
 - Giúp tránh trùng lặp
 
-**API Endpoint**: `POST /api/ai/check-duplicate`
+**API Endpoint**: `POST /ai/check-duplicate`
+
+**Yêu cầu**: Gemini API Key hoặc OpenAI API Key
 
 ### 4. Suggest Tech Stack - Đề Xuất Công Nghệ
 
@@ -535,13 +613,18 @@ Dự án tích hợp **5 tính năng AI** sử dụng Google Gemini API:
 - Database: công nghệ
 - Mobile: nếu cần
 - Hardware: nếu là dự án IoT
+- Cloud Infrastructure: AWS/Azure/GCP
+- DevOps Tools: CI/CD và deployment
 - Lời khuyên triển khai
+- Đánh giá độ phức tạp và timeline
 
 **Sử dụng**: 
 - Trong trang tạo ý tưởng
 - Giúp sinh viên lựa chọn công nghệ phù hợp
 
-**API Endpoint**: `POST /api/ai/suggest-tech-stack`
+**API Endpoint**: `POST /ai/suggest-tech-stack`
+
+**Yêu cầu**: Groq API Key
 
 ### 5. Scout Solutions - Thợ Săn Giải Pháp
 
@@ -557,23 +640,52 @@ Dự án tích hợp **5 tính năng AI** sử dụng Google Gemini API:
 - Trang riêng `/enterprise/scout` cho doanh nghiệp
 - Tìm giải pháp cho vấn đề cụ thể
 
-**API Endpoint**: `POST /api/ai/scout-solutions`
+**API Endpoint**: `POST /ai/scout-solutions`
+
+**Yêu cầu**: Gemini API Key hoặc OpenAI API Key
+
+### 6. Business Plan Generator - Tạo Kế Hoạch Kinh Doanh
+
+**Mô tả**: Tự động tạo thuyết minh kế hoạch ý tưởng hoàn chỉnh.
+
+**Tính năng**:
+- Tạo kế hoạch kinh doanh theo cấu trúc 12 phần:
+  1. Tóm tắt dự án (Business Model Canvas)
+  2. Bối cảnh thị trường & căn cứ
+  3. Vị trí dự kiến
+  4. Phân tích pháp luật
+  5. Nghiên cứu & đánh giá thị trường
+  6. Kế hoạch Marketing (4P & 4C)
+  7. Quy trình hoạt động
+  8. Tổ chức nhân lực
+  9. Kế hoạch tài chính
+  10. Tiến độ triển khai
+  11. Quản trị rủi ro
+  12. Kết luận & cam kết
+
+**Sử dụng**: 
+- Trong trang tạo ý tưởng
+- Giúp sinh viên hoàn thiện kế hoạch kinh doanh
+
+**API Endpoint**: `POST /api/ai/business-plan`
+
+**Yêu cầu**: Groq API Key
 
 ### Test API AI
 
 **Kiểm tra cấu hình:**
 ```powershell
-curl http://127.0.0.1:8000/api/test/gemini/config
+curl http://127.0.0.1:8000/api/test/groq/config
 ```
 
 **Test Text API:**
 ```powershell
-curl -X POST http://127.0.0.1:8000/api/test/gemini/text -H "Content-Type: application/json" -d "{\"prompt\":\"Hello\"}"
+curl -X POST http://127.0.0.1:8000/api/test/groq/text -H "Content-Type: application/json" -d "{\"prompt\":\"Hello\"}"
 ```
 
 **Test Image API:**
 ```powershell
-curl -X POST http://127.0.0.1:8000/api/test/gemini/image -F "image=@path/to/image.jpg"
+curl -X POST http://127.0.0.1:8000/api/test/groq/image -F "image=@path/to/image.jpg"
 ```
 
 ---
@@ -589,6 +701,7 @@ curl -X POST http://127.0.0.1:8000/api/test/gemini/image -F "image=@path/to/imag
 2. Bỏ dấu `;` trước các dòng extension:
    ```ini
    extension=pdo_mysql
+   extension=pdo_sqlite
    extension=fileinfo
    extension=openssl
    extension=mbstring
@@ -659,15 +772,15 @@ php artisan storage:link
    - Enable "Win32 long paths"
 2. Hoặc dùng Git Bash thay vì PowerShell
 
-### Lỗi API Gemini
+### Lỗi API Groq/Gemini
 
 **Lỗi 404**: API Key không hợp lệ
-- Kiểm tra `GEMINI_API_KEY` trong `.env`
-- Truy cập https://aistudio.google.com/app/apikeys để xác nhận
+- Kiểm tra `GROQ_API_KEY`, `GEMINI_API_KEY` trong `.env`
+- Truy cập console tương ứng để xác nhận API Key
 
 **Lỗi 429**: Quá nhiều yêu cầu
 - Chờ một lúc rồi thử lại
-- Kiểm tra giới hạn request của Gemini API
+- Kiểm tra giới hạn request của Groq/Gemini API
 
 **Lỗi Embedding Vector**:
 ```powershell
@@ -729,7 +842,7 @@ Sinh viên Khoa Khoa học Máy tính – VLUTE
 
 ### Tính Năng AI
 
-Tích hợp Google Gemini API (Text, Vision, Embedding)
+Tích hợp Groq API (Text/Vision) và Google Gemini API / OpenAI API (Embedding)
 
 ---
 
@@ -743,10 +856,11 @@ Các bảng chính:
 - `reviews`, `review_assignments`, `change_requests`
 - `faculties`, `categories`, `tags`, `idea_tag`
 - `competitions`, `competition_registrations`, `competition_submissions`
+- `challenges`, `challenge_submissions`
 - `organizations` (đối tác)
 - `scientific_news` (Bản tin NCKH)
 
-**Lưu ý**: Bảng `ideas` có cột `embedding_vector` (JSON) để lưu trữ Vector từ Gemini.
+**Lưu ý**: Bảng `ideas` có cột `embedding_vector` (JSON) để lưu trữ Vector từ Gemini/OpenAI.
 
 ### Phân Quyền Tự Động
 
@@ -767,18 +881,10 @@ php artisan cache:clear && php artisan config:clear && php artisan view:clear
 # Format code (Pint)
 ./vendor/bin/pint
 
-# Test API Gemini
-curl http://localhost:8000/api/test/gemini/config
-```
-
-### Lệnh Nhanh Cho Windows (PowerShell)
-
-```powershell
-# Setup hoàn chỉnh với SQLite
-composer install; npm install; Copy-Item .env.example .env; php artisan key:generate; New-Item -Path "database" -Name "database.sqlite" -ItemType File -Force | Out-Null; (Get-Content .env) -replace "DB_CONNECTION=mysql","DB_CONNECTION=sqlite" -replace "DB_HOST=.*","DB_HOST=127.0.0.1" | Set-Content .env; Add-Content .env "`nDB_DATABASE=database/database.sqlite"; php artisan migrate --seed; php artisan serve
+# Test API Groq
+curl http://localhost:8000/api/test/groq/config
 ```
 
 ---
 
 **Chúc bạn sử dụng dự án thành công! 🎉**
-

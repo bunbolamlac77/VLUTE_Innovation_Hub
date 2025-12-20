@@ -46,3 +46,6 @@ Route::get('/test/groq/config', function () {
     ]);
 });
 
+// AI Business Plan Generator - Tạo kế hoạch kinh doanh tự động từ ý tưởng
+Route::post('/ai/business-plan', [App\Http\Controllers\Api\AIController::class, 'createBusinessPlan']);
+

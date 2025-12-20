@@ -433,5 +433,92 @@ Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
             ]
         ]);
     }
+
+    // --- TÍNH NĂNG MỚI: TẠO KẾ HOẠCH KINH DOANH TỪ Ý TƯỞNG (Business Plan Generator) ---
+    public function createBusinessPlan(Request $request)
+    {
+        $request->validate([
+            'idea' => 'required|string|min:10', // Ý tưởng đầu vào (VD: App tìm trọ)
+        ]);
+
+        $userIdea = $request->input('idea');
+
+        // Prompt hướng dẫn AI viết theo cấu trúc file Word mẫu
+        // Tôi đã đưa các tiêu đề và hướng dẫn chi tiết từ file Word của bạn vào đây
+        $prompt = "Bạn là một chuyên gia viết dự án khởi nghiệp (Startup Founder) tài năng.
+Nhiệm vụ của bạn là viết một bản 'THUYẾT MINH KẾ HOẠCH Ý TƯỞNG' (Business Project Master Plan) hoàn chỉnh, chuyên nghiệp cho ý tưởng sau:
+
+\"{$userIdea}\"
+
+YÊU CẦU: Hãy viết chi tiết, dài và có chiều sâu, tuân thủ CHÍNH XÁC cấu trúc 12 phần sau đây (giống mẫu dự án VLUTE Innovation Hub):
+
+1. TÓM TẮT DỰ ÁN (Business Model Canvas):
+   - Trình bày dạng liệt kê các yếu tố: Đối tác chính, Hoạt động chính, Giải pháp giá trị, Quan hệ khách hàng, Phân khúc khách hàng, Tài nguyên chính, Kênh thông tin, Cơ cấu chi phí, Dòng doanh thu.
+
+2. BỐI CẢNH THỊ TRƯỜNG & CĂN CỨ:
+   - Phân tích cơ hội bên ngoài (Thị trường đang cần gì? Xu hướng chuyển đổi số ra sao?).
+   - Phân tích lợi thế bên trong (Điểm mạnh của team, công nghệ nắm giữ).
+   - Công nghệ ứng dụng (Frontend, Backend, Database, AI/Big Data...).
+
+3. VỊ TRÍ DỰ KIẾN:
+   - Hạ tầng máy chủ (Cloud/VPS).
+   - Tên miền/Địa chỉ hiện diện.
+
+4. PHÂN TÍCH PHÁP LUẬT:
+   - Các rủi ro pháp lý (Sở hữu trí tuệ, Bảo mật dữ liệu, An ninh mạng).
+   - Giải pháp tuân thủ (Trích dẫn luật liên quan nếu biết).
+
+5. NGHIÊN CỨU & ĐÁNH GIÁ THỊ TRƯỜNG:
+   - Số liệu khách hàng tiềm năng.
+   - Bảng so sánh với đối thủ cạnh tranh (Điểm yếu của đối thủ vs Điểm mạnh của dự án).
+
+6. KẾ HOẠCH MARKETING (4P & 4C):
+   - Marketing Mix 4P: Product (Sản phẩm cốt lõi), Price (Chiến lược giá), Place (Kênh phân phối), Promotion (Xúc tiến).
+   - Marketing Mix 4C: Customer Solution, Customer Cost, Convenience, Communication.
+
+7. QUY TRÌNH HOẠT ĐỘNG:
+   - Mô tả luồng đi (Flow) của người dùng trên hệ thống (Bước 1, Bước 2...).
+
+8. TỔ CHỨC NHÂN LỰC:
+   - Cơ cấu team (CEO, CTO, Marketing, Sales...) và nhiệm vụ.
+
+9. KẾ HOẠCH TÀI CHÍNH:
+   - Vốn đầu tư ban đầu (CAPEX).
+   - Vốn lưu động (OPEX).
+
+10. TIẾN ĐỘ TRIỂN KHAI:
+    - Chia 4 giai đoạn: Nghiên cứu -> MVP -> Pilot -> Growth.
+
+11. QUẢN TRỊ RỦI RO:
+    - Rủi ro kỹ thuật, Rủi ro nội dung/vận hành, Rủi ro thị trường.
+    - Phương án ứng phó cụ thể cho từng cái.
+
+12. KẾT LUẬN & CAM KẾT:
+    - Lời kết đầy cảm hứng về tầm nhìn của dự án.
+
+LƯU Ý QUAN TRỌNG:
+- Trình bày định dạng Markdown đẹp mắt (Dùng Bold, List, Table nếu cần).
+- Giọng văn: Chuyên nghiệp, thuyết phục, nhiệt huyết (như đang đi thi Startup).
+- Tự động 'bịa' ra các chi tiết hợp lý (số liệu giả định, tên công nghệ...) để bài viết đầy đủ nhất.";
+
+        try {
+            // Tăng max_tokens lên cao (8192) vì bài văn này rất dài
+            // Temperature 0.7 để AI sáng tạo thêm chi tiết
+            $result = $this->groq->generateText($prompt, false, 0.7, 8192); 
+
+            if (empty($result) || str_starts_with($result, 'Lỗi')) {
+                return response()->json([
+                    'error' => $result ?: 'Không thể tạo kế hoạch lúc này. Vui lòng thử lại.'
+                ], 500);
+            }
+
+            return response()->json(['result' => $result]);
+        } catch (\Exception $e) {
+            \Log::error('Business Plan Gen Error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Có lỗi xảy ra khi xử lý yêu cầu.'
+            ], 500);
+        }
+    }
 }
 

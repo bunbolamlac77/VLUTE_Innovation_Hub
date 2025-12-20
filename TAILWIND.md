@@ -6,27 +6,27 @@ Tài liệu này tóm tắt chuẩn sử dụng Tailwind trong dự án, các to
 
 File: `tailwind.config.js`
 
-- Content (đường quét)
+- **Content** (đường quét)
   - `./resources/views/**/*.blade.php`
   - `./storage/framework/views/*.php`
   - View từ Laravel Pagination của framework
-- Theme
-  - container: center, padding 1rem, 2xl = 1400px
-  - Colors mở rộng:
-    - brand-navy: #0a0f5a
-    - brand-green: #0aa84f
-    - brand-gray-50: #f5f7fb
-    - brand-gray-100: #eef2f7
-  - Shadow: `shadow-card` = `0 8px 24px rgba(2,16,43,.08)`
-  - Radius mặc định: 16px
-  - Font: Inter (kế thừa system-ui)
-  - Keyframes/Animation cho toast: slide-in/out-right, fade-in/out
-- Plugins: `@tailwindcss/forms`
+- **Theme**
+  - `container`: center, padding 1rem, 2xl = 1400px
+  - **Colors mở rộng**:
+    - `brand-navy`: #0a0f5a
+    - `brand-green`: #0aa84f
+    - `brand-gray-50`: #f5f7fb
+    - `brand-gray-100`: #eef2f7
+  - **Shadow**: `shadow-card` = `0 8px 24px rgba(2,16,43,.08)`
+  - **Radius mặc định**: 16px
+  - **Font**: Inter (kế thừa system-ui)
+  - **Keyframes/Animation** cho toast: slide-in/out-right, fade-in/out
+- **Plugins**: `@tailwindcss/forms`
 
 ## 2) Build/Run
 
-- Dev: `npm run dev`
-- Prod: `npm run build`
+- **Dev**: `npm run dev`
+- **Prod**: `npm run build`
 - Laravel vite đã được cấu hình gọi `resources/css/app.css` và `resources/js/app.js`.
 
 ## 3) Quy ước sử dụng
@@ -40,13 +40,13 @@ File: `tailwind.config.js`
 
 ## 4) Token (quick reference)
 
-- Màu:
+- **Màu**:
   - Nền chủ đạo: `bg-brand-navy`, `text-brand-navy`
   - Điểm nhấn: `text-brand-green`, `bg-brand-gray-50`, `bg-brand-gray-100`
-- Border/shadow:
+- **Border/shadow**:
   - Border nhạt: `border-slate-200`, input: `border-slate-300`
   - Card: `shadow-card`
-- Radius: `rounded-xl`, `rounded-2xl`, button pill: `rounded-full`
+- **Radius**: `rounded-xl`, `rounded-2xl`, button pill: `rounded-full`
 
 ## 5) Pattern thành phần thường dùng
 
@@ -141,16 +141,15 @@ File: `tailwind.config.js`
 
 ## 7) Lộ trình chuyển đổi (đã/đang làm)
 
-- Đã chuyển: header/footer, trang chính (welcome), trang công khai: ideas/index, events/index, competitions/index/show, auth (login/register, verify, forgot, reset).
-- Đang/Chưa chuyển: trang quản trị (admin/*), my-ideas/*, manage/*, một số trang search/ideas-show đã được chuyển một phần. Tiếp tục refactor để bỏ hoàn toàn CSS thuần.
+- **Đã chuyển**: header/footer, trang chính (welcome), trang công khai: ideas/index, events/index, competitions/index/show, auth (login/register, verify, forgot, reset), scientific-news.
+- **Đang/Chưa chuyển**: trang quản trị (admin/*), my-ideas/*, manage/*, một số trang search/ideas-show đã được chuyển một phần. Tiếp tục refactor để bỏ hoàn toàn CSS thuần.
 
 ## 8) FAQ
 
-- Làm sao chỉnh container rộng tối đa? Sửa `container.screens['2xl']` trong `tailwind.config.js`.
-- Thêm màu thương hiệu mới? Extend `theme.extend.colors` trong config.
-- Không generate lớp? Kiểm tra `content[]` đã bao phủ file Blade chứa lớp đó.
+- **Làm sao chỉnh container rộng tối đa?** Sửa `container.screens['2xl']` trong `tailwind.config.js`.
+- **Thêm màu thương hiệu mới?** Extend `theme.extend.colors` trong config.
+- **Không generate lớp?** Kiểm tra `content[]` đã bao phủ file Blade chứa lớp đó.
 
 ---
 
-Cần hỗ trợ thêm, liên hệ maintainer dự án hoặc mở issue. 
-
+Cần hỗ trợ thêm, liên hệ maintainer dự án hoặc mở issue.
