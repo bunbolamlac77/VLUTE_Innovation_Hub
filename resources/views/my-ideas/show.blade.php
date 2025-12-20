@@ -199,6 +199,56 @@
                       </div>
                   </div>
 
+                  {{-- KHỐI CỐ VẤN KINH DOANH AI --}}
+                  <div class="mt-8 bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden" x-data="studentAI()">
+                      {{-- Header --}}
+                      <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white flex justify-between items-center">
+                          <div>
+                              <h3 class="text-xl font-bold flex items-center gap-2">
+                                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                  Cố vấn Chiến lược AI
+                              </h3>
+                              <p class="text-indigo-100 text-sm mt-1">Biến ý tưởng thành bản kế hoạch kinh doanh chuyên nghiệp.</p>
+                          </div>
+                          
+                          <button @click="analyzePlan" 
+                                  :disabled="loading"
+                                  class="px-5 py-2 bg-white text-indigo-700 font-bold rounded-lg shadow hover:bg-indigo-50 transition flex items-center gap-2 disabled:opacity-50">
+                              <span x-show="!loading">✨ Phân tích ngay</span>
+                              <span x-show="loading" class="flex items-center gap-2">
+                                  <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                  Đang viết báo cáo...
+                              </span>
+                          </button>
+                      </div>
+
+                      {{-- Nội dung kết quả --}}
+                      <div class="p-8 bg-slate-50 min-h-[200px]">
+                          
+                          {{-- Màn hình chờ (Placeholder) --}}
+                          <div x-show="!result && !loading" class="text-center py-12">
+                              <div class="mb-4 inline-block p-4 bg-blue-100 rounded-full text-blue-600">
+                                  <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                              </div>
+                              <h4 class="text-lg font-semibold text-slate-700">Chưa có bản phân tích nào</h4>
+                              <p class="text-slate-500 max-w-md mx-auto mt-2">Nhấn nút bên trên để AI tự động nghiên cứu thị trường và lập kế hoạch cho dự án này.</p>
+                          </div>
+
+                          {{-- Hiển thị kết quả --}}
+                          <div x-show="result" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                              <div class="prose max-w-none text-slate-800 bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                                  <div x-html="result"></div>
+                              </div>
+                              
+                              <div class="mt-6 text-center">
+                                  <button @click="window.print()" class="text-slate-500 hover:text-blue-600 underline text-sm">
+                                      🖨️ In / Lưu PDF bản báo cáo này
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
                   {{-- Mentors --}}
                   <div class="card" style="margin-bottom: 24px;">
                       <div class="card-body" style="padding: 24px;">
@@ -591,5 +641,69 @@
               myIdeasLink.classList.add('active');
           }
       });
+
+      // Student AI Business Consultant
+      function studentAI() {
+          return {
+              loading: false,
+              result: null, // Có thể lưu vào localStorage nếu muốn giữ lại sau khi F5
+
+              analyzePlan() {
+                  this.loading = true;
+                  this.result = null;
+
+                  // Lấy nội dung ý tưởng từ mô tả và nội dung chi tiết (đã có sẵn trong biến $idea của Laravel)
+                  // Cần strip_tags để lấy text thuần gửi cho AI
+                  const description = `{{ strip_tags($idea->description ?? '') }}`.trim();
+                  const content = `{{ strip_tags($idea->content ?? '') }}`.trim();
+                  const ideaContent = (description + ' ' + content).trim();
+                  
+                  if (!ideaContent || ideaContent.length < 20) {
+                      this.loading = false;
+                      if (typeof Swal !== 'undefined') {
+                          Swal.fire('Lỗi', 'Mô tả ý tưởng quá ngắn. Vui lòng cập nhật mô tả ít nhất 20 ký tự.', 'warning');
+                      } else {
+                          alert('Mô tả ý tưởng quá ngắn. Vui lòng cập nhật mô tả ít nhất 20 ký tự.');
+                      }
+                      return;
+                  }
+
+                  fetch('{{ route('ai.student.business-plan') }}', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                      },
+                      body: JSON.stringify({ content: ideaContent })
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                      this.loading = false;
+                      if(data.success) {
+                          this.result = data.html;
+                          // Tự động cuộn xuống xem kết quả
+                          setTimeout(() => {
+                              this.$el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }, 100);
+                      } else {
+                          if (typeof Swal !== 'undefined') {
+                              Swal.fire('Lỗi', data.error || 'Có lỗi xảy ra', 'error');
+                          } else {
+                              alert(data.error || 'Có lỗi xảy ra');
+                          }
+                      }
+                  })
+                  .catch(err => {
+                      this.loading = false;
+                      console.error(err);
+                      if (typeof Swal !== 'undefined') {
+                          Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ AI.', 'error');
+                      } else {
+                          alert('Không thể kết nối tới máy chủ AI.');
+                      }
+                  });
+              }
+          }
+      }
   </script>
 @endpush

@@ -197,6 +197,46 @@
                             @enderror
                         </div>
 
+                        {{-- AI Description Input --}}
+                        <div style="margin-bottom: 32px; padding: 28px; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%); border: 2px solid #fbbf24; border-radius: 16px; box-shadow: 0 4px 20px rgba(251, 191, 36, 0.15), 0 0 0 1px rgba(251, 191, 36, 0.1); position: relative; overflow: hidden;">
+                            {{-- Decorative background pattern --}}
+                            <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+                            <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+                            
+                            <div style="position: relative; z-index: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                                        🤖
+                                    </div>
+                                    <div>
+                                        <label for="ai-description" style="display: block; margin: 0; font-weight: 800; color: #78350f; font-size: 18px; letter-spacing: -0.01em;">
+                                            Mô tả ý tưởng dành cho AI
+                                        </label>
+                                        <div style="display: inline-block; margin-top: 4px; padding: 2px 8px; background: rgba(245, 158, 11, 0.2); border-radius: 4px; font-size: 11px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            Dữ liệu đầu vào cho AI
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <p style="margin: 0 0 18px; font-size: 14px; color: #78350f; line-height: 1.6; padding-left: 50px;">
+                                    Nhập mô tả chi tiết về ý tưởng của bạn tại đây. Dữ liệu này sẽ được sử dụng bởi các AI để <strong style="color: #92400e;">tìm kiếm thêm thông tin</strong> và đưa ra gợi ý chính xác hơn.
+                                </p>
+                                
+                                <textarea id="ai-description" name="ai_description" rows="7"
+                                    placeholder="Ví dụ: Tôi muốn tạo một ứng dụng di động để quản lý việc học tập của sinh viên. Ứng dụng cần có tính năng nhắc nhở deadline, quản lý lịch học, và theo dõi tiến độ học tập..."
+                                    style="width: 100%; padding: 16px 20px; border: 2px solid #fbbf24; border-radius: 12px; font-size: 15px; font-family: inherit; resize: vertical; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: #ffffff; line-height: 1.7; color: #1f2937; box-shadow: 0 2px 8px rgba(251, 191, 36, 0.1);"
+                                    onfocus="this.style.borderColor='#f59e0b'; this.style.boxShadow='0 0 0 4px rgba(245, 158, 11, 0.15), 0 4px 12px rgba(245, 158, 11, 0.2)'; this.style.transform='translateY(-1px)';"
+                                    onblur="this.style.borderColor='#fbbf24'; this.style.boxShadow='0 2px 8px rgba(251, 191, 36, 0.1)'; this.style.transform='translateY(0)';">{{ old('ai_description') }}</textarea>
+                                
+                                <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(255, 255, 255, 0.6); border-radius: 8px; border-left: 3px solid #f59e0b;">
+                                    <span style="font-size: 16px;">💡</span>
+                                    <span style="font-size: 13px; color: #78350f; line-height: 1.5;">
+                                        <strong style="color: #92400e;">Mẹo:</strong> Mô tả càng chi tiết, AI sẽ đưa ra gợi ý càng chính xác và hữu ích.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         {{-- Tech Stack Advisor --}}
                         <div style="margin-bottom: 28px; padding: 24px; background: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 100%); border: 2px solid #c7d2fe; border-radius: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -204,10 +244,63 @@
                                     <h4 style="margin: 0 0 4px; font-weight: 700; color: #4c1d95; font-size: 16px;">🛠️ Kiến trúc sư Công nghệ AI</h4>
                                     <p style="margin: 0; font-size: 13px; color: #6b21a8;">Chưa biết dùng công nghệ gì? Hãy nhập mô tả ý tưởng và hỏi AI gợi ý.</p>
                                 </div>
-                                <button type="button" onclick="askTechAdvisor()" style="padding: 10px 18px; background: #7c3aed; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;" onmouseover="this.style.background='#6d28d9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#7c3aed'; this.style.transform='translateY(0)';">✨ Gợi ý Tech Stack</button>
+                                <button type="button" onclick="askTechAdvisor()" 
+                                    style="padding: 12px 24px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3), 0 0 0 1px rgba(124, 58, 237, 0.1); position: relative; overflow: hidden;" 
+                                    onmouseover="this.style.background='linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(124, 58, 237, 0.4), 0 0 0 1px rgba(124, 58, 237, 0.15)';" 
+                                    onmouseout="this.style.background='linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(124, 58, 237, 0.3), 0 0 0 1px rgba(124, 58, 237, 0.1)';"
+                                    onmousedown="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(124, 58, 237, 0.3)';"
+                                    onmouseup="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(124, 58, 237, 0.4), 0 0 0 1px rgba(124, 58, 237, 0.15)';">
+                                    <span style="display: inline-flex; align-items: center; gap: 8px; position: relative; z-index: 1;">
+                                        <span style="font-size: 16px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));">✨</span>
+                                        <span>Gợi ý Tech Stack</span>
+                                    </span>
+                                </button>
                             </div>
                             <div id="tech-loading" class="hidden" style="text-align: center; padding: 16px; color: #7c3aed;"><div style="display: inline-block; width: 20px; height: 20px; border: 2px solid #e9d5ff; border-top-color: #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite;"></div><p style="margin: 8px 0 0; font-size: 13px;">🤖 Đang phân tích yêu cầu kỹ thuật...</p></div>
                             <div id="tech-stack-result" class="hidden" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px;"></div>
+                        </div>
+
+                        {{-- AI Business Consultant --}}
+                        <div style="margin-bottom: 28px; padding: 24px; background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border: 2px solid #93c5fd; border-radius: 12px;" x-data="businessPlanAI()">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                <div>
+                                    <h4 style="margin: 0 0 4px; font-weight: 700; color: #1e40af; font-size: 16px;">💼 Cố vấn Chiến lược Kinh doanh AI</h4>
+                                    <p style="margin: 0; font-size: 13px; color: #1e3a8a;">Biến ý tưởng thành bản kế hoạch kinh doanh chuyên nghiệp để thuyết phục doanh nghiệp đầu tư.</p>
+                                </div>
+                                <button type="button" @click="analyzePlan" :disabled="loading" 
+                                    style="padding: 12px 24px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.1); position: relative; overflow: hidden;" 
+                                    :style="loading ? 'opacity: 0.7; cursor: not-allowed; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);' : ''" 
+                                    onmouseover="if (!this.disabled) { this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.15)'; }" 
+                                    onmouseout="if (!this.disabled) { this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.1)'; }"
+                                    onmousedown="if (!this.disabled) { this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(37, 99, 235, 0.3)'; }"
+                                    onmouseup="if (!this.disabled) { this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.15)'; }">
+                                    <span x-show="!loading" style="display: inline-flex; align-items: center; gap: 8px; position: relative; z-index: 1;">
+                                        <span style="font-size: 16px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));">✨</span>
+                                        <span>Phân tích Kế hoạch</span>
+                                    </span>
+                                    <span x-show="loading" style="display: inline-flex; align-items: center; gap: 8px; position: relative; z-index: 1;">
+                                        <svg style="width: 16px; height: 16px; animation: spin 0.8s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle class="opacity-25" cx="12" cy="12" r="10"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span>Đang phân tích...</span>
+                                    </span>
+                                </button>
+                            </div>
+                            
+                            {{-- Loading state --}}
+                            <div x-show="loading" style="text-align: center; padding: 16px; color: #2563eb;">
+                                <div style="display: inline-block; width: 20px; height: 20px; border: 2px solid #bfdbfe; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                <p style="margin: 8px 0 0; font-size: 13px;">🤖 AI đang nghiên cứu thị trường và lập kế hoạch...</p>
+                            </div>
+
+                            {{-- Result display --}}
+                            <div x-show="result && !loading" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="margin-top: 16px;">
+                                <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #bfdbfe; max-height: 500px; overflow-y: auto;">
+                                    <div class="prose" style="max-width: 100%;" x-html="result"></div>
+                                </div>
+                                <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+                                    <button type="button" @click="copyToContent" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">📋 Copy vào Nội dung chi tiết</button>
+                                    <button type="button" @click="result = null" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">✕ Đóng</button>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- File Attachments --}}
@@ -261,13 +354,185 @@
 
 @push('scripts')
     <script>
+        // Business Plan AI Function (Alpine.js)
+        function businessPlanAI() {
+            return {
+                loading: false,
+                result: null,
+
+                analyzePlan() {
+                    // Reset states
+                    this.loading = true;
+                    this.result = null;
+                    
+                    // Ẩn kết quả cũ nếu có
+                    const resultDiv = document.querySelector('[x-show="result && !loading"]');
+                    if (resultDiv) {
+                        resultDiv.style.display = 'none';
+                    }
+
+                    // Lấy nội dung từ khung mô tả dành cho AI
+                    const aiDescTextarea = document.getElementById('ai-description');
+                    let description = '';
+                    
+                    if (aiDescTextarea) {
+                        description = aiDescTextarea.value.trim() || '';
+                    }
+                    
+                    // Nếu khung AI trống, thử lấy từ mô tả chính (fallback)
+                    if (!description || description.length < 20) {
+                        const descTextarea = document.getElementById('editor');
+                        if (descTextarea) {
+                            // Nếu có CKEditor instance, lấy data từ editor
+                            if (window.CKEditorInstance && window.CKEditorInstance.getData) {
+                                description = window.CKEditorInstance.getData();
+                            } else {
+                                description = descTextarea.value || descTextarea.textContent || '';
+                            }
+                        }
+                    }
+                    
+                    // Lấy nội dung chi tiết để bổ sung thông tin
+                    const contentTextarea = document.getElementById('content');
+                    const content = contentTextarea ? contentTextarea.value.trim() : '';
+                    
+                    // Kết hợp description và content
+                    const ideaContent = (description + ' ' + content).trim();
+                    
+                    // Strip HTML tags nếu có
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = ideaContent;
+                    const plainText = tempDiv.textContent || tempDiv.innerText || ideaContent;
+
+                    if (!plainText || plainText.length < 20) {
+                        this.loading = false;
+                        // Focus vào khung AI description
+                        if (aiDescTextarea) {
+                            aiDescTextarea.focus();
+                            aiDescTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Lỗi', 'Mô tả ý tưởng quá ngắn. Vui lòng nhập ít nhất 20 ký tự vào khung "Mô tả ý tưởng dành cho AI".', 'warning');
+                        } else {
+                            alert('Mô tả ý tưởng quá ngắn. Vui lòng nhập ít nhất 20 ký tự vào khung "Mô tả ý tưởng dành cho AI".');
+                        }
+                        return;
+                    }
+
+                    fetch('{{ route('ai.student.business-plan') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ content: plainText })
+                    })
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.json().then(err => {
+                                throw new Error(err.error || 'Network response was not ok');
+                            });
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        this.loading = false;
+                        if(data.success && data.html) {
+                            this.result = data.html;
+                        } else {
+                            const errorMsg = data.error || 'Có lỗi xảy ra khi xử lý yêu cầu';
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire('Lỗi', errorMsg, 'error');
+                            } else {
+                                alert(errorMsg);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        this.loading = false;
+                        console.error('Business Plan AI Error:', err);
+                        const errorMsg = err.message || 'Không thể kết nối tới máy chủ AI. Vui lòng thử lại sau.';
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Lỗi', errorMsg, 'error');
+                        } else {
+                            alert('Lỗi: ' + errorMsg);
+                        }
+                    });
+                },
+
+                copyToContent() {
+                    if (!this.result) return;
+                    
+                    // Lấy text thuần từ HTML
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = this.result;
+                    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+                    
+                    // Thêm vào textarea content
+                    const contentTextarea = document.getElementById('content');
+                    if (contentTextarea) {
+                        const currentContent = contentTextarea.value.trim();
+                        const newContent = currentContent ? currentContent + '\n\n' + plainText : plainText;
+                        contentTextarea.value = newContent;
+                        
+                        // Focus vào textarea
+                        contentTextarea.focus();
+                        contentTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Thành công', 'Đã copy kế hoạch kinh doanh vào phần Nội dung chi tiết!', 'success');
+                        } else {
+                            alert('Đã copy kế hoạch kinh doanh vào phần Nội dung chi tiết!');
+                        }
+                    }
+                }
+            }
+        }
+
         // Tech Stack Advisor Function
         function askTechAdvisor() {
-            const descTextarea = document.getElementById('editor');
-            const content = descTextarea ? descTextarea.value : '';
+            // Reset kết quả cũ
+            const container = document.getElementById('tech-stack-result');
+            if (container) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+            }
+            
+            // Lấy nội dung từ khung mô tả dành cho AI
+            const aiDescTextarea = document.getElementById('ai-description');
+            let content = '';
+            
+            if (aiDescTextarea) {
+                content = aiDescTextarea.value.trim() || '';
+            }
+            
+            // Nếu khung AI trống, thử lấy từ mô tả chính (fallback)
+            if (!content || content.length < 20) {
+                const descTextarea = document.getElementById('editor');
+                if (descTextarea) {
+                    // Nếu có CKEditor instance, lấy data từ editor
+                    if (window.CKEditorInstance && window.CKEditorInstance.getData) {
+                        content = window.CKEditorInstance.getData();
+                    } else {
+                        content = descTextarea.value || descTextarea.textContent || '';
+                    }
+                }
+            }
 
-            if (content.length < 20) {
-                alert('Vui lòng mô tả ý tưởng chi tiết hơn (ít nhất 20 ký tự).');
+            // Strip HTML tags nếu có
+            if (content) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                content = tempDiv.textContent || tempDiv.innerText || content;
+            }
+
+            if (!content || content.length < 20) {
+                alert('Vui lòng nhập mô tả ý tưởng chi tiết hơn vào khung "Mô tả ý tưởng dành cho AI" (ít nhất 20 ký tự).');
+                // Focus vào khung AI description
+                if (aiDescTextarea) {
+                    aiDescTextarea.focus();
+                    aiDescTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 return;
             }
 
@@ -283,10 +548,23 @@
                 body: JSON.stringify({ content: content })
             })
             .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
+                if (!res.ok) {
+                    return res.json().then(err => {
+                        throw new Error(err.error || 'Network response was not ok');
+                    });
+                }
                 return res.json();
             })
             .then(res => {
+                // Kiểm tra nếu có lỗi trong response
+                if (res.error) {
+                    throw new Error(res.error);
+                }
+
+                if (!res.data) {
+                    throw new Error('Dữ liệu trả về không hợp lệ');
+                }
+
                 const data = res.data;
                 const container = document.getElementById('tech-stack-result');
                 container.innerHTML = '';
@@ -307,11 +585,11 @@
                     `;
                 };
 
-                let html = createCard('Frontend', '💻', data.frontend);
-                html += createCard('Backend', '⚙️', data.backend);
-                html += createCard('Database', '🗄️', data.database);
-                html += createCard('Mobile', '📱', data.mobile);
-                html += createCard('Hardware/IoT', '🔌', data.hardware);
+                let html = createCard('Frontend', '💻', data.frontend || 'Chưa có gợi ý');
+                html += createCard('Backend', '⚙️', data.backend || 'Chưa có gợi ý');
+                html += createCard('Database', '🗄️', data.database || 'Chưa có gợi ý');
+                html += createCard('Mobile', '📱', data.mobile || 'Không áp dụng');
+                html += createCard('Hardware/IoT', '🔌', data.hardware || 'Không áp dụng');
 
                 const adviceHtml = `
                     <div style="grid-column: 1 / -1; background: #fef3c7; padding: 16px; border-radius: 8px; border: 1px solid #fcd34d;">
@@ -329,7 +607,24 @@
             })
             .catch(err => {
                 console.error('Error:', err);
-                alert('Lỗi kết nối AI: ' + err.message);
+                const container = document.getElementById('tech-stack-result');
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; background: #fee2e2; padding: 16px; border-radius: 8px; border: 1px solid #fca5a5; text-align: center;">
+                        <div style="font-weight: 700; color: #991b1b; font-size: 14px; margin-bottom: 8px;">
+                            ❌ Lỗi
+                        </div>
+                        <div style="font-size: 13px; color: #7f1d1d; line-height: 1.5;">
+                            ${err.message || 'Có lỗi xảy ra khi kết nối với AI. Vui lòng thử lại sau.'}
+                        </div>
+                    </div>
+                `;
+                container.classList.remove('hidden');
+                
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire('Lỗi', err.message || 'Có lỗi xảy ra khi kết nối với AI.', 'error');
+                } else {
+                    alert('Lỗi: ' + (err.message || 'Có lỗi xảy ra khi kết nối với AI.'));
+                }
             })
             .finally(() => {
                 document.getElementById('tech-loading').classList.add('hidden');
@@ -554,6 +849,9 @@
                     placeholder: 'Nhập mô tả chi tiết về ý tưởng của bạn tại đây...'
                 })
                 .then(editor => {
+                    // Lưu editor instance vào window để script khác có thể truy cập
+                    window.CKEditorInstance = editor;
+                    
                     // Đặt min-height cho vùng soạn thảo
                     editor.editing.view.change(writer => {
                         writer.setStyle('min-height', '300px', editor.editing.view.document.getRoot());

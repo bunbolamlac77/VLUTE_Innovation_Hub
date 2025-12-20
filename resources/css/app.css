@@ -193,4 +193,24 @@
     /* Ideas panel refinements */
     .ideas-actions { @apply grid gap-2 justify-end; grid-template-columns: repeat(1,minmax(0,1fr)); }
     @screen md { .ideas-actions { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+
+    /* Style cho nội dung AI Business Plan */
+    .prose h3 {
+        @apply text-xl font-bold text-indigo-800 mt-6 mb-3 border-b border-indigo-100 pb-2;
+    }
+    .prose h4 {
+        @apply text-lg font-bold text-indigo-700 mt-4 mb-2;
+    }
+    .prose p {
+        @apply mb-4 leading-relaxed text-slate-700 text-justify;
+    }
+    .prose ul {
+        @apply list-disc list-inside mb-4 pl-4 space-y-2 bg-slate-50 p-4 rounded-lg;
+    }
+    .prose li {
+        @apply text-slate-700;
+    }
+    .prose strong {
+        @apply text-indigo-900 font-bold;
+    }
 }

@@ -43,30 +43,34 @@ class AIController extends Controller
             return response()->json(['error' => 'Không thể tạo Vector.'], 500);
         }
 
-        $ideas = Idea::whereNotNull('embedding_vector')->get();
+        // FIX: Chỉ lấy các trường cần thiết để giảm tải RAM (id, title, embedding_vector)
+        $ideas = Idea::select('id', 'title', 'embedding_vector')
+                     ->whereNotNull('embedding_vector')
+                     ->get();
+                     
         $matches = [];
         foreach ($ideas as $idea) {
             if (!empty($currentId) && (string)$idea->id === (string)$currentId) {
                 continue;
             }
+            
+            // Decode vector (có thể lỗi nếu data rác)
             $storedVector = json_decode((string)$idea->embedding_vector, true);
+            
             if (is_array($storedVector)) {
                 $score = $this->cosineSimilarity($currentVector, $storedVector);
                 if ($score >= 0.75) {
                     $matches[] = [
                         'title' => $idea->title ?? ('Ý tưởng #' . $idea->id),
                         'score' => round($score * 100, 1) . '%',
+                        'raw_score' => $score // Dùng để sort
                     ];
                 }
             }
         }
 
-        // sort by numeric score desc
-        usort($matches, function ($a, $b) {
-            $sa = (float) rtrim($a['score'], '%');
-            $sb = (float) rtrim($b['score'], '%');
-            return $sb <=> $sa;
-        });
+        // Sort tối ưu hơn
+        usort($matches, fn($a, $b) => $b['raw_score'] <=> $a['raw_score']);
 
         return response()->json([
             'is_duplicate' => count($matches) > 0,
@@ -109,6 +113,10 @@ class AIController extends Controller
     // --- TÍNH NĂNG A: KIẾN TRÚC SƯ CÔNG NGHỆ (CHO SINH VIÊN) ---
     public function suggestTechStack(Request $request)
     {
+        $request->validate([
+            'content' => 'required|string|min:20',
+        ]);
+
         $content = $request->input('content');
 
         $prompt = "Bạn là một CTO (Giám đốc công nghệ) giàu kinh nghiệm. Sinh viên có ý tưởng sau: \"$content\". \n" .
@@ -123,12 +131,35 @@ class AIController extends Controller
                   "\"advice\": \"Lời khuyên triển khai ngắn gọn\"" .
                   "}";
 
-        $resultRaw = $this->gemini->generateText($prompt);
+        try {
+            $resultRaw = $this->gemini->generateText($prompt);
 
-        // Làm sạch chuỗi JSON (đề phòng AI trả về dạng ```json ... ```)
-        $jsonString = str_replace(['```json', '```'], '', $resultRaw);
+            if (!$resultRaw || str_starts_with($resultRaw, 'Lỗi')) {
+                return response()->json([
+                    'error' => 'Không thể kết nối tới AI. Vui lòng thử lại sau.'
+                ], 500);
+            }
 
-        return response()->json(['data' => json_decode($jsonString)]);
+            // FIX: Hàm trích xuất JSON mạnh mẽ hơn
+            $jsonString = $this->extractJson($resultRaw);
+
+            $decoded = json_decode($jsonString, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+                // Fallback nếu AI trả về lỗi định dạng
+                return response()->json([
+                    'error' => 'AI trả về định dạng không hợp lệ',
+                    'raw_response' => $resultRaw
+                ], 500);
+            }
+
+            return response()->json(['data' => $decoded]);
+        } catch (\Exception $e) {
+            \Log::error('Tech Stack AI Error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại sau.'
+            ], 500);
+        }
     }
 
     // --- TÍNH NĂNG B: THỢ SĂN GIẢI PHÁP (CHO DOANH NGHIỆP) ---
@@ -142,7 +173,10 @@ class AIController extends Controller
         if (!$queryVector) return response()->json(['message' => 'Lỗi tạo vector.'], 500);
 
         // 2. Quét toàn bộ kho ý tưởng (Tận dụng cột embedding_vector đã làm ở bài trước)
+        // FIX: Chỉ lấy các trường cần thiết để giảm tải RAM
         $ideas = Idea::publicApproved()
+                     ->select('id', 'title', 'slug', 'summary', 'description', 'content', 'embedding_vector', 'owner_id')
+                     ->with('owner:id,name') // Load relationship owner với chỉ các trường cần thiết
                      ->whereNotNull('embedding_vector')
                      ->get();
 
@@ -174,6 +208,18 @@ class AIController extends Controller
             'found' => count($matches),
             'results' => array_slice($matches, 0, 5) // Trả về top 5
         ]);
+    }
+
+    // Hàm phụ trợ để lọc chuỗi JSON từ phản hồi hỗn tạp
+    private function extractJson($text) {
+        $text = str_replace(['```json', '```'], '', $text);
+        $start = strpos($text, '{');
+        $end = strrpos($text, '}');
+        
+        if ($start !== false && $end !== false) {
+            return substr($text, $start, $end - $start + 1);
+        }
+        return $text;
     }
 
     // DEBUG: Kiểm tra cấu hình API

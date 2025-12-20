@@ -84,6 +84,10 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::post('/scout-solutions', [AIController::class, 'scoutSolutions'])->name('scout');
         Route::get('/seed', [AIController::class, 'seedEmbeddings'])->name('seed');
         Route::get('/debug', [AIController::class, 'debugInfo'])->name('debug');
+        
+        // Student AI Business Consultant
+        Route::post('/student/business-plan', [\App\Http\Controllers\Api\StudentAIController::class, 'analyzeBusinessPlan'])
+            ->name('student.business-plan');
     });
 
     // Review Queue - Hàng chờ phản biện (cho Giảng viên, Trung tâm ĐMST, BGH)

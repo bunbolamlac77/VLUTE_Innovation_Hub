@@ -18,10 +18,11 @@ class GeminiService
     // TÍNH NĂNG 3: Phân tích văn bản (Review Insight)
     public function generateText(string $prompt): string
     {
-        // Thử nhiều model khác nhau
+        // Ưu tiên bản ổn định 1.5 trước, bản 2.0 experimental để sau
         $models = [
-            'gemini-2.0-flash',
             'gemini-1.5-flash',
+            'gemini-2.0-flash-exp',
+            'gemini-2.0-flash',
             'gemini-pro'
         ];
         
@@ -48,10 +49,11 @@ class GeminiService
             return 'Lỗi: File ảnh không tồn tại.';
         }
 
-        // Thử nhiều model khác nhau
+        // Ưu tiên bản ổn định 1.5 trước, bản 2.0 experimental để sau
         $models = [
-            'gemini-2.0-flash',
             'gemini-1.5-flash',
+            'gemini-2.0-flash-exp',
+            'gemini-2.0-flash',
             'gemini-pro-vision'
         ];
         
@@ -122,7 +124,10 @@ class GeminiService
                 return 'Lỗi: API Key không được cấu hình.';
             }
 
-            $response = Http::withHeaders(['Content-Type' => 'application/json'])->post($url, $body);
+            // FIX: Thêm timeout(60) giây để chờ AI xử lý
+            $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                ->timeout(60)
+                ->post($url, $body);
 
             // Log response cho debug
             Log::info('Gemini API Response', [
@@ -138,6 +143,13 @@ class GeminiService
                 if (is_string($text) && $text !== '') {
                     return $text;
                 }
+                // Bổ sung: Handle trường hợp AI trả về cấu trúc lạ
+                if (isset($json['candidates'][0]['content']['parts'][0])) {
+                    $part = $json['candidates'][0]['content']['parts'][0];
+                    if (is_string($part)) {
+                        return $part;
+                    }
+                }
                 // Fallback to aggregated text pieces
                 if (isset($json['candidates'][0]['content']['parts']) && is_array($json['candidates'][0]['content']['parts'])) {
                     $parts = $json['candidates'][0]['content']['parts'];
@@ -149,7 +161,7 @@ class GeminiService
                         return implode("\n\n", $texts);
                     }
                 }
-                return 'Không có phản hồi từ AI.';
+                return 'Không có nội dung văn bản trả về.';
             }
 
             // Xử lý lỗi chi tiết
@@ -168,9 +180,19 @@ class GeminiService
                 return 'Lỗi API: 401 - API Key không hợp lệ.';
             } elseif ($statusCode === 429) {
                 return 'Lỗi API: 429 - Quá nhiều yêu cầu. Vui lòng thử lại sau.';
+            } elseif ($response->serverError()) {
+                // Bổ sung: Handle lỗi server quá tải (503/500)
+                return 'Lỗi hệ thống AI (Server Error). Vui lòng thử lại.';
             } else {
                 return 'Lỗi API: ' . $statusCode;
             }
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Bắt lỗi timeout cụ thể
+            Log::error('Gemini API Timeout', [
+                'message' => $e->getMessage(),
+                'url' => $url
+            ]);
+            return 'Lỗi kết nối: Phản hồi từ AI quá lâu (Timeout).';
         } catch (\Throwable $e) {
             Log::error('Gemini API Exception', [
                 'message' => $e->getMessage(),
