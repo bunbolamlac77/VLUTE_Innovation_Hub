@@ -8,3 +8,6 @@ DB_USERNAME=sail
 DB_PASSWORD=password
 FORWARD_DB_PORT=3307 # host port that maps to 3306 in container
 MYSQL_EXTRA_OPTIONS=
+
+# Gemini AI API Configuration
+GEMINI_API_KEY=AIzaSy... # Điền API Key của bạn vào đây (lấy từ https://aistudio.google.com/apikey)

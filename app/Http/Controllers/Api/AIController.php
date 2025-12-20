@@ -39,23 +39,23 @@ class AIController extends Controller
         $currentText = (string) $request->input('content', '');
         $currentId = $request->input('current_id');
         $currentVector = $this->gemini->generateEmbedding($currentText);
+        
         if (!$currentVector) {
-            return response()->json(['error' => 'Không thể tạo Vector.'], 500);
+            return response()->json(['error' => 'Lỗi tạo vector'], 500);
         }
 
-        // FIX: Chỉ lấy các trường cần thiết để giảm tải RAM (id, title, embedding_vector)
-        $ideas = Idea::select('id', 'title', 'embedding_vector')
-                     ->whereNotNull('embedding_vector')
-                     ->get();
-                     
+        // Tối ưu: Dùng cursor() để duyệt từng dòng thay vì load tất cả vào RAM
+        $ideas = Idea::whereNotNull('embedding_vector')
+                    ->select('id', 'title', 'embedding_vector') 
+                    ->cursor();
+
         $matches = [];
         foreach ($ideas as $idea) {
             if (!empty($currentId) && (string)$idea->id === (string)$currentId) {
                 continue;
             }
             
-            // Decode vector (có thể lỗi nếu data rác)
-            $storedVector = json_decode((string)$idea->embedding_vector, true);
+            $storedVector = json_decode($idea->embedding_vector, true);
             
             if (is_array($storedVector)) {
                 $score = $this->cosineSimilarity($currentVector, $storedVector);
@@ -69,7 +69,7 @@ class AIController extends Controller
             }
         }
 
-        // Sort tối ưu hơn
+        // Sort
         usort($matches, fn($a, $b) => $b['raw_score'] <=> $a['raw_score']);
 
         return response()->json([
@@ -140,20 +140,20 @@ class AIController extends Controller
                 ], 500);
             }
 
-            // FIX: Hàm trích xuất JSON mạnh mẽ hơn
-            $jsonString = $this->extractJson($resultRaw);
+            // Sử dụng hàm parse mới từ GeminiService
+            $data = $this->gemini->parseJsonFromText($resultRaw);
 
-            $decoded = json_decode($jsonString, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
-                // Fallback nếu AI trả về lỗi định dạng
+            if (!$data) {
+                // Fallback nếu AI không trả về JSON đúng
                 return response()->json([
-                    'error' => 'AI trả về định dạng không hợp lệ',
-                    'raw_response' => $resultRaw
-                ], 500);
+                    'data' => [
+                        'advice' => 'Hệ thống đang bận, vui lòng thử lại. (Lỗi phân tích JSON)',
+                        'result_raw' => $resultRaw // Debug để xem AI trả về gì
+                    ]
+                ]);
             }
 
-            return response()->json(['data' => $decoded]);
+            return response()->json(['data' => $data]);
         } catch (\Exception $e) {
             \Log::error('Tech Stack AI Error: ' . $e->getMessage());
             return response()->json([
@@ -173,16 +173,16 @@ class AIController extends Controller
         if (!$queryVector) return response()->json(['message' => 'Lỗi tạo vector.'], 500);
 
         // 2. Quét toàn bộ kho ý tưởng (Tận dụng cột embedding_vector đã làm ở bài trước)
-        // FIX: Chỉ lấy các trường cần thiết để giảm tải RAM
+        // Tối ưu: Dùng cursor() để duyệt từng dòng thay vì load tất cả vào RAM
         $ideas = Idea::publicApproved()
                      ->select('id', 'title', 'slug', 'summary', 'description', 'content', 'embedding_vector', 'owner_id')
                      ->with('owner:id,name') // Load relationship owner với chỉ các trường cần thiết
                      ->whereNotNull('embedding_vector')
-                     ->get();
+                     ->cursor();
 
         $matches = [];
         foreach ($ideas as $idea) {
-            $ideaVector = json_decode($idea->embedding_vector);
+            $ideaVector = json_decode($idea->embedding_vector, true);
             if (is_array($ideaVector)) {
                 // Tái sử dụng hàm cosineSimilarity bạn đã viết ở bài trước
                 $score = $this->cosineSimilarity($queryVector, $ideaVector);
@@ -208,18 +208,6 @@ class AIController extends Controller
             'found' => count($matches),
             'results' => array_slice($matches, 0, 5) // Trả về top 5
         ]);
-    }
-
-    // Hàm phụ trợ để lọc chuỗi JSON từ phản hồi hỗn tạp
-    private function extractJson($text) {
-        $text = str_replace(['```json', '```'], '', $text);
-        $start = strpos($text, '{');
-        $end = strrpos($text, '}');
-        
-        if ($start !== false && $end !== false) {
-            return substr($text, $start, $end - $start + 1);
-        }
-        return $text;
     }
 
     // DEBUG: Kiểm tra cấu hình API

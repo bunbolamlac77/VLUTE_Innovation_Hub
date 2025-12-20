@@ -20,10 +20,9 @@ class GeminiService
     {
         // Ưu tiên bản ổn định 1.5 trước, bản 2.0 experimental để sau
         $models = [
-            'gemini-1.5-flash',
-            'gemini-2.0-flash-exp',
-            'gemini-2.0-flash',
-            'gemini-pro'
+            'gemini-1.5-flash', // Nhanh, ổn định, rẻ
+            'gemini-1.5-pro',   // Thông minh hơn
+            'gemini-1.0-pro'    // Fallback cũ
         ];
         
         foreach ($models as $model) {
@@ -51,10 +50,9 @@ class GeminiService
 
         // Ưu tiên bản ổn định 1.5 trước, bản 2.0 experimental để sau
         $models = [
-            'gemini-1.5-flash',
-            'gemini-2.0-flash-exp',
-            'gemini-2.0-flash',
-            'gemini-pro-vision'
+            'gemini-1.5-flash', // Nhanh, ổn định, hỗ trợ tốt cả hình ảnh và văn bản
+            'gemini-1.5-pro',   // Thông minh hơn
+            'gemini-1.0-pro'    // Fallback cũ
         ];
         
         $imageData = base64_encode(file_get_contents($imagePath));
@@ -200,6 +198,20 @@ class GeminiService
             ]);
             return 'Lỗi hệ thống: ' . $e->getMessage();
         }
+    }
+
+    // Hàm hỗ trợ làm sạch JSON cho Tính năng 4
+    public function parseJsonFromText(string $text): ?array
+    {
+        // 1. Tìm chuỗi nằm giữa { và } đầu tiên và cuối cùng
+        if (preg_match('/\{.*\}/s', $text, $matches)) {
+            $jsonString = $matches[0];
+            $decoded = json_decode($jsonString, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+        }
+        return null; // Trả về null nếu không tìm thấy JSON hợp lệ
     }
 }
 
