@@ -213,11 +213,19 @@
                           
                           <button @click="analyzePlan" 
                                   :disabled="loading"
-                                  class="px-5 py-2 bg-white text-indigo-700 font-bold rounded-lg shadow hover:bg-indigo-50 transition flex items-center gap-2 disabled:opacity-50">
-                              <span x-show="!loading">✨ Phân tích ngay</span>
-                              <span x-show="loading" class="flex items-center gap-2">
-                                  <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                  Đang viết báo cáo...
+                                  style="padding: 12px 24px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.1); position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 8px;"
+                                  :style="loading ? 'opacity: 0.7; cursor: not-allowed; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);' : ''"
+                                  onmouseover="if (!this.disabled) { this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.15)'; }"
+                                  onmouseout="if (!this.disabled) { this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.1)'; }"
+                                  onmousedown="if (!this.disabled) { this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(37, 99, 235, 0.3)'; }"
+                                  onmouseup="if (!this.disabled) { this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.15)'; }">
+                              <span x-show="!loading" style="display: inline-flex; align-items: center; gap: 8px; position: relative; z-index: 1;">
+                                  <span style="font-size: 16px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));">✨</span>
+                                  <span>Phân tích Kế hoạch</span>
+                              </span>
+                              <span x-show="loading" style="display: inline-flex; align-items: center; gap: 8px; position: relative; z-index: 1;">
+                                  <svg style="width: 16px; height: 16px; animation: spin 0.8s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle class="opacity-25" cx="12" cy="12" r="10"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                  <span>Đang phân tích...</span>
                               </span>
                           </button>
                       </div>

@@ -80,19 +80,19 @@
                 @endif
             </div>
 
-            {{-- 2. CÔNG CỤ AI (ĐÃ CHUYỂN XUỐNG DƯỚI & BỎ PHÂN TÍCH ẢNH) --}}
-            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6" x-data="{ aiResult: '', loading: false }">
+            {{-- 2. CÔNG CỤ AI --}}
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6" x-data="{ aiResult: '', loading: false, visionLoading: false, visionResult: '' }">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-indigo-800 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        Trợ lý AI (Gemini)
+                        Trợ lý AI (Groq)
                     </h3>
                 </div>
 
                 <p class="text-sm text-indigo-600 mb-4">Sử dụng AI để tóm tắt và đánh giá sơ bộ ý tưởng này trước khi bạn quyết định.</p>
                 
-                {{-- Chỉ còn nút Phân tích nội dung (Văn bản) --}}
-                <div class="flex gap-2">
+                {{-- Nút Phân tích nội dung (Văn bản) --}}
+                <div class="flex gap-2 mb-4">
                     <button type="button" 
                         @click="
                             loading = true; aiResult = '';
@@ -102,21 +102,103 @@
                                     'Content-Type': 'application/json',
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                 },
-                                body: JSON.stringify({ content: `{{ strip_tags($idea->description) }}` })
+                                body: JSON.stringify({ content: `{{ strip_tags($idea->description ?? $idea->summary ?? '') }}` })
                             })
-                            .then(res => res.json())
-                            .then(data => { aiResult = data.result; loading = false; })
-                            .catch(err => { aiResult = 'Lỗi kết nối AI'; loading = false; });
+                            .then(res => {
+                                if (!res.ok) {
+                                    return res.json().then(err => {
+                                        throw new Error(err.error || 'Lỗi từ server');
+                                    });
+                                }
+                                return res.json();
+                            })
+                            .then(data => { 
+                                if (data.error) {
+                                    aiResult = '❌ Lỗi: ' + data.error;
+                                } else {
+                                    aiResult = data.result || 'Không có kết quả';
+                                }
+                                loading = false; 
+                            })
+                            .catch(err => { 
+                                aiResult = '❌ Lỗi kết nối AI: ' + (err.message || 'Vui lòng thử lại sau'); 
+                                loading = false; 
+                            });
                         "
-                        class="px-4 py-2 bg-white border border-indigo-200 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 flex items-center gap-2"
-                        :disabled="loading">
+                        class="px-4 py-2 bg-white border border-indigo-200 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 flex items-center gap-2 transition-all"
+                        :disabled="loading"
+                        :class="loading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'">
                         <span x-show="loading" class="animate-spin">⌛</span>
+                        <span x-show="!loading">📝</span>
                         Phân tích Văn bản
                     </button>
                 </div>
 
-                {{-- Kết quả AI --}}
-                <div x-show="aiResult" class="mt-4 p-4 bg-white rounded-lg border border-indigo-100 text-sm leading-relaxed whitespace-pre-line" x-text="aiResult"></div>
+                {{-- Nút Phân tích Hình ảnh --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-indigo-700 mb-2">Phân tích Poster/Slide (nếu có)</label>
+                    <div class="flex gap-2">
+                        <input type="file" 
+                            id="vision-image-input" 
+                            accept="image/*" 
+                            class="hidden"
+                            @change="
+                                const file = $event.target.files[0];
+                                if (!file) return;
+                                if (file.size > 5120000) {
+                                    alert('File quá lớn. Vui lòng chọn file nhỏ hơn 5MB.');
+                                    return;
+                                }
+                                const formData = new FormData();
+                                formData.append('image', file);
+                                visionLoading = true; visionResult = '';
+                                fetch('{{ route('ai.vision') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: formData
+                                })
+                                .then(res => {
+                                    if (!res.ok) {
+                                        return res.json().then(err => {
+                                            throw new Error(err.error || 'Lỗi từ server');
+                                        });
+                                    }
+                                    return res.json();
+                                })
+                                .then(data => { 
+                                    if (data.error) {
+                                        visionResult = '❌ Lỗi: ' + data.error;
+                                    } else {
+                                        visionResult = data.result || 'Không có kết quả';
+                                    }
+                                    visionLoading = false; 
+                                })
+                                .catch(err => { 
+                                    visionResult = '❌ Lỗi kết nối AI: ' + (err.message || 'Vui lòng thử lại sau'); 
+                                    visionLoading = false; 
+                                });
+                            ">
+                        <label for="vision-image-input" 
+                            class="px-4 py-2 bg-white border border-indigo-200 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 flex items-center gap-2 cursor-pointer transition-all"
+                            :class="visionLoading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'">
+                            <span x-show="visionLoading" class="animate-spin">⌛</span>
+                            <span x-show="!visionLoading">🖼️</span>
+                            Phân tích Hình ảnh
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Kết quả AI - Văn bản --}}
+                <div x-show="aiResult" 
+                     class="mt-4 p-4 bg-white rounded-lg border border-indigo-100 text-sm leading-relaxed max-w-none overflow-auto max-h-96 prose prose-sm prose-indigo" 
+                     x-html="aiResult ? aiResult.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/^### (.*$)/gim, '<h3>$1</h3>').replace(/^## (.*$)/gim, '<h2>$1</h2>').replace(/^# (.*$)/gim, '<h1>$1</h1>').replace(/^\- (.*$)/gim, '<li>$1</li>').replace(/\n/g, '<br>') : ''"></div>
+
+                {{-- Kết quả AI - Hình ảnh --}}
+                <div x-show="visionResult" 
+                     class="mt-4 p-4 bg-white rounded-lg border border-indigo-100 text-sm leading-relaxed max-w-none overflow-auto max-h-96 prose prose-sm prose-indigo" 
+                     x-html="visionResult ? visionResult.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/^### (.*$)/gim, '<h3>$1</h3>').replace(/^## (.*$)/gim, '<h2>$1</h2>').replace(/^# (.*$)/gim, '<h1>$1</h1>').replace(/^\- (.*$)/gim, '<li>$1</li>').replace(/\n/g, '<br>') : ''"></div>
             </div>
 
             {{-- 3. FORM QUYẾT ĐỊNH (ĐÃ CHUYỂN XUỐNG DƯỚI CÙNG) --}}

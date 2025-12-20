@@ -3,34 +3,146 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\GeminiService;
+use App\Services\GroqService;
 use App\Models\Idea;
 use Illuminate\Http\Request;
 
 class AIController extends Controller
 {
-    protected GeminiService $gemini;
+    protected GroqService $groq;
 
-    public function __construct(GeminiService $gemini)
+    public function __construct(GroqService $groq)
     {
-        $this->gemini = $gemini;
+        $this->groq = $groq;
     }
 
-    // 1) Review Insight
+    // 1) Review Insight - Phân tích chi tiết ý tưởng cho Giám khảo
     public function reviewInsight(Request $request)
     {
         $content = (string) $request->input('content', '');
-        $prompt = "Bạn là Giám khảo cuộc thi khởi nghiệp. Hãy phân tích ý tưởng sau:\n\n\"{$content}\"\n\nHãy trả về nhận xét ngắn gọn định dạng Markdown gồm: **Điểm mạnh**, **Điểm yếu**, **Tiềm năng** (Thang 10).";
-        return response()->json(['result' => $this->gemini->generateText($prompt)]);
+        
+        if (empty(trim($content)) || strlen(trim($content)) < 10) {
+            return response()->json([
+                'error' => 'Nội dung quá ngắn. Vui lòng cung cấp ít nhất 10 ký tự.'
+            ], 400);
+        }
+        
+        $prompt = "Bạn là một Giám khảo chuyên nghiệp và giàu kinh nghiệm trong các cuộc thi khởi nghiệp và đổi mới sáng tạo. 
+        
+Hãy phân tích CHI TIẾT và TOÀN DIỆN ý tưởng sau đây:
+
+\"{$content}\"
+
+YÊU CẦU PHÂN TÍCH (trả lời dài, đầy đủ, ít nhất 500-800 từ):
+
+**1. ĐIỂM MẠNH (Strengths):**
+- Liệt kê và phân tích ít nhất 3-5 điểm mạnh nổi bật của ý tưởng
+- Giải thích tại sao những điểm này là thế mạnh
+- Đưa ra ví dụ cụ thể nếu có thể
+
+**2. ĐIỂM YẾU & RỦI RO (Weaknesses & Risks):**
+- Chỉ ra ít nhất 3-5 điểm yếu hoặc rủi ro tiềm ẩn
+- Phân tích mức độ nghiêm trọng của từng rủi ro
+- Đề xuất cách khắc phục hoặc giảm thiểu rủi ro
+
+**3. TIỀM NĂNG THỊ TRƯỜNG (Market Potential):**
+- Đánh giá quy mô thị trường mục tiêu (TAM, SAM, SOM)
+- Phân tích đối thủ cạnh tranh hiện tại và tiềm năng
+- Đánh giá khả năng mở rộng (Scalability)
+
+**4. KHẢ THI CÔNG NGHỆ (Technical Feasibility):**
+- Đánh giá độ phức tạp kỹ thuật
+- Phân tích công nghệ cần thiết và tính khả thi
+- Đánh giá thời gian và chi phí phát triển
+
+**5. ĐIỂM SỐ TỔNG THỂ (Overall Score):**
+- Chấm điểm từng tiêu chí trên thang 10:
+  * Sáng tạo & Đổi mới: /10
+  * Khả thi kỹ thuật: /10
+  * Tiềm năng thị trường: /10
+  * Tính thực tế: /10
+  * Khả năng triển khai: /10
+- Điểm tổng thể: /50
+- Nhận xét tổng kết và khuyến nghị
+
+Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng, dễ đọc. Phân tích phải sâu sắc, chuyên nghiệp và mang tính xây dựng.";
+
+        try {
+            $result = $this->groq->generateText($prompt, false, 0.7, 4096);
+            
+            if (empty($result) || str_starts_with($result, 'Lỗi')) {
+                return response()->json([
+                    'error' => $result ?: 'Không thể tạo phân tích. Vui lòng thử lại sau.'
+                ], 500);
+            }
+            
+            return response()->json(['result' => $result]);
+        } catch (\Exception $e) {
+            \Log::error('Review Insight AI Error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại sau.'
+            ], 500);
+        }
     }
 
-    // 2) Vision
+    // 2) Vision - Phân tích hình ảnh Poster/Slide
     public function analyzeVisual(Request $request)
     {
         $request->validate(['image' => 'required|image|max:5120']);
         $path = $request->file('image')->getRealPath();
-        $prompt = "Hãy nhìn vào Poster/Slide này.\n- Đánh giá tính thẩm mỹ (Màu sắc, bố cục).\n- Đánh giá nội dung hiển thị.\n- Đưa ra lời khuyên cải thiện ngắn gọn.";
-        return response()->json(['result' => $this->gemini->analyzeImage($prompt, $path)]);
+        
+        $prompt = "Bạn là một chuyên gia thiết kế đồ họa và marketing chuyên nghiệp. Hãy phân tích CHI TIẾT và TOÀN DIỆN poster/slide này.
+
+YÊU CẦU PHÂN TÍCH (trả lời dài, đầy đủ, ít nhất 400-600 từ):
+
+**1. ĐÁNH GIÁ TÍNH THẨM MỸ (Aesthetic Evaluation):**
+- Màu sắc: Phân tích bảng màu, độ tương phản, sự hài hòa
+- Bố cục (Layout): Đánh giá cách sắp xếp các elements, khoảng trắng, hierarchy
+- Typography: Phân tích font chữ, kích thước, readability
+- Hình ảnh/Icon: Đánh giá chất lượng, sự phù hợp, tính nhất quán
+- Tổng thể: Đánh giá sự chuyên nghiệp và thu hút
+
+**2. ĐÁNH GIÁ NỘI DUNG (Content Evaluation):**
+- Thông điệp chính: Rõ ràng hay mơ hồ?
+- Cấu trúc thông tin: Logic, dễ hiểu?
+- Call-to-action: Có rõ ràng và thuyết phục?
+- Thông tin quan trọng: Đầy đủ hay thiếu sót?
+
+**3. ĐÁNH GIÁ HIỆU QUẢ TRUYỀN ĐẠT (Communication Effectiveness):**
+- Khả năng thu hút sự chú ý
+- Khả năng truyền đạt thông điệp
+- Phù hợp với đối tượng mục tiêu
+
+**4. LỜI KHUYÊN CẢI THIỆN (Improvement Recommendations):**
+- Liệt kê ít nhất 5-7 điểm cần cải thiện cụ thể
+- Đưa ra giải pháp cụ thể cho từng điểm
+- Ưu tiên các cải thiện quan trọng nhất
+- Đề xuất best practices nếu có
+
+**5. ĐIỂM SỐ (Scoring):**
+- Thẩm mỹ: /10
+- Nội dung: /10
+- Hiệu quả truyền đạt: /10
+- Tổng điểm: /30
+
+Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân tích phải chi tiết, chuyên nghiệp và mang tính xây dựng.";
+
+        try {
+            $result = $this->groq->analyzeImage($prompt, $path);
+            
+            if (empty($result) || str_starts_with($result, 'Lỗi')) {
+                return response()->json([
+                    'error' => $result ?: 'Không thể phân tích hình ảnh. Vui lòng thử lại sau.'
+                ], 500);
+            }
+            
+            return response()->json(['result' => $result]);
+        } catch (\Exception $e) {
+            \Log::error('Vision AI Error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Có lỗi xảy ra khi xử lý hình ảnh. Vui lòng thử lại sau.'
+            ], 500);
+        }
     }
 
     // 3) Check Duplicate by Embedding Cosine Similarity
@@ -40,10 +152,14 @@ class AIController extends Controller
         $currentId = $request->input('current_id');
         
         // Tạo vector cho ý tưởng mới
-        $currentVector = $this->gemini->generateEmbedding($currentText);
+        $currentVector = $this->groq->generateEmbedding($currentText);
         
         if (!$currentVector) {
-            return response()->json(['is_duplicate' => false, 'message' => 'Không thể tạo vector.'], 200);
+            return response()->json([
+                'is_duplicate' => false, 
+                'message' => 'Tính năng kiểm tra trùng lặp yêu cầu OpenAI API key (Groq không hỗ trợ embedding). Vui lòng thêm OPENAI_API_KEY vào .env để sử dụng tính năng này.',
+                'requires_openai' => true
+            ], 200);
         }
 
         $matches = [];
@@ -106,7 +222,7 @@ class AIController extends Controller
         foreach ($ideas as $idea) {
             $text = trim(($idea->title ?? '') . '. ' . ($idea->summary ?? '') . ' ' . ($idea->description ?? '') . ' ' . ($idea->content ?? ''));
             if ($text === '') continue;
-            $vec = $this->gemini->generateEmbedding($text);
+            $vec = $this->groq->generateEmbedding($text);
             if ($vec) {
                 $idea->update(['embedding_vector' => json_encode($vec)]);
                 $count++;
@@ -124,34 +240,74 @@ class AIController extends Controller
 
         $content = $request->input('content');
 
-        $prompt = "Bạn là một CTO (Giám đốc công nghệ) giàu kinh nghiệm. Sinh viên có ý tưởng sau: \"$content\". \n" .
-                  "Hãy đề xuất một bộ công nghệ (Tech Stack) phù hợp nhất để xây dựng dự án này. \n" .
-                  "Trả về định dạng JSON thuần túy với cấu trúc sau: \n" .
-                  "{" .
-                  "\"frontend\": \"tên công nghệ + lý do ngắn\"," .
-                  "\"backend\": \"tên công nghệ + lý do ngắn\"," .
-                  "\"database\": \"tên công nghệ\"," .
-                  "\"mobile\": \"tên công nghệ (nếu cần)\"," .
-                  "\"hardware\": \"tên thiết bị (nếu là dự án IoT/Phần cứng)\"," .
-                  "\"advice\": \"Lời khuyên triển khai ngắn gọn\"" .
-                  "}";
+        $prompt = "Bạn là một CTO (Giám đốc Công nghệ) hàng đầu với hơn 15 năm kinh nghiệm trong việc xây dựng và triển khai các hệ thống công nghệ quy mô lớn.
+
+Sinh viên có ý tưởng sau: \"$content\"
+
+Hãy phân tích CHI TIẾT và đề xuất một bộ công nghệ (Tech Stack) TỐI ƯU và PHÙ HỢP NHẤT để xây dựng dự án này.
+
+YÊU CẦU:
+1. Phân tích yêu cầu kỹ thuật của dự án
+2. Đề xuất tech stack cho từng layer với LÝ DO CHI TIẾT
+3. Xem xét tính khả thi, chi phí, và khả năng mở rộng
+4. Đưa ra lời khuyên triển khai cụ thể
+
+QUAN TRỌNG: Bạn PHẢI trả về CHỈ JSON thuần túy, không có text nào khác trước hoặc sau JSON. Định dạng JSON bắt buộc:
+
+{
+  \"frontend\": \"Tên công nghệ + lý do chi tiết tại sao chọn công nghệ này, ưu điểm, phù hợp với dự án như thế nào\",
+  \"backend\": \"Tên công nghệ + lý do chi tiết, xử lý được những yêu cầu gì của dự án\",
+  \"database\": \"Tên công nghệ + lý do chi tiết, phù hợp với loại dữ liệu nào\",
+  \"mobile\": \"Tên công nghệ (nếu cần) + lý do, hoặc 'Không cần' nếu không phù hợp\",
+  \"hardware\": \"Tên thiết bị/công nghệ (nếu là dự án IoT/Phần cứng) + lý do, hoặc 'Không áp dụng' nếu không phù hợp\",
+  \"cloud_infrastructure\": \"Đề xuất hạ tầng cloud (AWS/Azure/GCP) + lý do\",
+  \"devops_tools\": \"Công cụ CI/CD và deployment đề xuất\",
+  \"advice\": \"Lời khuyên triển khai chi tiết, roadmap ngắn hạn và dài hạn, các lưu ý quan trọng khi phát triển\",
+  \"estimated_complexity\": \"Đánh giá độ phức tạp: Thấp/Trung bình/Cao\",
+  \"estimated_timeline\": \"Ước tính thời gian phát triển (nếu có thể)\"
+}
+
+Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
 
         try {
             // Gọi hàm với tham số jsonMode = true để sử dụng JSON Mode
-            $result = $this->gemini->generateText($prompt, true);
+            $result = $this->groq->generateText($prompt, true, 0.7, 4096);
 
             if (isset($result['error'])) {
+                \Log::error('Tech Stack AI Error', ['error' => $result['error']]);
                 return response()->json([
                     'error' => $result['error']
                 ], 500);
             }
 
+            // Kiểm tra xem result có phải là array hợp lệ không
+            if (!is_array($result)) {
+                \Log::error('Tech Stack AI: Result is not array', ['result' => $result]);
+                return response()->json([
+                    'error' => 'Dữ liệu trả về không đúng định dạng. Vui lòng thử lại.'
+                ], 500);
+            }
+
+            // Đảm bảo có ít nhất các trường cơ bản
+            $defaultFields = [
+                'frontend' => 'Chưa có gợi ý',
+                'backend' => 'Chưa có gợi ý',
+                'database' => 'Chưa có gợi ý',
+                'mobile' => 'Không cần',
+                'hardware' => 'Không áp dụng',
+                'advice' => 'Không có lời khuyên'
+            ];
+            
+            $result = array_merge($defaultFields, $result);
+
             // Khi jsonMode = true, result đã là array (JSON decoded)
             return response()->json(['data' => $result]);
         } catch (\Exception $e) {
-            \Log::error('Tech Stack AI Error: ' . $e->getMessage());
+            \Log::error('Tech Stack AI Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
-                'error' => 'Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại sau.'
+                'error' => 'Có lỗi xảy ra khi xử lý yêu cầu: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -166,10 +322,13 @@ class AIController extends Controller
         }
 
         // 1. Tạo vector cho vấn đề của doanh nghiệp
-        $queryVector = $this->gemini->generateEmbedding($problem);
+        $queryVector = $this->groq->generateEmbedding($problem);
 
         if (!$queryVector) {
-            return response()->json(['message' => 'Lỗi tạo vector.'], 500);
+            return response()->json([
+                'message' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu OpenAI API key (Groq không hỗ trợ embedding). Vui lòng thêm OPENAI_API_KEY vào .env để sử dụng tính năng này.',
+                'requires_openai' => true
+            ], 400);
         }
 
         $matches = [];
@@ -215,16 +374,20 @@ class AIController extends Controller
     // DEBUG: Kiểm tra cấu hình API
     public function debugInfo()
     {
-        $apiKey = env('GEMINI_API_KEY');
+        $groqApiKey = env('GROQ_API_KEY');
+        $openaiApiKey = env('OPENAI_API_KEY');
         return response()->json([
-            'api_key_set' => !empty($apiKey),
-            'api_key_length' => strlen($apiKey ?? ''),
-            'api_key_preview' => !empty($apiKey) ? substr($apiKey, 0, 10) . '...' : 'NOT SET',
-            'base_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
+            'groq_api_key_set' => !empty($groqApiKey),
+            'groq_api_key_length' => strlen($groqApiKey ?? ''),
+            'groq_api_key_preview' => !empty($groqApiKey) ? substr($groqApiKey, 0, 10) . '...' : 'NOT SET',
+            'groq_model' => env('GROQ_MODEL', 'llama-3.1-70b-versatile'),
+            'openai_api_key_set' => !empty($openaiApiKey),
+            'openai_api_key_preview' => !empty($openaiApiKey) ? substr($openaiApiKey, 0, 10) . '...' : 'NOT SET (Groq không hỗ trợ embedding - chỉ cần OpenAI nếu muốn dùng)',
+            'base_url' => 'https://api.groq.com/openai/v1',
             'models' => [
-                'text' => 'gemini-1.5-flash:generateContent',
-                'vision' => 'gemini-1.5-flash:generateContent',
-                'embedding' => 'text-embedding-004:embedContent'
+                'text' => env('GROQ_MODEL', 'llama-3.1-70b-versatile'),
+                'vision' => 'llama-3.2-11b-vision-preview',
+                'embedding' => 'text-embedding-3-small (OpenAI)'
             ]
         ]);
     }

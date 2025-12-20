@@ -16,14 +16,20 @@ class Idea extends Model
     {
         static::created(function (Idea $idea) {
             try {
-                $apiKey = (string) env('GEMINI_API_KEY');
-                if ($apiKey === '') {
-                    return; // skip if no API key
+                // Tự động tạo embedding cho ý tưởng mới (nếu có OpenAI API key)
+                // Lưu ý: Groq không hỗ trợ embedding, chỉ cần OpenAI nếu muốn dùng tính năng này
+                $openaiApiKey = (string) env('OPENAI_API_KEY');
+                
+                // Nếu không có OpenAI key, skip embedding (không bắt buộc)
+                if (empty($openaiApiKey)) {
+                    return; // Embedding là tùy chọn, không ảnh hưởng đến việc tạo ý tưởng
                 }
-                $gemini = new \App\Services\GeminiService();
+                
+                $groq = new \App\Services\GroqService();
                 $text = trim(($idea->title ?? '') . '. ' . ($idea->summary ?? '') . ' ' . ($idea->description ?? '') . ' ' . ($idea->content ?? ''));
                 if ($text === '') return;
-                $vector = $gemini->generateEmbedding($text);
+                
+                $vector = $groq->generateEmbedding($text);
                 if (is_array($vector) && !empty($vector)) {
                     $idea->embedding_vector = json_encode($vector);
                     $idea->saveQuietly();

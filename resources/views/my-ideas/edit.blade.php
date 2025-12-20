@@ -75,11 +75,20 @@
                                     <h4 style="margin: 0 0 4px; font-weight: 700; color: #1e40af; font-size: 16px;">💼 Cố vấn Chiến lược Kinh doanh AI</h4>
                                     <p style="margin: 0; font-size: 13px; color: #1e3a8a;">Biến ý tưởng thành bản kế hoạch kinh doanh chuyên nghiệp để thuyết phục doanh nghiệp đầu tư.</p>
                                 </div>
-                                <button type="button" @click="analyzePlan" :disabled="loading" style="padding: 10px 18px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0; opacity: 1;" :style="loading ? 'opacity: 0.6; cursor: not-allowed;' : ''" onmouseover="if (!this.disabled) { this.style.background='#1d4ed8'; this.style.transform='translateY(-1px)'; }" onmouseout="if (!this.disabled) { this.style.background='#2563eb'; this.style.transform='translateY(0)'; }">
-                                    <span x-show="!loading">✨ Phân tích Kế hoạch</span>
-                                    <span x-show="loading" style="display: inline-flex; align-items: center; gap: 6px;">
-                                        <svg style="width: 14px; height: 14px; animation: spin 0.8s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle class="opacity-25" cx="12" cy="12" r="10"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                        Đang phân tích...
+                                <button type="button" @click="analyzePlan" :disabled="loading" 
+                                    style="padding: 12px 24px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; flex-shrink: 0; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.1); position: relative; overflow: hidden;" 
+                                    :style="loading ? 'opacity: 0.7; cursor: not-allowed; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);' : ''" 
+                                    onmouseover="if (!this.disabled) { this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.15)'; }" 
+                                    onmouseout="if (!this.disabled) { this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.1)'; }"
+                                    onmousedown="if (!this.disabled) { this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(37, 99, 235, 0.3)'; }"
+                                    onmouseup="if (!this.disabled) { this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(37, 99, 235, 0.4), 0 0 0 1px rgba(37, 99, 235, 0.15)'; }">
+                                    <span x-show="!loading" style="display: inline-flex; align-items: center; gap: 8px; position: relative; z-index: 1;">
+                                        <span style="font-size: 16px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));">✨</span>
+                                        <span>Phân tích Kế hoạch</span>
+                                    </span>
+                                    <span x-show="loading" style="display: inline-flex; align-items: center; gap: 8px; position: relative; z-index: 1;">
+                                        <svg style="width: 16px; height: 16px; animation: spin 0.8s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle class="opacity-25" cx="12" cy="12" r="10"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span>Đang phân tích...</span>
                                     </span>
                                 </button>
                             </div>
