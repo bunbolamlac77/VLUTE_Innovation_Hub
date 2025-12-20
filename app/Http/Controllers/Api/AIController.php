@@ -88,8 +88,44 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng, dễ 
     // 2) Vision - Phân tích hình ảnh Poster/Slide
     public function analyzeVisual(Request $request)
     {
-        $request->validate(['image' => 'required|image|max:5120']);
-        $path = $request->file('image')->getRealPath();
+        $request->validate([
+            'image' => 'nullable|image|max:5120',
+            'image_url' => 'nullable|url'
+        ]);
+
+        $path = null;
+        $tempFile = null;
+
+        // Xử lý file upload hoặc URL
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->getRealPath();
+        } elseif ($request->filled('image_url')) {
+            $imageUrl = $request->input('image_url');
+            
+            // Tải ảnh từ URL và lưu tạm
+            try {
+                $imageContent = @file_get_contents($imageUrl);
+                if ($imageContent === false) {
+                    return response()->json([
+                        'error' => 'Không thể tải hình ảnh từ URL. Vui lòng kiểm tra lại đường dẫn.'
+                    ], 400);
+                }
+                
+                // Tạo file tạm
+                $tempFile = tempnam(sys_get_temp_dir(), 'vision_');
+                file_put_contents($tempFile, $imageContent);
+                $path = $tempFile;
+            } catch (\Exception $e) {
+                \Log::error('Error downloading image from URL: ' . $e->getMessage());
+                return response()->json([
+                    'error' => 'Lỗi khi tải hình ảnh từ URL: ' . $e->getMessage()
+                ], 400);
+            }
+        } else {
+            return response()->json([
+                'error' => 'Vui lòng cung cấp file ảnh hoặc URL ảnh.'
+            ], 400);
+        }
         
         $prompt = "Bạn là một chuyên gia thiết kế đồ họa và marketing chuyên nghiệp. Hãy phân tích CHI TIẾT và TOÀN DIỆN poster/slide này.
 
@@ -142,6 +178,11 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
             return response()->json([
                 'error' => 'Có lỗi xảy ra khi xử lý hình ảnh. Vui lòng thử lại sau.'
             ], 500);
+        } finally {
+            // Xóa file tạm nếu có
+            if ($tempFile && file_exists($tempFile)) {
+                @unlink($tempFile);
+            }
         }
     }
 
@@ -157,7 +198,7 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
         if (!$currentVector) {
             return response()->json([
                 'is_duplicate' => false, 
-                'message' => 'Tính năng kiểm tra trùng lặp yêu cầu OpenAI API key (Groq không hỗ trợ embedding). Vui lòng thêm OPENAI_API_KEY vào .env để sử dụng tính năng này.',
+                'message' => 'Tính năng kiểm tra trùng lặp yêu cầu GEMINI_API_KEY hoặc OPENAI_API_KEY (Groq không hỗ trợ embedding). Vui lòng thêm một trong hai key vào .env để sử dụng tính năng này.',
                 'requires_openai' => true
             ], 200);
         }
@@ -166,7 +207,7 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
         
         // Tối ưu: Chunking - Xử lý từng lô 100 bản ghi để tránh tràn RAM
         Idea::whereNotNull('embedding_vector')
-            ->select('id', 'title', 'embedding_vector')
+            ->select('id', 'title', 'slug', 'embedding_vector')
             ->chunk(100, function ($ideas) use ($currentVector, $currentId, &$matches) {
                 foreach ($ideas as $idea) {
                     if (!empty($currentId) && (string)$idea->id === (string)$currentId) {
@@ -182,6 +223,7 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
                             $matches[] = [
                                 'id' => $idea->id,
                                 'title' => $idea->title ?? ('Ý tưởng #' . $idea->id),
+                                'slug' => $idea->slug ?? null,
                                 'score' => round($score * 100, 1) . '%',
                                 'raw_score' => $score // Dùng để sort
                             ];
@@ -326,7 +368,7 @@ Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
 
         if (!$queryVector) {
             return response()->json([
-                'message' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu OpenAI API key (Groq không hỗ trợ embedding). Vui lòng thêm OPENAI_API_KEY vào .env để sử dụng tính năng này.',
+                'message' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu GEMINI_API_KEY hoặc OPENAI_API_KEY (Groq không hỗ trợ embedding). Vui lòng thêm một trong hai key vào .env để sử dụng tính năng này.',
                 'requires_openai' => true
             ], 400);
         }

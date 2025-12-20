@@ -11,12 +11,14 @@ class GroqService
     protected string $baseUrl = 'https://api.groq.com/openai/v1';
     protected string $model;
     protected ?string $openaiApiKey; // Dùng cho embedding nếu cần
+    protected ?string $geminiApiKey; // Dùng cho embedding nếu cần (ưu tiên hơn OpenAI)
 
     public function __construct()
     {
         $this->apiKey = (string) env('GROQ_API_KEY', '');
         $this->model = (string) env('GROQ_MODEL', 'llama-3.1-70b-versatile');
         $this->openaiApiKey = env('OPENAI_API_KEY'); // Optional, dùng cho embedding
+        $this->geminiApiKey = env('GEMINI_API_KEY'); // Optional, ưu tiên dùng cho embedding
     }
 
     /**
@@ -193,7 +195,7 @@ class GroqService
      * Tạo embedding vector
      * 
      * LƯU Ý: Groq không có embedding API riêng.
-     * Nếu có OpenAI API key, sẽ sử dụng OpenAI embeddings (tùy chọn).
+     * Ưu tiên: Gemini API > OpenAI API
      * Nếu không có, trả về null (embedding bị vô hiệu hóa).
      * 
      * @param string $text Văn bản cần tạo embedding
@@ -201,13 +203,24 @@ class GroqService
      */
     public function generateEmbedding(string $text): ?array
     {
-        // Nếu có OpenAI API key, sử dụng OpenAI embeddings (tùy chọn)
+        // Ưu tiên sử dụng Gemini API nếu có
+        if (!empty($this->geminiApiKey)) {
+            try {
+                $geminiService = new \App\Services\GeminiService();
+                return $geminiService->generateEmbedding($text);
+            } catch (\Throwable $e) {
+                Log::error('Gemini Embedding Error in GroqService: ' . $e->getMessage());
+                // Fallback to OpenAI nếu Gemini fail
+            }
+        }
+
+        // Nếu không có Gemini, thử OpenAI API key
         if (!empty($this->openaiApiKey)) {
             return $this->generateOpenAIEmbedding($text);
         }
 
         // Groq không hỗ trợ embedding, trả về null
-        // Tính năng embedding chỉ khả dụng nếu có OpenAI API key
+        // Tính năng embedding chỉ khả dụng nếu có Gemini hoặc OpenAI API key
         return null;
     }
 

@@ -13,9 +13,9 @@
         <span class="text-slate-900 font-semibold">Chi tiết</span>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {{-- CỘT TRÁI: NỘI DUNG Ý TƯỞNG --}}
-        <div class="lg:col-span-2 space-y-8">
+    <div class="space-y-8">
+        {{-- NỘI DUNG CHÍNH --}}
+        <div class="space-y-8">
             
             {{-- 1. HIỂN THỊ POSTER / LOGO (Yêu cầu mới) --}}
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -35,13 +35,13 @@
             </div>
 
             {{-- Thông tin chi tiết --}}
-            <div class="card p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <h1 class="text-3xl font-bold text-slate-900">{{ $idea->title }}</h1>
-                    <span class="badge badge-amber">{{ $idea->status }}</span>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:p-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+                    <h1 class="text-2xl lg:text-3xl font-bold text-slate-900 leading-tight">{{ $idea->title }}</h1>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">{{ $idea->status }}</span>
                 </div>
 
-                <div class="flex flex-wrap gap-4 text-sm text-slate-600 mb-6 border-b border-slate-100 pb-4">
+                <div class="flex flex-wrap gap-3 lg:gap-4 text-sm text-slate-600 mb-6 pb-4 border-b border-slate-200">
                     <div class="flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         <b>{{ $idea->owner->name }}</b>
@@ -56,22 +56,40 @@
                     </div>
                 </div>
 
-                <div class="prose max-w-none text-slate-800">
-                    <h3 class="font-bold text-lg mb-2">Mô tả chi tiết ý tưởng:</h3>
-                    {!! $idea->description !!}
+                <div class="prose prose-slate max-w-none text-slate-700">
+                    <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Mô tả chi tiết ý tưởng
+                    </h3>
+                    <div class="text-slate-700 leading-relaxed">{!! $idea->description !!}</div>
                 </div>
+
+                @if($idea->content)
+                    <div class="prose prose-slate max-w-none text-slate-700 mt-8 pt-8 border-t border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            Nội dung chi tiết
+                        </h3>
+                        <div class="text-slate-700 leading-relaxed">{!! $idea->content !!}</div>
+                    </div>
+                @endif
 
                 {{-- File đính kèm --}}
                 @if($idea->attachments && $idea->attachments->count() > 0)
-                    <div class="mt-8 pt-4 border-t border-slate-100">
-                        <h4 class="font-bold text-sm text-slate-500 uppercase mb-3">Tài liệu đính kèm</h4>
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <h4 class="font-bold text-sm text-slate-700 uppercase mb-4 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            Tài liệu đính kèm
+                        </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             @foreach($idea->attachments as $file)
-                                <a href="{{ route('attachments.download', $file->id) }}" class="flex items-center gap-3 p-3 border rounded-lg hover:bg-slate-50">
-                                    <span class="text-2xl">📄</span>
-                                    <div class="overflow-hidden">
-                                        <div class="truncate font-medium text-sm">{{ $file->filename }}</div>
-                                        <div class="text-xs text-slate-400">{{ round($file->size / 1024) }} KB</div>
+                                <a href="{{ route('attachments.download', $file->id) }}" class="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 transition-all group">
+                                    <div class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    </div>
+                                    <div class="overflow-hidden flex-1 min-w-0">
+                                        <div class="truncate font-medium text-sm text-slate-900 group-hover:text-indigo-700">{{ $file->filename }}</div>
+                                        <div class="text-xs text-slate-500 mt-0.5">{{ round($file->size / 1024) }} KB</div>
                                     </div>
                                 </a>
                             @endforeach
@@ -81,18 +99,18 @@
             </div>
 
             {{-- 2. CÔNG CỤ AI --}}
-            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6" x-data="{ aiResult: '', loading: false, visionLoading: false, visionResult: '' }">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-indigo-800 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-6 lg:p-8 shadow-sm" x-data="{ aiResult: '', loading: false, duplicateLoading: false, duplicateResult: null }">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         Trợ lý AI (Groq)
                     </h3>
                 </div>
 
-                <p class="text-sm text-indigo-600 mb-4">Sử dụng AI để tóm tắt và đánh giá sơ bộ ý tưởng này trước khi bạn quyết định.</p>
+                <p class="text-sm text-indigo-700 mb-6 leading-relaxed">Sử dụng AI để tóm tắt và đánh giá sơ bộ ý tưởng này trước khi bạn quyết định.</p>
                 
-                {{-- Nút Phân tích nội dung (Văn bản) --}}
-                <div class="flex gap-2 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {{-- Nút Phân tích nội dung (Văn bản) --}}
                     <button type="button" 
                         @click="
                             loading = true; aiResult = '';
@@ -125,140 +143,155 @@
                                 loading = false; 
                             });
                         "
-                        class="px-4 py-2 bg-white border border-indigo-200 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 flex items-center gap-2 transition-all"
+                        class="px-5 py-3 bg-white border-2 border-indigo-300 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-100 hover:border-indigo-400 flex items-center justify-center gap-2 transition-all shadow-sm"
                         :disabled="loading"
                         :class="loading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'">
-                        <span x-show="loading" class="animate-spin">⌛</span>
-                        <span x-show="!loading">📝</span>
-                        Phân tích Văn bản
+                        <span x-show="loading" class="animate-spin text-lg">⌛</span>
+                        <span x-show="!loading" class="text-lg">📝</span>
+                        <span>Phân tích Văn bản</span>
                     </button>
-                </div>
 
-                {{-- Nút Phân tích Hình ảnh --}}
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-indigo-700 mb-2">Phân tích Poster/Slide (nếu có)</label>
-                    <div class="flex gap-2">
-                        <input type="file" 
-                            id="vision-image-input" 
-                            accept="image/*" 
-                            class="hidden"
-                            @change="
-                                const file = $event.target.files[0];
-                                if (!file) return;
-                                if (file.size > 5120000) {
-                                    alert('File quá lớn. Vui lòng chọn file nhỏ hơn 5MB.');
-                                    return;
-                                }
-                                const formData = new FormData();
-                                formData.append('image', file);
-                                visionLoading = true; visionResult = '';
-                                fetch('{{ route('ai.vision') }}', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                    },
-                                    body: formData
+                    {{-- Nút Kiểm tra Đạo văn --}}
+                    <button type="button" 
+                        @click="
+                            duplicateLoading = true; duplicateResult = null;
+                            const content = `{{ strip_tags($idea->description ?? $idea->summary ?? '') }} {{ strip_tags($idea->content ?? '') }}`.trim();
+                            if (!content || content.length < 10) {
+                                duplicateResult = { error: 'Nội dung quá ngắn để kiểm tra.' };
+                                duplicateLoading = false;
+                                return;
+                            }
+                            fetch('{{ route('ai.duplicate') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ 
+                                    content: content,
+                                    current_id: {{ $idea->id }}
                                 })
-                                .then(res => {
-                                    if (!res.ok) {
-                                        return res.json().then(err => {
-                                            throw new Error(err.error || 'Lỗi từ server');
-                                        });
-                                    }
-                                    return res.json();
-                                })
-                                .then(data => { 
-                                    if (data.error) {
-                                        visionResult = '❌ Lỗi: ' + data.error;
-                                    } else {
-                                        visionResult = data.result || 'Không có kết quả';
-                                    }
-                                    visionLoading = false; 
-                                })
-                                .catch(err => { 
-                                    visionResult = '❌ Lỗi kết nối AI: ' + (err.message || 'Vui lòng thử lại sau'); 
-                                    visionLoading = false; 
-                                });
-                            ">
-                        <label for="vision-image-input" 
-                            class="px-4 py-2 bg-white border border-indigo-200 text-indigo-700 font-bold rounded-lg hover:bg-indigo-100 flex items-center gap-2 cursor-pointer transition-all"
-                            :class="visionLoading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'">
-                            <span x-show="visionLoading" class="animate-spin">⌛</span>
-                            <span x-show="!visionLoading">🖼️</span>
-                            Phân tích Hình ảnh
-                        </label>
-                    </div>
+                            })
+                            .then(res => res.json())
+                            .then(data => { 
+                                duplicateResult = data;
+                                duplicateLoading = false; 
+                            })
+                            .catch(err => { 
+                                duplicateResult = { error: '❌ Lỗi kết nối: ' + (err.message || 'Vui lòng thử lại sau') }; 
+                                duplicateLoading = false; 
+                            });
+                        "
+                        class="px-5 py-3 bg-white border-2 border-indigo-300 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-100 hover:border-indigo-400 flex items-center justify-center gap-2 transition-all shadow-sm"
+                        :disabled="duplicateLoading"
+                        :class="duplicateLoading ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'">
+                        <span x-show="duplicateLoading" class="animate-spin text-lg">⌛</span>
+                        <span x-show="!duplicateLoading" class="text-lg">🔍</span>
+                        <span>Kiểm tra Đạo văn</span>
+                    </button>
                 </div>
 
                 {{-- Kết quả AI - Văn bản --}}
                 <div x-show="aiResult" 
-                     class="mt-4 p-4 bg-white rounded-lg border border-indigo-100 text-sm leading-relaxed max-w-none overflow-auto max-h-96 prose prose-sm prose-indigo" 
+                     class="mt-6 p-5 bg-white rounded-xl border-2 border-indigo-200 text-sm leading-relaxed max-w-none overflow-auto max-h-96 prose prose-sm prose-indigo shadow-sm" 
                      x-html="aiResult ? aiResult.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/^### (.*$)/gim, '<h3>$1</h3>').replace(/^## (.*$)/gim, '<h2>$1</h2>').replace(/^# (.*$)/gim, '<h1>$1</h1>').replace(/^\- (.*$)/gim, '<li>$1</li>').replace(/\n/g, '<br>') : ''"></div>
 
-                {{-- Kết quả AI - Hình ảnh --}}
-                <div x-show="visionResult" 
-                     class="mt-4 p-4 bg-white rounded-lg border border-indigo-100 text-sm leading-relaxed max-w-none overflow-auto max-h-96 prose prose-sm prose-indigo" 
-                     x-html="visionResult ? visionResult.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/^### (.*$)/gim, '<h3>$1</h3>').replace(/^## (.*$)/gim, '<h2>$1</h2>').replace(/^# (.*$)/gim, '<h1>$1</h1>').replace(/^\- (.*$)/gim, '<li>$1</li>').replace(/\n/g, '<br>') : ''"></div>
+                {{-- Kết quả Kiểm tra Đạo văn --}}
+                <div x-show="duplicateResult" 
+                     class="mt-6 p-5 bg-white rounded-xl border-2 border-indigo-200 text-sm shadow-sm">
+                    <template x-if="duplicateResult && duplicateResult.error">
+                        <div class="text-red-600" x-text="duplicateResult.error"></div>
+                    </template>
+                    <template x-if="duplicateResult && duplicateResult.requires_openai">
+                        <div class="text-amber-600" x-text="duplicateResult.message || 'Tính năng này yêu cầu OpenAI API key.'"></div>
+                    </template>
+                    <template x-if="duplicateResult && !duplicateResult.error && !duplicateResult.requires_openai">
+                        <div>
+                            <div class="font-bold mb-2" x-text="duplicateResult.is_duplicate ? '⚠️ Phát hiện trùng lặp!' : '✅ Không phát hiện trùng lặp'"></div>
+                            <template x-if="duplicateResult.matches && duplicateResult.matches.length > 0">
+                                <div class="mt-2">
+                                    <div class="text-sm font-semibold mb-1">Các ý tưởng tương tự:</div>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <template x-for="match in duplicateResult.matches" :key="match.id">
+                                            <li>
+                                                <a :href="match.slug ? '/ideas/' + match.slug : '/my-ideas/' + match.id" 
+                                                   target="_blank" 
+                                                   class="text-indigo-600 hover:underline"
+                                                   x-text="match.title + ' (' + match.score + ')'"></a>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
             </div>
 
-            {{-- 3. FORM QUYẾT ĐỊNH (ĐÃ CHUYỂN XUỐNG DƯỚI CÙNG) --}}
-            <div class="bg-white border-2 border-brand-navy rounded-xl p-6 shadow-lg">
-                <h3 class="text-xl font-bold text-slate-900 mb-4 border-b pb-2">Quyết định Phản biện</h3>
+            {{-- 3. FORM QUYẾT ĐỊNH --}}
+            <div class="bg-white border-2 border-indigo-300 rounded-xl p-6 lg:p-8 shadow-lg">
+                <h3 class="text-xl lg:text-2xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-indigo-200 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Quyết định Phản biện
+                </h3>
                 
                 <form action="{{ route('manage.review.store', $idea->id) }}" method="POST">
                     @csrf
                     
                     {{-- Nhập nhận xét --}}
-                    <div class="mb-4">
-                        <label class="block font-bold text-sm mb-2 text-slate-700">Nhận xét / Góp ý của bạn (*)</label>
-                        <textarea name="comment" rows="4" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required placeholder="Nhập lý do duyệt, từ chối hoặc yêu cầu sửa đổi..."></textarea>
+                    <div class="mb-6">
+                        <label class="block font-semibold text-sm mb-3 text-slate-700 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            Nhận xét / Góp ý của bạn <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="comment" rows="5" class="w-full rounded-lg border-2 border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all p-3 text-slate-700" required placeholder="Nhập lý do duyệt, từ chối hoặc yêu cầu sửa đổi..."></textarea>
                     </div>
 
                     {{-- Các nút hành động --}}
-                    <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="flex flex-col sm:flex-row gap-4">
                         <button type="submit" name="action" value="approve" 
-                                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                                class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             Duyệt & Gửi cấp trên
                         </button>
 
                         <button type="submit" name="action" value="request_changes" 
-                                class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                                class="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             Yêu cầu chỉnh sửa
                         </button>
 
                         <button type="submit" name="action" value="reject" 
-                                class="flex-1 bg-slate-200 hover:bg-red-100 text-slate-700 hover:text-red-600 font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                                class="flex-1 bg-gradient-to-r from-slate-200 to-slate-300 hover:from-red-100 hover:to-red-200 text-slate-700 hover:text-red-700 font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all border-2 border-slate-300 hover:border-red-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             Từ chối
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
 
-        {{-- CỘT PHẢI: CHỈ CÒN THÔNG TIN BỔ SUNG (Lịch sử, Tag...) --}}
-        <div class="lg:col-span-1 space-y-6">
-            {{-- Panel Lịch sử --}}
-            <div class="card p-5 bg-slate-50">
-                <h4 class="font-bold text-slate-700 mb-3 text-sm uppercase">Lịch sử xử lý</h4>
-                <div class="space-y-4 border-l-2 border-slate-200 ml-2 pl-4 relative">
+            {{-- 4. LỊCH SỬ XỬ LÝ (ĐÃ CHUYỂN XUỐNG DƯỚI) --}}
+            <div class="bg-white rounded-xl shadow-sm border-2 border-slate-200 p-6 lg:p-8">
+                <h4 class="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2 pb-3 border-b-2 border-slate-200">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Lịch sử xử lý
+                </h4>
+                <div class="space-y-5 border-l-2 border-indigo-300 ml-3 pl-6 relative">
                     @forelse($idea->auditLogs as $log)
                         <div class="relative">
-                            <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                            <div class="text-xs text-slate-500">{{ $log->created_at->format('H:i d/m/Y') }}</div>
-                            <div class="font-semibold text-sm text-slate-800">{{ $log->actor->name ?? 'Hệ thống' }}</div>
-                            <div class="text-sm text-slate-600">{{ $log->action }}</div>
+                            <span class="absolute -left-[29px] top-1.5 w-4 h-4 rounded-full bg-indigo-500 border-2 border-white shadow-sm"></span>
+                            <div class="text-xs font-medium text-indigo-600 mb-1">{{ $log->created_at->format('H:i d/m/Y') }}</div>
+                            <div class="font-semibold text-sm text-slate-900 mb-1">{{ $log->actor->name ?? 'Hệ thống' }}</div>
+                            <div class="text-sm text-slate-700 mb-2">{{ $log->action }}</div>
                             @php
                                 $comment = $log->meta['comment'] ?? ($log->comment ?? null);
                             @endphp
                             @if($comment)
-                                <div class="mt-1 text-xs italic bg-white p-2 rounded border text-slate-500">"{{ $comment }}"</div>
+                                <div class="mt-2 text-sm bg-indigo-50 border-l-4 border-indigo-400 p-3 rounded-r-lg text-slate-700 italic">"{{ $comment }}"</div>
                             @endif
                         </div>
                     @empty
-                        <div class="text-sm text-slate-400 italic">Chưa có lịch sử.</div>
+                        <div class="text-sm text-slate-400 italic py-4">Chưa có lịch sử xử lý.</div>
                     @endforelse
                 </div>
             </div>

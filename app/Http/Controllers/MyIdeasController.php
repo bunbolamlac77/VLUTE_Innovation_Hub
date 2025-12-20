@@ -84,10 +84,11 @@ class MyIdeasController extends Controller
 
         // Xử lý ảnh đại diện
         $imagePath = null;
+        $imageUrl = null;
         if ($request->hasFile('image_file')) {
             $imagePath = $request->file('image_file')->store('ideas', 'public');
         } elseif ($request->filled('image_url')) {
-            $imagePath = $request->input('image_url');
+            $imageUrl = $request->input('image_url');
         }
 
         $idea = Idea::create([
@@ -101,6 +102,7 @@ class MyIdeasController extends Controller
             'category_id' => $validated['category_id'] ?? null,
             'status' => 'draft', // Mặc định là Draft
             'image' => $imagePath,
+            'image_url' => $imageUrl,
         ]);
 
         // Xử lý upload file đính kèm
