@@ -259,18 +259,38 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
     // TOOL: Seed embeddings for older ideas
     public function seedEmbeddings()
     {
-        $ideas = Idea::whereNull('embedding_vector')->limit(10)->get();
+        // Lấy tất cả ý tưởng chưa có embedding (không giới hạn số lượng)
+        $ideas = Idea::whereNull('embedding_vector')->get();
         $count = 0;
+        $failed = 0;
+        
         foreach ($ideas as $idea) {
-            $text = trim(($idea->title ?? '') . '. ' . ($idea->summary ?? '') . ' ' . ($idea->description ?? '') . ' ' . ($idea->content ?? ''));
-            if ($text === '') continue;
-            $vec = $this->groq->generateEmbedding($text);
-            if ($vec) {
-                $idea->update(['embedding_vector' => json_encode($vec)]);
-                $count++;
+            try {
+                $text = trim(($idea->title ?? '') . '. ' . ($idea->summary ?? '') . ' ' . ($idea->description ?? '') . ' ' . ($idea->content ?? ''));
+                if ($text === '') {
+                    \Log::warning("Idea #{$idea->id} không có nội dung để tạo embedding");
+                    continue;
+                }
+                
+                $vec = $this->groq->generateEmbedding($text);
+                if ($vec && is_array($vec) && !empty($vec)) {
+                    $idea->update(['embedding_vector' => json_encode($vec)]);
+                    $count++;
+                    \Log::info("Đã tạo embedding cho Idea #{$idea->id}");
+                } else {
+                    $failed++;
+                    \Log::warning("Không thể tạo embedding cho Idea #{$idea->id}");
+                }
+                
+                // Thêm delay nhỏ để tránh rate limit
+                usleep(100000); // 0.1 giây
+            } catch (\Throwable $e) {
+                $failed++;
+                \Log::error("Lỗi khi tạo embedding cho Idea #{$idea->id}: " . $e->getMessage());
             }
         }
-        return "Đã cập nhật vector cho {$count} ý tưởng.";
+        
+        return "Đã cập nhật vector cho {$count} ý tưởng. Thất bại: {$failed}.";
     }
 
     // --- TÍNH NĂNG A: KIẾN TRÚC SƯ CÔNG NGHỆ (CHO SINH VIÊN) ---
@@ -398,21 +418,33 @@ Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
                             $ideaVector = json_decode($idea->embedding_vector, true);
                             
                             // Kiểm tra vector dimension phải khớp
-                            if (is_array($ideaVector) && count($ideaVector) === count($queryVector)) {
-                                // Tái sử dụng hàm cosineSimilarity
-                                $score = $this->cosineSimilarity($queryVector, $ideaVector);
+                            if (!is_array($ideaVector)) {
+                                continue; // Skip invalid vectors
+                            }
+                            
+                            if (count($ideaVector) !== count($queryVector)) {
+                                // Log warning nếu dimension không khớp (có thể do dùng 2 service khác nhau)
+                                \Log::debug("Scout: Idea #{$idea->id} có embedding dimension khác", [
+                                    'idea_id' => $idea->id,
+                                    'idea_dim' => count($ideaVector),
+                                    'query_dim' => count($queryVector)
+                                ]);
+                                continue;
+                            }
+                            
+                            // Tái sử dụng hàm cosineSimilarity
+                            $score = $this->cosineSimilarity($queryVector, $ideaVector);
 
-                                // Nếu độ phù hợp > 65% (Ngưỡng tìm kiếm ngữ nghĩa)
-                                if ($score >= 0.65) {
-                                    $matches[] = [
-                                        'id' => $idea->id,
-                                        'title' => $idea->title,
-                                        'slug' => $idea->slug,
-                                        'abstract' => \Illuminate\Support\Str::limit(\Illuminate\Support\Str::of(strip_tags($idea->summary ?? $idea->description ?? $idea->content ?? ''))->squish(), 140),
-                                        'author' => optional($idea->owner)->name ?? 'Ẩn danh', // Tác giả (owner)
-                                        'score' => round($score * 100, 1) // Điểm phù hợp
-                                    ];
-                                }
+                            // Nếu độ phù hợp > 65% (Ngưỡng tìm kiếm ngữ nghĩa)
+                            if ($score >= 0.65) {
+                                $matches[] = [
+                                    'id' => $idea->id,
+                                    'title' => $idea->title,
+                                    'slug' => $idea->slug,
+                                    'abstract' => \Illuminate\Support\Str::limit(\Illuminate\Support\Str::of(strip_tags($idea->summary ?? $idea->description ?? $idea->content ?? ''))->squish(), 140),
+                                    'author' => optional($idea->owner)->name ?? 'Ẩn danh', // Tác giả (owner)
+                                    'score' => round($score * 100, 1) // Điểm phù hợp
+                                ];
                             }
                         } catch (\Throwable $e) {
                             // Bỏ qua lỗi khi xử lý từng idea, tiếp tục với idea tiếp theo
