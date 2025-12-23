@@ -27,147 +27,93 @@ class CompetitionSeeder extends Seeder
 
         $competitions = [
             [
-                'title' => 'Cuộc thi Sáng tạo Khởi nghiệp 2025',
-                'slug' => 'cuoc-thi-sang-tao-khoi-nghiep-2025',
-                'description' => '<p>Cuộc thi Sáng tạo Khởi nghiệp 2025 là sân chơi dành cho các bạn sinh viên có đam mê khởi nghiệp và sáng tạo. Cuộc thi nhằm tìm kiếm và phát triển các ý tưởng kinh doanh tiềm năng.</p>
-                <h3>Thể lệ cuộc thi:</h3>
-                <ul>
-                    <li>Đối tượng: Sinh viên các trường đại học, cao đẳng</li>
-                    <li>Hình thức: Cá nhân hoặc nhóm (tối đa 5 người)</li>
-                    <li>Hồ sơ: Ý tưởng kinh doanh, kế hoạch triển khai, video giới thiệu</li>
-                </ul>
-                <h3>Giải thưởng:</h3>
-                <ul>
-                    <li>Giải Nhất: 50.000.000 VNĐ + Hỗ trợ ươm tạo</li>
-                    <li>Giải Nhì: 30.000.000 VNĐ</li>
-                    <li>Giải Ba: 20.000.000 VNĐ</li>
-                </ul>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->subDays(5),
-                'end_date' => Carbon::now()->addDays(30),
+                'title' => 'Innovation Launchpad 2025',
+                'slug' => 'innovation-launchpad-2025',
+                'description' => '<p>Chương trình ươm tạo ý tưởng khởi nghiệp công nghệ dành cho sinh viên năm 2-4.</p><ul><li>Vòng 1: Pitch deck 10 slide + video 2 phút</li><li>Vòng 2: Prototype và phỏng vấn hội đồng</li><li>Mentor 1-1 từ doanh nghiệp</li></ul><p>Giải nhất nhận gói ươm tạo 6 tháng và kết nối nhà đầu tư thiên thần.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1552664730-0fd89f07c78b?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->subDays(7),
+                'end_date' => Carbon::now()->addDays(28),
                 'status' => 'open',
             ],
             [
-                'title' => 'Hackathon Công nghệ Thông tin 2025',
-                'slug' => 'hackathon-cong-nghe-thong-tin-2025',
-                'banner_url' => 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&h=600&fit=crop',
-                'description' => '<p>Hackathon Công nghệ Thông tin 2025 là cuộc thi lập trình marathon dành cho các lập trình viên, sinh viên CNTT. Tham gia để phát triển các giải pháp công nghệ sáng tạo trong 48 giờ.</p>
-                <h3>Chủ đề:</h3>
-                <ul>
-                    <li>Giải pháp số hóa giáo dục</li>
-                    <li>Ứng dụng AI trong cuộc sống</li>
-                    <li>Blockchain và Fintech</li>
-                    <li>IoT và Smart City</li>
-                </ul>
-                <h3>Yêu cầu:</h3>
-                <ul>
-                    <li>Nhóm 2-4 người</li>
-                    <li>Code tại chỗ trong 48 giờ</li>
-                    <li>Demo sản phẩm cuối cùng</li>
-                </ul>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->addDays(15),
-                'end_date' => Carbon::now()->addDays(45),
-                'status' => 'open',
-            ],
-            [
-                'title' => 'Cuộc thi Thiết kế Sản phẩm Sáng tạo',
-                'slug' => 'cuoc-thi-thiet-ke-san-pham-sang-tao',
-                'banner_url' => 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&h=600&fit=crop',
-                'description' => '<p>Cuộc thi tìm kiếm các thiết kế sản phẩm sáng tạo, có tính ứng dụng cao trong đời sống. Dành cho sinh viên các ngành thiết kế, kỹ thuật, và các ngành liên quan.</p>
-                <h3>Hạng mục:</h3>
-                <ul>
-                    <li>Thiết kế sản phẩm công nghiệp</li>
-                    <li>Thiết kế đồ họa</li>
-                    <li>Thiết kế nội thất</li>
-                    <li>Thiết kế thời trang</li>
-                </ul>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->addDays(7),
-                'end_date' => Carbon::now()->addDays(60),
-                'status' => 'open',
-            ],
-            [
-                'title' => 'Cuộc thi Nghiên cứu Khoa học Sinh viên',
-                'slug' => 'cuoc-thi-nghien-cuu-khoa-hoc-sinh-vien',
-                'banner_url' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&h=600&fit=crop',
-                'description' => '<p>Cuộc thi khuyến khích sinh viên tham gia nghiên cứu khoa học, phát triển các đề tài nghiên cứu có giá trị khoa học và thực tiễn.</p>
-                <h3>Lĩnh vực:</h3>
-                <ul>
-                    <li>Khoa học tự nhiên</li>
-                    <li>Khoa học xã hội</li>
-                    <li>Kỹ thuật và Công nghệ</li>
-                    <li>Y tế và Sức khỏe</li>
-                </ul>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->subDays(60),
-                'end_date' => Carbon::now()->subDays(30),
-                'status' => 'closed',
-            ],
-            [
-                'title' => 'Cuộc thi Sáng tạo Video Marketing',
-                'slug' => 'cuoc-thi-sang-tao-video-marketing',
-                'banner_url' => 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&h=600&fit=crop',
-                'description' => '<p>Cuộc thi tìm kiếm các video marketing sáng tạo, có khả năng lan tỏa và tạo tác động tích cực đến cộng đồng.</p>
-                <h3>Yêu cầu:</h3>
-                <ul>
-                    <li>Video dài 30 giây - 3 phút</li>
-                    <li>Nội dung tích cực, có ý nghĩa</li>
-                    <li>Chất lượng HD trở lên</li>
-                </ul>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->addDays(20),
-                'end_date' => Carbon::now()->addDays(50),
-                'status' => 'draft',
-            ],
-            [
-                'title' => 'Cuộc thi Ý tưởng Chuyển đổi số trong Giáo dục',
-                'slug' => 'cuoc-thi-y-tuong-chuyen-doi-so-trong-giao-duc',
-                'banner_url' => 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=1200&h=600&fit=crop',
-                'description' => '<p>Tìm kiếm các ý tưởng, giải pháp chuyển đổi số giúp nâng cao chất lượng giảng dạy, học tập và quản lý trong nhà trường.</p>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
+                'title' => 'AI for Campus Hackathon',
+                'slug' => 'ai-for-campus-hackathon',
+                'description' => '<p>48 giờ xây sản phẩm AI giải quyết bài toán trong trường đại học: quản lý học vụ, bãi xe, truy xuất tài liệu.</p><p>Đầu ra: demo live + báo cáo kỹ thuật ngắn, ưu tiên mô hình gọn nhẹ có thể triển khai on-prem.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1400&h=640&fit=crop',
                 'start_date' => Carbon::now()->addDays(10),
                 'end_date' => Carbon::now()->addDays(40),
                 'status' => 'open',
             ],
             [
-                'title' => 'Cuộc thi Ứng dụng Trí tuệ nhân tạo trong Đời sống',
-                'slug' => 'cuoc-thi-ung-dung-tri-tue-nhan-tao-trong-doi-song',
-                'banner_url' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=600&fit=crop',
-                'description' => '<p>Khuyến khích sinh viên xây dựng các ứng dụng AI giải quyết bài toán thực tế trong y tế, giao thông, nông nghiệp, dịch vụ công.</p>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
+                'title' => 'Green Campus Challenge',
+                'slug' => 'green-campus-challenge',
+                'description' => '<p>Tìm kiếm giải pháp giảm phát thải, tối ưu năng lượng và quản lý rác thải trong khuôn viên trường.</p><p>Yêu cầu: baseline số liệu, kế hoạch đo lường sau triển khai, mô hình tài chính đơn giản.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->subDays(3),
+                'end_date' => Carbon::now()->addDays(22),
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Digital Content Sprint',
+                'slug' => 'digital-content-sprint',
+                'description' => '<p>Thi sáng tạo video, podcast, infographic giáo dục theo chủ đề STEM và đổi mới sáng tạo.</p><p>Tiêu chí: thông điệp rõ ràng, tính lan tỏa, bản quyền nội dung.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1400&h=640&fit=crop',
                 'start_date' => Carbon::now()->addDays(5),
-                'end_date' => Carbon::now()->addDays(35),
-                'status' => 'open',
-            ],
-            [
-                'title' => 'Cuộc thi Đổi mới sáng tạo vì Cộng đồng',
-                'slug' => 'cuoc-thi-doi-moi-sang-tao-vi-cong-dong',
-                'banner_url' => 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=600&fit=crop',
-                'description' => '<p>Các dự án, mô hình giải quyết vấn đề xã hội: môi trường, giáo dục, bình đẳng, an toàn giao thông,…</p>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->subDays(10),
-                'end_date' => Carbon::now()->addDays(15),
-                'status' => 'open',
-            ],
-            [
-                'title' => 'Cuộc thi Thiết kế UI/UX cho Nền tảng Số',
-                'slug' => 'cuoc-thi-thiet-ke-ui-ux-cho-nen-tang-so',
-                'banner_url' => 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&h=600&fit=crop',
-                'description' => '<p>Thiết kế giao diện và trải nghiệm người dùng cho các sản phẩm số trong giáo dục, thương mại điện tử, quản lý thông minh.</p>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->addDays(3),
-                'end_date' => Carbon::now()->addDays(25),
+                'end_date' => Carbon::now()->addDays(32),
                 'status' => 'draft',
             ],
             [
-                'title' => 'Cuộc thi Sáng tạo Nội dung Số cho Sinh viên',
-                'slug' => 'cuoc-thi-sang-tao-noi-dung-so-cho-sinh-vien',
-                'banner_url' => 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=600&fit=crop',
-                'description' => '<p>Khuyến khích sinh viên sản xuất podcast, video, infographic, blog chia sẻ kiến thức, kỹ năng và câu chuyện truyền cảm hứng.</p>',
-                'banner_url' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=600&fit=crop',
-                'start_date' => Carbon::now()->subDays(20),
-                'end_date' => Carbon::now()->subDays(1),
+                'title' => 'Smart Mobility Makeathon',
+                'slug' => 'smart-mobility-makeathon',
+                'description' => '<p>Thiết kế thiết bị/ứng dụng hỗ trợ di chuyển an toàn, đỗ xe thông minh, tối ưu giao thông nội bộ.</p><p>Ưu tiên giải pháp kết hợp IoT + AI + năng lượng tái tạo.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->addDays(2),
+                'end_date' => Carbon::now()->addDays(50),
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Fintech Student Cup',
+                'slug' => 'fintech-student-cup',
+                'description' => '<p>Phát triển sản phẩm tài chính số cho sinh viên: quản lý chi tiêu, tiết kiệm nhỏ, tín dụng học tập.</p><p>Yêu cầu: tuân thủ bảo mật dữ liệu, mô hình rủi ro đơn giản.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->subDays(25),
+                'end_date' => Carbon::now()->subDays(5),
+                'status' => 'closed',
+            ],
+            [
+                'title' => 'UI/UX for Public Services',
+                'slug' => 'ui-ux-for-public-services',
+                'description' => '<p>Thiết kế trải nghiệm người dùng cho dịch vụ công trực tuyến địa phương: đăng ký hồ sơ, tra cứu kết quả, phản ánh hiện trường.</p><p>Giao nộp: wireframe, prototype tương tác, guideline thiết kế.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->addDays(8),
+                'end_date' => Carbon::now()->addDays(45),
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Data for Social Good',
+                'slug' => 'data-for-social-good',
+                'description' => '<p>Cuộc thi phân tích dữ liệu mở về môi trường, y tế, giáo dục. Chấm điểm theo insight hành động và trực quan hóa.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->subDays(15),
+                'end_date' => Carbon::now()->addDays(5),
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Product Design Lab',
+                'slug' => 'product-design-lab',
+                'description' => '<p>Thiết kế và in 3D mẫu thử cho sản phẩm cơ khí/điện tử, tập trung vào tính công năng và khả năng sản xuất.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->addDays(1),
+                'end_date' => Carbon::now()->addDays(30),
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Research Poster Day',
+                'slug' => 'research-poster-day',
+                'description' => '<p>Trình bày poster nghiên cứu khoa học sinh viên. Hội đồng phản biện nhanh, góp ý cải thiện paper.</p>',
+                'banner_url' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1400&h=640&fit=crop',
+                'start_date' => Carbon::now()->subDays(40),
+                'end_date' => Carbon::now()->subDays(10),
                 'status' => 'closed',
             ],
         ];

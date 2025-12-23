@@ -20,7 +20,9 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminUserSeeder::class);
         $this->call(ApprovedUsersSeeder::class);
         $this->call(FeaturedIdeasSeeder::class);
+        $this->call(PendingReviewIdeasSeeder::class);
         $this->call(CompetitionSeeder::class);
+        $this->call(PendingCompetitionsSeeder::class);
         $this->call(ScientificNewsSeeder::class);
         $this->call(ChallengeSeeder::class);
 

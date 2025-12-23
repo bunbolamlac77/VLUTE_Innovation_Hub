@@ -357,60 +357,87 @@ Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
     // --- TÍNH NĂNG B: THỢ SĂN GIẢI PHÁP (CHO DOANH NGHIỆP) ---
     public function scoutSolutions(Request $request)
     {
-        $problem = $request->input('problem'); // Doanh nghiệp nhập "Vấn đề cần tìm giải pháp"
+        try {
+            $problem = $request->input('problem'); // Doanh nghiệp nhập "Vấn đề cần tìm giải pháp"
 
-        if (empty($problem)) {
-            return response()->json(['message' => 'Vui lòng nhập vấn đề cần tìm giải pháp.'], 400);
-        }
+            if (empty($problem) || trim($problem) === '') {
+                return response()->json([
+                    'error' => 'Vui lòng nhập vấn đề cần tìm giải pháp.',
+                    'message' => 'Vui lòng nhập vấn đề cần tìm giải pháp.'
+                ], 400);
+            }
 
-        // 1. Tạo vector cho vấn đề của doanh nghiệp
-        $queryVector = $this->groq->generateEmbedding($problem);
+            if (strlen(trim($problem)) < 10) {
+                return response()->json([
+                    'error' => 'Vui lòng mô tả vấn đề chi tiết hơn (ít nhất 10 ký tự).',
+                    'message' => 'Vui lòng mô tả vấn đề chi tiết hơn (ít nhất 10 ký tự).'
+                ], 400);
+            }
 
-        if (!$queryVector) {
-            return response()->json([
-                'message' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu GEMINI_API_KEY hoặc OPENAI_API_KEY (Groq không hỗ trợ embedding). Vui lòng thêm một trong hai key vào .env để sử dụng tính năng này.',
-                'requires_openai' => true
-            ], 400);
-        }
+            // 1. Tạo vector cho vấn đề của doanh nghiệp
+            $queryVector = $this->groq->generateEmbedding(trim($problem));
 
-        $matches = [];
+            if (!$queryVector) {
+                return response()->json([
+                    'error' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu GEMINI_API_KEY hoặc OPENAI_API_KEY (Groq không hỗ trợ embedding). Vui lòng thêm một trong hai key vào .env để sử dụng tính năng này.',
+                    'message' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu GEMINI_API_KEY hoặc OPENAI_API_KEY (Groq không hỗ trợ embedding). Vui lòng thêm một trong hai key vào .env để sử dụng tính năng này.',
+                    'requires_openai' => true
+                ], 400);
+            }
 
-        // 2. Tối ưu: Chunking - Xử lý từng lô 100 bản ghi để tránh tràn RAM và Timeout
-        Idea::publicApproved()
-            ->select('id', 'title', 'slug', 'summary', 'description', 'content', 'embedding_vector', 'owner_id')
-            ->with('owner:id,name') // Load relationship owner với chỉ các trường cần thiết
-            ->whereNotNull('embedding_vector')
-            ->chunk(100, function ($ideas) use ($queryVector, &$matches) {
-                foreach ($ideas as $idea) {
-                    $ideaVector = json_decode($idea->embedding_vector, true);
-                    
-                    // Kiểm tra vector dimension phải khớp
-                    if (is_array($ideaVector) && count($ideaVector) === count($queryVector)) {
-                        // Tái sử dụng hàm cosineSimilarity
-                        $score = $this->cosineSimilarity($queryVector, $ideaVector);
+            $matches = [];
 
-                        // Nếu độ phù hợp > 65% (Ngưỡng tìm kiếm ngữ nghĩa)
-                        if ($score >= 0.65) {
-                            $matches[] = [
-                                'id' => $idea->id,
-                                'title' => $idea->title,
-                                'slug' => $idea->slug,
-                                'abstract' => \Illuminate\Support\Str::limit(\Illuminate\Support\Str::of(strip_tags($idea->summary ?? $idea->description ?? $idea->content ?? ''))->squish(), 140),
-                                'author' => optional($idea->owner)->name ?? 'Ẩn danh', // Tác giả (owner)
-                                'score' => round($score * 100, 1) // Điểm phù hợp
-                            ];
+            // 2. Tối ưu: Chunking - Xử lý từng lô 100 bản ghi để tránh tràn RAM và Timeout
+            Idea::publicApproved()
+                ->select('id', 'title', 'slug', 'summary', 'description', 'content', 'embedding_vector', 'owner_id')
+                ->with('owner:id,name') // Load relationship owner với chỉ các trường cần thiết
+                ->whereNotNull('embedding_vector')
+                ->chunk(100, function ($ideas) use ($queryVector, &$matches) {
+                    foreach ($ideas as $idea) {
+                        try {
+                            $ideaVector = json_decode($idea->embedding_vector, true);
+                            
+                            // Kiểm tra vector dimension phải khớp
+                            if (is_array($ideaVector) && count($ideaVector) === count($queryVector)) {
+                                // Tái sử dụng hàm cosineSimilarity
+                                $score = $this->cosineSimilarity($queryVector, $ideaVector);
+
+                                // Nếu độ phù hợp > 65% (Ngưỡng tìm kiếm ngữ nghĩa)
+                                if ($score >= 0.65) {
+                                    $matches[] = [
+                                        'id' => $idea->id,
+                                        'title' => $idea->title,
+                                        'slug' => $idea->slug,
+                                        'abstract' => \Illuminate\Support\Str::limit(\Illuminate\Support\Str::of(strip_tags($idea->summary ?? $idea->description ?? $idea->content ?? ''))->squish(), 140),
+                                        'author' => optional($idea->owner)->name ?? 'Ẩn danh', // Tác giả (owner)
+                                        'score' => round($score * 100, 1) // Điểm phù hợp
+                                    ];
+                                }
+                            }
+                        } catch (\Throwable $e) {
+                            // Bỏ qua lỗi khi xử lý từng idea, tiếp tục với idea tiếp theo
+                            \Log::warning('Error processing idea in scout: ' . $e->getMessage());
+                            continue;
                         }
                     }
-                }
-            });
+                });
 
-        // Sắp xếp: Phù hợp nhất lên đầu
-        usort($matches, fn($a, $b) => $b['score'] <=> $a['score']);
+            // Sắp xếp: Phù hợp nhất lên đầu
+            usort($matches, fn($a, $b) => $b['score'] <=> $a['score']);
 
-        return response()->json([
-            'found' => count($matches),
-            'results' => array_slice($matches, 0, 5) // Trả về top 5
-        ]);
+            return response()->json([
+                'found' => count($matches),
+                'results' => array_slice($matches, 0, 5) // Trả về top 5
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Scout Solutions Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'error' => 'Có lỗi xảy ra khi tìm kiếm giải pháp: ' . $e->getMessage(),
+                'message' => 'Có lỗi xảy ra khi tìm kiếm giải pháp. Vui lòng thử lại sau.'
+            ], 500);
+        }
     }
 
     // DEBUG: Kiểm tra cấu hình API

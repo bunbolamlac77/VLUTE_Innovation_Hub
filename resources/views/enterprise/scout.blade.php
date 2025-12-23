@@ -46,6 +46,17 @@
                     <p style="margin-top: 16px; font-size: 16px; color: rgba(255, 255, 255, 0.8);">⏳ Đang quét kho dữ liệu vector...</p>
                 </div>
 
+                {{-- Success Notification --}}
+                <div id="found-notification" class="hidden" style="margin-bottom: 24px; padding: 20px 24px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); animation: slideDown 0.4s ease-out;">
+                    <div style="display: flex; align-items: center; gap: 16px; color: white;">
+                        <div style="font-size: 32px;">✅</div>
+                        <div style="flex: 1;">
+                            <p style="margin: 0; font-size: 18px; font-weight: 700;">Đã tìm thấy giải pháp!</p>
+                            <p style="margin: 4px 0 0; font-size: 14px; opacity: 0.9;">Hệ thống đã tìm thấy các ý tưởng phù hợp với vấn đề của bạn.</p>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- No Results State --}}
                 <div id="no-results" class="hidden" style="text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; border: 2px dashed rgba(255, 255, 255, 0.3);">
                     <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
@@ -55,13 +66,8 @@
             </div>
 
             {{-- Results Container --}}
-            <div id="scout-results" class="hidden" style="margin-top: 32px; space-y: 16px;">
-                <div style="margin-bottom: 24px;">
-                    <h2 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #0f172a;">
-                        📋 Kết quả tìm kiếm
-                    </h2>
-                    <p id="result-count" style="margin: 0; font-size: 14px; color: var(--muted);"></p>
-                </div>
+            <div id="scout-results" class="hidden" style="margin-top: 32px;">
+                {{-- Results will be dynamically inserted here by JavaScript --}}
             </div>
         </div>
     </section>
@@ -95,6 +101,7 @@
             document.getElementById('scout-loading').classList.remove('hidden');
             document.getElementById('scout-results').classList.add('hidden');
             document.getElementById('no-results').classList.add('hidden');
+            document.getElementById('found-notification').classList.add('hidden');
 
             fetch('{{ route("ai.scout") }}', {
                 method: 'POST',
@@ -104,18 +111,30 @@
                 },
                 body: JSON.stringify({ problem: problem })
             })
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-                return res.json();
+            .then(async res => {
+                const data = await res.json();
+                if (!res.ok) {
+                    // Xử lý lỗi từ server (400, 500, etc.)
+                    const errorMsg = data.message || data.error || 'Có lỗi xảy ra khi tìm kiếm giải pháp.';
+                    throw new Error(errorMsg);
+                }
+                return data;
             })
             .then(data => {
                 const container = document.getElementById('scout-results');
                 const resultCount = document.getElementById('result-count');
                 container.innerHTML = '';
 
-                if (data.found === 0) {
+                // Kiểm tra nếu không có kết quả hoặc found = 0
+                if (!data.found || data.found === 0) {
                     document.getElementById('no-results').classList.remove('hidden');
+                    document.getElementById('scout-results').classList.add('hidden');
+                    document.getElementById('found-notification').classList.add('hidden');
                 } else {
+                    // Hiển thị thông báo tìm thấy giải pháp
+                    document.getElementById('found-notification').classList.remove('hidden');
+                    document.getElementById('no-results').classList.add('hidden');
+                    
                     // Add header with count
                     const header = document.createElement('div');
                     header.style.cssText = 'margin-bottom: 24px;';
@@ -216,8 +235,13 @@
             })
             .catch(err => {
                 console.error('Error:', err);
-                alert('Lỗi kết nối AI: ' + err.message);
+                // Hiển thị lỗi chi tiết hơn
+                const errorMsg = err.message || 'Có lỗi xảy ra khi kết nối với hệ thống AI.';
+                alert('❌ ' + errorMsg + '\n\nVui lòng kiểm tra:\n- API key đã được cấu hình chưa (GEMINI_API_KEY hoặc OPENAI_API_KEY)\n- Kết nối mạng có ổn định không');
                 document.getElementById('scout-loading').classList.add('hidden');
+                document.getElementById('scout-results').classList.add('hidden');
+                document.getElementById('no-results').classList.add('hidden');
+                document.getElementById('found-notification').classList.add('hidden');
             })
             .finally(() => {
                 document.getElementById('scout-loading').classList.add('hidden');
@@ -238,6 +262,16 @@
                 from {
                     opacity: 0;
                     transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
                 }
                 to {
                     opacity: 1;

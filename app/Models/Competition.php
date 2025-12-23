@@ -19,6 +19,7 @@ class Competition extends Model
         'start_date',
         'end_date',
         'status',
+        'approval_level',
         'created_by',
     ];
 

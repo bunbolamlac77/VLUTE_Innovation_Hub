@@ -77,7 +77,7 @@ class PublicIdeaController extends Controller
     {
         $idea = Idea::publicApproved()
             ->where('slug', $slug)
-            ->with(['owner', 'faculty', 'category', 'members.user', 'likes', 'comments.user'])
+            ->with(['owner', 'faculty', 'category', 'members.user', 'likes', 'comments.user', 'tags'])
             ->withCount('likes')
             ->firstOrFail();
 

@@ -14,21 +14,34 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {{-- CỘT TRÁI: NỘI DUNG --}}
         <div class="lg:col-span-2 space-y-6">
-            {{-- --- BẮT ĐẦU PHẦN SỬA: HIỂN THỊ ẢNH/LOGO --- --}}
+            {{-- Hiển thị ảnh: ưu tiên image_url, sau đó image, không hiển thị logo trường --}}
+            @php
+                $imageUrl = null;
+                // Ưu tiên image_url (link ảnh)
+                if ($idea->image_url) {
+                    $imageUrl = trim($idea->image_url);
+                    // Nếu không phải URL đầy đủ hoặc đường dẫn tuyệt đối, giả sử là đường dẫn tương đối
+                    if (!str_starts_with($imageUrl, 'http://') && !str_starts_with($imageUrl, 'https://') && !str_starts_with($imageUrl, '/')) {
+                        $imageUrl = asset($imageUrl);
+                    }
+                } 
+                // Nếu không có image_url, dùng image (ảnh đã upload)
+                elseif ($idea->image) {
+                    $imageUrl = str_starts_with($idea->image, 'http') 
+                        ? $idea->image 
+                        : asset('storage/' . ltrim($idea->image, '/'));
+                }
+            @endphp
+            @if($imageUrl)
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="w-full bg-slate-100 flex items-center justify-center">
-                    @if($idea->image)
-                        <img src="{{ str_starts_with($idea->image, 'http') ? $idea->image : asset('storage/' . $idea->image) }}" 
-                             class="w-full object-cover max-h-[500px]" alt="{{ $idea->title }}">
-                    @else
-                        {{-- Hiển thị Logo trường nếu không có ảnh --}}
-                        <div class="py-12">
-                            <img src="{{ asset('images/logotruong.jpg') }}" class="h-48 object-contain opacity-70" alt="Logo Mặc định">
-                        </div>
-                    @endif
+                    <img src="{{ $imageUrl }}" 
+                         class="w-full object-cover max-h-[500px]" 
+                         alt="{{ $idea->title }}"
+                         onerror="this.parentElement.parentElement.style.display='none'">
                 </div>
             </div>
-            {{-- --- KẾT THÚC PHẦN SỬA --- --}}
+            @endif
 
             <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
                 <h1 class="text-3xl font-bold text-slate-900 mb-4 leading-tight">{{ $idea->title }}</h1>
@@ -41,10 +54,36 @@
                     @endforeach
                 </div>
 
-                <div class="prose max-w-none text-slate-700">
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">Mô tả ý tưởng</h3>
-                    {{-- Hiển thị HTML từ CKEditor --}}
-                    {!! $idea->description !!}
+                <div class="prose max-w-none text-slate-700 space-y-6">
+                    {{-- Tóm tắt ý tưởng --}}
+                    @if($idea->summary)
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Tóm tắt ý tưởng</h3>
+                        <div class="text-slate-700 leading-relaxed">
+                            {!! nl2br(e($idea->summary)) !!}
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Mô tả ý tưởng --}}
+                    @if($idea->description)
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Mô tả ý tưởng</h3>
+                        <div class="text-slate-700 leading-relaxed">
+                            {!! $idea->description !!}
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Nội dung chi tiết --}}
+                    @if($idea->content)
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Nội dung chi tiết</h3>
+                        <div class="text-slate-700 leading-relaxed">
+                            {!! $idea->content !!}
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
 

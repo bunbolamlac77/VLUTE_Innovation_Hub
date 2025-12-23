@@ -30,13 +30,34 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {{-- Main Content --}}
             <div class="lg:col-span-2">
-                @if($competition->poster)
-                    <img src="{{ asset('storage/' . $competition->poster) }}" class="w-full rounded-xl shadow-md mb-8">
+                {{-- Hiển thị ảnh: sử dụng banner_url, không hiển thị logo trường --}}
+                @php
+                    $imageUrl = null;
+                    // Sử dụng banner_url (link ảnh)
+                    if ($competition->banner_url) {
+                        $imageUrl = trim($competition->banner_url);
+                        // Nếu không phải URL đầy đủ hoặc đường dẫn tuyệt đối, giả sử là đường dẫn tương đối
+                        if (!str_starts_with($imageUrl, 'http://') && !str_starts_with($imageUrl, 'https://') && !str_starts_with($imageUrl, '/')) {
+                            $imageUrl = asset('storage/' . ltrim($imageUrl, '/'));
+                        }
+                    }
+                @endphp
+                @if($imageUrl)
+                <div class="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
+                    <img src="{{ $imageUrl }}" 
+                         class="w-full object-cover max-h-[500px]" 
+                         alt="{{ $competition->title }}"
+                         onerror="this.parentElement.style.display='none'">
+                </div>
                 @endif
                 
                 <div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm prose max-w-none">
+                    @if($competition->description)
                     <h3>Nội dung cuộc thi</h3>
-                    {!! $competition->description !!}
+                    <div class="text-slate-700 leading-relaxed">
+                        {!! $competition->description !!}
+                    </div>
+                    @endif
                 </div>
             </div>
 

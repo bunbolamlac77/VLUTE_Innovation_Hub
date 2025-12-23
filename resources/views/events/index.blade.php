@@ -66,7 +66,27 @@
                         $hasRegistered = auth()->check() && $c->registrations()->where('user_id', auth()->id())->exists();
                     @endphp
                     <article class="flex flex-col border border-slate-200 bg-white rounded-2xl shadow-card overflow-hidden">
-                        <div class="h-[160px] bg-gradient-to-br from-indigo-200 to-emerald-200"></div>
+                        @php
+                            $imageUrl = null;
+                            // Sử dụng banner_url (link ảnh)
+                            if ($c->banner_url) {
+                                $imageUrl = trim($c->banner_url);
+                                // Nếu không phải URL đầy đủ hoặc đường dẫn tuyệt đối, giả sử là đường dẫn tương đối
+                                if (!str_starts_with($imageUrl, 'http://') && !str_starts_with($imageUrl, 'https://') && !str_starts_with($imageUrl, '/')) {
+                                    $imageUrl = asset('storage/' . ltrim($imageUrl, '/'));
+                                }
+                            }
+                        @endphp
+                        @if($imageUrl)
+                            <div class="h-[160px] bg-slate-100 overflow-hidden">
+                                <img src="{{ $imageUrl }}" 
+                                     class="w-full h-full object-cover" 
+                                     alt="{{ $c->title }}"
+                                     onerror="this.parentElement.style.background='linear-gradient(to bottom right, rgb(199, 210, 254), rgb(167, 243, 208))'; this.style.display='none';">
+                            </div>
+                        @else
+                            <div class="h-[160px] bg-gradient-to-br from-indigo-200 to-emerald-200"></div>
+                        @endif
                         <div class="p-4 flex-1 flex flex-col">
                             <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
                                 <span

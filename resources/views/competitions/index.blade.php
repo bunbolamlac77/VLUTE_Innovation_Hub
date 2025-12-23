@@ -14,9 +14,22 @@
             $isOpen = $competition->status === 'open' && (!$end || $end->isFuture());
           @endphp
           <article class="border border-slate-200 rounded-2xl overflow-hidden shadow-card bg-white">
+            @php
+                $imageUrl = null;
+                // Sử dụng banner_url (link ảnh)
+                if ($competition->banner_url) {
+                    $imageUrl = trim($competition->banner_url);
+                    // Nếu không phải URL đầy đủ hoặc đường dẫn tuyệt đối, giả sử là đường dẫn tương đối
+                    if (!str_starts_with($imageUrl, 'http://') && !str_starts_with($imageUrl, 'https://') && !str_starts_with($imageUrl, '/')) {
+                        $imageUrl = asset('storage/' . ltrim($imageUrl, '/'));
+                    }
+                }
+            @endphp
+            @if($imageUrl)
             <a href="{{ route('competitions.show', $competition->slug) }}" class="block h-48 bg-slate-100 overflow-hidden">
-              <img src="{{ $competition->banner_url ?? asset('images/panel-truong.jpg') }}" alt="{{ $competition->title }}" class="w-full h-full object-cover" />
-                        </a>
+              <img src="{{ $imageUrl }}" alt="{{ $competition->title }}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none';" />
+            </a>
+            @endif
             <div class="p-5">
               <div class="flex items-start justify-between gap-3 mb-2">
                 <h3 class="text-base font-semibold leading-tight">
