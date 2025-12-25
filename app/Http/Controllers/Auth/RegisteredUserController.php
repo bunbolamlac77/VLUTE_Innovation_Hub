@@ -100,7 +100,12 @@ class RegisteredUserController extends Controller
             \Log::warning('Sync roles on register failed', ['user' => $user->id, 'err' => $e->getMessage()]);
         }
 
-        // Gửi email xác thực (Laravel sẽ bắn notification khi event Registered được fire)
+        // Gửi email xác thực
+        // Laravel tự động gửi email verification notification khi:
+        // 1. User implements MustVerifyEmail (đã có trong User model)
+        // 2. User sử dụng trait Notifiable (đã có trong User model)
+        // 3. Event Registered được fire (dòng này)
+        // Listener SendEmailVerificationNotification sẽ tự động được gọi
         event(new Registered($user));
 
         // Đăng nhập tạm để vào trang "verify-email" (chuẩn flow của Laravel/Breeze)

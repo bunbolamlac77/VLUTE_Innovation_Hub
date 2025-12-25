@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
+use App\Helpers\MarkdownHelper;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register markdown helper as Blade directive
+        Blade::directive('markdown', function ($expression) {
+            return "<?php echo App\Helpers\MarkdownHelper::parse($expression); ?>";
+        });
     }
 }

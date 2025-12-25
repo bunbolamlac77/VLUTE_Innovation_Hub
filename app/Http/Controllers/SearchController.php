@@ -34,14 +34,50 @@ class SearchController extends Controller
         $competitions = null; /** @var LengthAwarePaginator|null $competitions */
         $mentors = null; /** @var LengthAwarePaginator|null $mentors */
 
-        // Helper: wrap like query safely
+        // Helper: improved search with relevance scoring and better matching
         $applyLike = function ($query) use ($q) {
             if ($q === '') return $query;
-            return $query->where(function ($s) use ($q) {
-                $s->where('title', 'like', "%{$q}%")
-                  ->orWhere('summary', 'like', "%{$q}%")
-                  ->orWhere('description', 'like', "%{$q}%");
-            });
+            
+            // Escape special LIKE characters
+            $escapedQ = str_replace(['%', '_'], ['\%', '\_'], $q);
+            
+            // Split query into individual words
+            $words = array_filter(
+                preg_split('/\s+/', trim($q)),
+                function($word) {
+                    return mb_strlen(trim($word)) > 0;
+                }
+            );
+            
+            return $query->where(function ($s) use ($escapedQ, $words) {
+                // Exact phrase match (highest priority)
+                $s->where(function ($exact) use ($escapedQ) {
+                    $exact->where('title', 'like', "%{$escapedQ}%")
+                          ->orWhere('summary', 'like', "%{$escapedQ}%")
+                          ->orWhere('description', 'like', "%{$escapedQ}%");
+                });
+                
+                // If multiple words, also match all words (AND logic)
+                if (count($words) > 1) {
+                    $s->orWhere(function ($allWords) use ($words) {
+                        foreach ($words as $word) {
+                            $escapedWord = str_replace(['%', '_'], ['\%', '\_'], trim($word));
+                            $allWords->where(function ($w) use ($escapedWord) {
+                                $w->where('title', 'like', "%{$escapedWord}%")
+                                  ->orWhere('summary', 'like', "%{$escapedWord}%")
+                                  ->orWhere('description', 'like', "%{$escapedWord}%");
+                            });
+                        }
+                    });
+                }
+            })->orderByRaw("
+                CASE 
+                    WHEN title LIKE ? THEN 1
+                    WHEN summary LIKE ? THEN 2
+                    WHEN description LIKE ? THEN 3
+                    ELSE 4
+                END ASC
+            ", ["%{$escapedQ}%", "%{$escapedQ}%", "%{$escapedQ}%"]);
         };
 
         if ($type === 'all' || $type === 'ideas') {
@@ -58,7 +94,14 @@ class SearchController extends Controller
                 $ideasQuery->where('category_id', $categoryId);
             }
 
-            $ideas = $ideasQuery->latest()->paginate(10)->withQueryString();
+            // Order by relevance first (if search query exists), then by date
+            if ($q !== '') {
+                // Relevance ordering is already applied in applyLike via orderByRaw
+                // Add secondary ordering by date
+                $ideas = $ideasQuery->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+            } else {
+                $ideas = $ideasQuery->latest()->paginate(10)->withQueryString();
+            }
         }
 
         if ($type === 'all' || $type === 'competitions') {

@@ -191,8 +191,8 @@
                                 <h3 style="margin: 0 0 12px; font-size: 18px; color: #0f172a; font-weight: 700;">
                                     Nội dung chi tiết
                                 </h3>
-                                <div style="color: #374151; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;">
-                                    {!! nl2br(e($idea->content)) !!}
+                                <div class="prose prose-slate max-w-none" style="color: #374151; line-height: 1.8; overflow-wrap: break-word; word-wrap: break-word;">
+                                    {!! \App\Helpers\MarkdownHelper::parse($idea->content) !!}
                                 </div>
                             </div>
                           @endif

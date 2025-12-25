@@ -32,6 +32,9 @@ class DatabaseSeeder extends Seeder
         // - Thêm nhiều cuộc thi và thử thách mẫu
         $this->call(DemoBulkSeeder::class);
 
+        // Seeder tạo 50+ ý tưởng đa dạng với hình ảnh và mô tả chi tiết
+        $this->call(DiverseIdeasSeeder::class);
+
         // (Tuỳ chọn) tạo user mẫu bằng factory
         // User::factory(10)->create();
 

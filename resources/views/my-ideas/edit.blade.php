@@ -105,7 +105,6 @@
                                     <div class="prose" style="max-width: 100%;" x-html="result"></div>
                                 </div>
                                 <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
-                                    <button type="button" @click="copyToContent" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">📋 Copy vào Nội dung chi tiết</button>
                                     <button type="button" @click="result = null" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">✕ Đóng</button>
                                 </div>
                             </div>
@@ -296,33 +295,6 @@
                             alert('Không thể kết nối tới máy chủ AI.');
                         }
                     });
-                },
-
-                copyToContent() {
-                    if (!this.result) return;
-                    
-                    // Lấy text thuần từ HTML
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = this.result;
-                    const plainText = tempDiv.textContent || tempDiv.innerText || '';
-                    
-                    // Thêm vào textarea content
-                    const contentTextarea = document.getElementById('content');
-                    if (contentTextarea) {
-                        const currentContent = contentTextarea.value.trim();
-                        const newContent = currentContent ? currentContent + '\n\n' + plainText : plainText;
-                        contentTextarea.value = newContent;
-                        
-                        // Focus vào textarea
-                        contentTextarea.focus();
-                        contentTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire('Thành công', 'Đã copy kế hoạch kinh doanh vào phần Nội dung chi tiết!', 'success');
-                        } else {
-                            alert('Đã copy kế hoạch kinh doanh vào phần Nội dung chi tiết!');
-                        }
-                    }
                 }
             }
         }

@@ -259,24 +259,55 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
     // TOOL: Seed embeddings for older ideas
     public function seedEmbeddings()
     {
-        // Lấy tất cả ý tưởng chưa có embedding (không giới hạn số lượng)
-        $ideas = Idea::whereNull('embedding_vector')->get();
+        // Lấy API key hiện tại để xác định dimension mong đợi
+        $geminiApiKey = env('GEMINI_API_KEY');
+        $openaiApiKey = env('OPENAI_API_KEY');
+        
+        // Xác định dimension mong đợi dựa trên service được sử dụng
+        // Gemini text-embedding-004: 768 dimensions
+        // OpenAI text-embedding-3-small: 1536 dimensions
+        $expectedDim = !empty($geminiApiKey) ? 768 : (!empty($openaiApiKey) ? 1536 : null);
+        
+        if (!$expectedDim) {
+            return "Lỗi: Cần GEMINI_API_KEY hoặc OPENAI_API_KEY để tạo embedding.";
+        }
+        
+        // Lấy tất cả ý tưởng chưa có embedding hoặc có embedding với dimension sai
+        $ideas = Idea::all()->filter(function($idea) use ($expectedDim) {
+            if (empty($idea->embedding_vector)) {
+                return true; // Cần tạo embedding mới
+            }
+            $vec = json_decode($idea->embedding_vector, true);
+            if (!is_array($vec) || count($vec) !== $expectedDim) {
+                return true; // Dimension không khớp, cần tái tạo
+            }
+            return false; // Đã có embedding đúng dimension
+        });
+        
         $count = 0;
         $failed = 0;
+        $skipped = 0;
         
         foreach ($ideas as $idea) {
             try {
                 $text = trim(($idea->title ?? '') . '. ' . ($idea->summary ?? '') . ' ' . ($idea->description ?? '') . ' ' . ($idea->content ?? ''));
                 if ($text === '') {
                     \Log::warning("Idea #{$idea->id} không có nội dung để tạo embedding");
+                    $skipped++;
                     continue;
                 }
                 
                 $vec = $this->groq->generateEmbedding($text);
                 if ($vec && is_array($vec) && !empty($vec)) {
-                    $idea->update(['embedding_vector' => json_encode($vec)]);
-                    $count++;
-                    \Log::info("Đã tạo embedding cho Idea #{$idea->id}");
+                    $actualDim = count($vec);
+                    if ($actualDim === $expectedDim) {
+                        $idea->update(['embedding_vector' => json_encode($vec)]);
+                        $count++;
+                        \Log::info("Đã tạo embedding cho Idea #{$idea->id} (dimension: {$actualDim})");
+                    } else {
+                        $failed++;
+                        \Log::warning("Idea #{$idea->id}: Dimension không khớp (mong đợi: {$expectedDim}, nhận được: {$actualDim})");
+                    }
                 } else {
                     $failed++;
                     \Log::warning("Không thể tạo embedding cho Idea #{$idea->id}");
@@ -290,7 +321,7 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
             }
         }
         
-        return "Đã cập nhật vector cho {$count} ý tưởng. Thất bại: {$failed}.";
+        return "Đã cập nhật vector cho {$count} ý tưởng. Thất bại: {$failed}. Bỏ qua: {$skipped}.";
     }
 
     // --- TÍNH NĂNG A: KIẾN TRÚC SƯ CÔNG NGHỆ (CHO SINH VIÊN) ---
@@ -300,11 +331,22 @@ Hãy trình bày dưới dạng Markdown với các tiêu đề rõ ràng. Phân
             'content' => 'required|string|min:20',
         ]);
 
-        $content = $request->input('content');
+        $content = trim($request->input('content'));
+        
+        // Đảm bảo nội dung được làm sạch và chuẩn hóa
+        $content = strip_tags($content);
+        $content = preg_replace('/\s+/', ' ', $content);
+        $content = trim($content);
 
+        // Tạo prompt với timestamp và nội dung cụ thể để tránh cache
+        $timestamp = now()->format('Y-m-d H:i:s');
         $prompt = "Bạn là một CTO (Giám đốc Công nghệ) hàng đầu với hơn 15 năm kinh nghiệm trong việc xây dựng và triển khai các hệ thống công nghệ quy mô lớn.
 
+QUAN TRỌNG: Hãy phân tích CHI TIẾT và đưa ra gợi ý CỤ THỂ dựa trên ý tưởng sau đây. Mỗi ý tưởng khác nhau PHẢI có tech stack khác nhau.
+
 Sinh viên có ý tưởng sau: \"$content\"
+
+[Thời gian yêu cầu: $timestamp]
 
 Hãy phân tích CHI TIẾT và đề xuất một bộ công nghệ (Tech Stack) TỐI ƯU và PHÙ HỢP NHẤT để xây dựng dự án này.
 
@@ -332,8 +374,9 @@ QUAN TRỌNG: Bạn PHẢI trả về CHỈ JSON thuần túy, không có text n
 Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
 
         try {
+            // Tăng temperature lên 0.8 để có nhiều biến thể hơn và giảm cache
             // Gọi hàm với tham số jsonMode = true để sử dụng JSON Mode
-            $result = $this->groq->generateText($prompt, true, 0.7, 4096);
+            $result = $this->groq->generateText($prompt, true, 0.8, 4096);
 
             if (isset($result['error'])) {
                 \Log::error('Tech Stack AI Error', ['error' => $result['error']]);
@@ -394,10 +437,25 @@ Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
                 ], 400);
             }
 
+            // 1. Chuẩn hóa và làm sạch vấn đề trước khi tạo embedding
+            $normalizedProblem = trim($problem);
+            // Loại bỏ các ký tự đặc biệt không cần thiết
+            $normalizedProblem = preg_replace('/\s+/', ' ', $normalizedProblem);
+            
+            // Chuẩn bị từ khóa cho tìm kiếm text fallback
+            // Với tiếng Việt, giữ nguyên cụm từ để tìm kiếm chính xác hơn
+            $keywords = array_filter(
+                explode(' ', mb_strtolower($normalizedProblem)),
+                function($kw) {
+                    return mb_strlen(trim($kw)) > 0;
+                }
+            );
+            
             // 1. Tạo vector cho vấn đề của doanh nghiệp
-            $queryVector = $this->groq->generateEmbedding(trim($problem));
+            $queryVector = $this->groq->generateEmbedding($normalizedProblem);
+            $hasEmbedding = !empty($queryVector);
 
-            if (!$queryVector) {
+            if (!$hasEmbedding) {
                 return response()->json([
                     'error' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu GEMINI_API_KEY hoặc OPENAI_API_KEY (Groq không hỗ trợ embedding). Vui lòng thêm một trong hai key vào .env để sử dụng tính năng này.',
                     'message' => 'Tính năng tìm kiếm ngữ nghĩa yêu cầu GEMINI_API_KEY hoặc OPENAI_API_KEY (Groq không hỗ trợ embedding). Vui lòng thêm một trong hai key vào .env để sử dụng tính năng này.',
@@ -406,44 +464,75 @@ Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
             }
 
             $matches = [];
+            $queryVectorDim = count($queryVector);
 
             // 2. Tối ưu: Chunking - Xử lý từng lô 100 bản ghi để tránh tràn RAM và Timeout
+            // SEMANTIC SEARCH: Tìm kiếm dựa trên ý nghĩa (embedding) kết hợp với text similarity để đảm bảo độ chính xác
             Idea::publicApproved()
                 ->select('id', 'title', 'slug', 'summary', 'description', 'content', 'embedding_vector', 'owner_id')
                 ->with('owner:id,name') // Load relationship owner với chỉ các trường cần thiết
-                ->whereNotNull('embedding_vector')
-                ->chunk(100, function ($ideas) use ($queryVector, &$matches) {
+                ->chunk(100, function ($ideas) use ($queryVector, $queryVectorDim, $normalizedProblem, &$matches) {
                     foreach ($ideas as $idea) {
                         try {
-                            $ideaVector = json_decode($idea->embedding_vector, true);
+                            $score = 0;
+                            $useEmbedding = false;
+                            $embeddingScore = 0;
+                            $textScore = 0;
                             
-                            // Kiểm tra vector dimension phải khớp
-                            if (!is_array($ideaVector)) {
-                                continue; // Skip invalid vectors
+                            // Tính text similarity để kiểm tra từ khóa liên quan (không yêu cầu exact match)
+                            $textScore = $this->calculateTextSimilarityLight(
+                                $normalizedProblem,
+                                $idea->title,
+                                $idea->summary ?? $idea->description ?? $idea->content ?? ''
+                            );
+                            
+                            // ƯU TIÊN 1: Tìm kiếm bằng embedding (semantic search) nếu có
+                            if (!empty($idea->embedding_vector)) {
+                                $ideaVector = json_decode($idea->embedding_vector, true);
+                                
+                                if (is_array($ideaVector) && count($ideaVector) === $queryVectorDim) {
+                                    $embeddingScore = $this->cosineSimilarity($queryVector, $ideaVector);
+                                    $embeddingScorePercent = $embeddingScore * 100;
+                                    
+                                    // Kết hợp embedding và text similarity với trọng số:
+                                    // - Embedding chiếm 65% (ưu tiên semantic search)
+                                    // - Text similarity chiếm 35% (đảm bảo có từ khóa liên quan)
+                                    // Ngưỡng: embedding >= 55% VÀ text >= 25% (đảm bảo có từ khóa liên quan rõ ràng)
+                                    if ($embeddingScore >= 0.55 && $textScore >= 25) {
+                                        $score = ($embeddingScorePercent * 0.65) + ($textScore * 0.35);
+                                        $useEmbedding = true;
+                                    } elseif ($embeddingScore >= 0.75 && $textScore >= 20) {
+                                        // Nếu embedding rất cao (>=75%), cho phép text thấp hơn một chút
+                                        $score = ($embeddingScorePercent * 0.70) + ($textScore * 0.30);
+                                        $useEmbedding = true;
+                                    } elseif ($embeddingScore >= 0.80 && $textScore >= 15) {
+                                        // Nếu embedding cực cao (>=80%), cho phép text thấp hơn
+                                        $score = ($embeddingScorePercent * 0.75) + ($textScore * 0.25);
+                                        $useEmbedding = true;
+                                    }
+                                }
                             }
                             
-                            if (count($ideaVector) !== count($queryVector)) {
-                                // Log warning nếu dimension không khớp (có thể do dùng 2 service khác nhau)
-                                \Log::debug("Scout: Idea #{$idea->id} có embedding dimension khác", [
-                                    'idea_id' => $idea->id,
-                                    'idea_dim' => count($ideaVector),
-                                    'query_dim' => count($queryVector)
-                                ]);
-                                continue;
+                            // FALLBACK: Chỉ dùng text-based nếu không có embedding hoặc embedding không đạt yêu cầu
+                            if (!$useEmbedding) {
+                                // Yêu cầu text similarity cao hơn cho text-only search để đảm bảo chất lượng
+                                if ($textScore >= 40) {
+                                    $score = $textScore;
+                                } else {
+                                    continue; // Bỏ qua nếu không đạt ngưỡng
+                                }
                             }
                             
-                            // Tái sử dụng hàm cosineSimilarity
-                            $score = $this->cosineSimilarity($queryVector, $ideaVector);
-
-                            // Nếu độ phù hợp > 65% (Ngưỡng tìm kiếm ngữ nghĩa)
-                            if ($score >= 0.65) {
+                            // Chỉ thêm vào kết quả nếu điểm >= 50% (đảm bảo chất lượng)
+                            if ($score >= 50) {
                                 $matches[] = [
                                     'id' => $idea->id,
                                     'title' => $idea->title,
                                     'slug' => $idea->slug,
                                     'abstract' => \Illuminate\Support\Str::limit(\Illuminate\Support\Str::of(strip_tags($idea->summary ?? $idea->description ?? $idea->content ?? ''))->squish(), 140),
                                     'author' => optional($idea->owner)->name ?? 'Ẩn danh', // Tác giả (owner)
-                                    'score' => round($score * 100, 1) // Điểm phù hợp
+                                    'score' => round($score, 1), // Điểm phù hợp
+                                    'method' => $useEmbedding ? 'embedding+text' : 'text' // Để debug
                                 ];
                             }
                         } catch (\Throwable $e) {
@@ -470,6 +559,217 @@ Lưu ý: Chỉ trả về JSON, không có text giải thích thêm.";
                 'message' => 'Có lỗi xảy ra khi tìm kiếm giải pháp. Vui lòng thử lại sau.'
             ], 500);
         }
+    }
+
+    /**
+     * Tính điểm tương đồng nhẹ nhàng dựa trên text matching (fallback khi không có embedding)
+     * Không yêu cầu exact match, chỉ kiểm tra một số từ khóa có xuất hiện hay không
+     * 
+     * @param string $query Câu truy vấn gốc
+     * @param string $title Tiêu đề ý tưởng
+     * @param string $content Nội dung ý tưởng
+     * @return float Điểm từ 0-100
+     */
+    private function calculateTextSimilarityLight(string $query, string $title, string $content): float
+    {
+        $text = mb_strtolower($title . ' ' . strip_tags($content));
+        $queryLower = mb_strtolower(trim($query));
+        $titleLower = mb_strtolower($title);
+        
+        // Ưu tiên 1: Exact phrase match trong title (cao nhất - 95%)
+        if (mb_stripos($title, $query) !== false) {
+            return 95;
+        }
+        
+        // Ưu tiên 2: Exact phrase match trong content (75%)
+        if (mb_stripos($text, $query) !== false) {
+            return 75;
+        }
+        
+        // Ưu tiên 3: Kiểm tra các cụm từ quan trọng (2-3 từ liên tiếp)
+        // Tách query thành các cụm từ để tìm kiếm chính xác hơn
+        $words = array_filter(
+            explode(' ', $queryLower),
+            function($w) {
+                $w = trim($w);
+                // Loại bỏ các từ không quan trọng
+                $stopWords = ['tôi', 'muốn', 'xây', 'dựng', 'hệ', 'thống', 'dành', 'cho', 'bằng', 'với', 'của', 'và', 'hoặc', 'là', 'có', 'được', 'sẽ', 'trong', 'này', 'đó'];
+                return mb_strlen($w) >= 3 && !in_array($w, $stopWords);
+            }
+        );
+        
+        if (empty($words)) {
+            return 0;
+        }
+        
+        // Kiểm tra cụm từ 2-3 từ liên tiếp (quan trọng nhất)
+        $phraseScore = 0;
+        if (count($words) >= 2) {
+            for ($i = 0; $i < count($words) - 1; $i++) {
+                $phrase2 = $words[$i] . ' ' . $words[$i + 1];
+                if (mb_stripos($titleLower, $phrase2) !== false) {
+                    $phraseScore = 60; // Cụm từ 2 từ trong title = 60%
+                    break;
+                } elseif (mb_stripos($text, $phrase2) !== false) {
+                    $phraseScore = max($phraseScore, 40); // Cụm từ 2 từ trong content = 40%
+                }
+            }
+            
+            // Kiểm tra cụm từ 3 từ
+            if (count($words) >= 3 && $phraseScore < 60) {
+                for ($i = 0; $i < count($words) - 2; $i++) {
+                    $phrase3 = $words[$i] . ' ' . $words[$i + 1] . ' ' . $words[$i + 2];
+                    if (mb_stripos($titleLower, $phrase3) !== false) {
+                        $phraseScore = 70; // Cụm từ 3 từ trong title = 70%
+                        break;
+                    } elseif (mb_stripos($text, $phrase3) !== false) {
+                        $phraseScore = max($phraseScore, 50); // Cụm từ 3 từ trong content = 50%
+                    }
+                }
+            }
+        }
+        
+        if ($phraseScore > 0) {
+            return $phraseScore;
+        }
+        
+        // Ưu tiên 4: Kiểm tra từng từ khóa riêng lẻ
+        $matchedKeywords = 0;
+        $titleMatches = 0;
+        $importantKeywords = ['xe', 'giữ', 'đỗ', 'bãi', 'thông', 'minh', 'ai', 'trí', 'tuệ', 'nhân', 'tạo', 'hệ', 'thống'];
+        
+        foreach ($words as $keyword) {
+            $keyword = trim($keyword);
+            $isImportant = in_array($keyword, $importantKeywords);
+            
+            // Kiểm tra trong title trước (ưu tiên cao hơn)
+            if (mb_stripos($titleLower, $keyword) !== false) {
+                $matchedKeywords++;
+                $titleMatches++;
+                if ($isImportant) {
+                    $matchedKeywords += 0.5; // Bonus cho từ khóa quan trọng
+                }
+            } elseif (mb_stripos($text, $keyword) !== false) {
+                $matchedKeywords++;
+                if ($isImportant) {
+                    $matchedKeywords += 0.3; // Bonus nhỏ hơn cho từ khóa quan trọng trong content
+                }
+            }
+        }
+        
+        // Nếu không có từ khóa nào khớp, điểm = 0
+        if ($matchedKeywords === 0) {
+            return 0;
+        }
+        
+        // Tính điểm dựa trên tỷ lệ từ khóa khớp
+        $totalKeywords = count($words);
+        $matchRatio = min(1.0, $matchedKeywords / $totalKeywords);
+        
+        // Điểm cơ bản: tỷ lệ từ khóa khớp (tối đa 40%)
+        $baseScore = $matchRatio * 40;
+        
+        // Bonus cho từ khóa trong title (mỗi từ = 4%)
+        $titleBonus = min(25, $titleMatches * 4);
+        
+        $finalScore = min(100, $baseScore + $titleBonus);
+        
+        // Trả về điểm nếu >= 15% (ngưỡng tối thiểu cho fallback)
+        return $finalScore >= 15 ? $finalScore : 0;
+    }
+
+    /**
+     * Tính điểm tương đồng dựa trên text matching (fallback khi không có embedding)
+     * Cải thiện để xử lý tốt hơn với tiếng Việt và ưu tiên cụm từ chính xác
+     * 
+     * @param string $query Câu truy vấn gốc
+     * @param array $keywords Mảng từ khóa đã tách
+     * @param string $title Tiêu đề ý tưởng
+     * @param string $content Nội dung ý tưởng
+     * @return float Điểm từ 0-100
+     */
+    private function calculateTextSimilarity(string $query, array $keywords, string $title, string $content): float
+    {
+        $text = mb_strtolower($title . ' ' . strip_tags($content));
+        $queryLower = mb_strtolower(trim($query));
+        $titleLower = mb_strtolower($title);
+        
+        // Ưu tiên 1: Exact phrase match trong title (cao nhất - 95%)
+        if (mb_stripos($title, $query) !== false) {
+            return 95;
+        }
+        
+        // Ưu tiên 2: Exact phrase match trong content (80%)
+        if (mb_stripos($text, $query) !== false) {
+            return 80;
+        }
+        
+        // Ưu tiên 3: Tất cả từ khóa phải xuất hiện (AND logic) - chỉ tính từ >= 3 ký tự
+        $validKeywords = array_filter($keywords, function($kw) {
+            return mb_strlen(trim($kw)) >= 3;
+        });
+        
+        if (empty($validKeywords)) {
+            return 0;
+        }
+        
+        $matchedKeywords = 0;
+        $allKeywordsMatched = true;
+        $titleMatches = 0;
+        $contentMatches = 0;
+        
+        foreach ($validKeywords as $keyword) {
+            $keyword = trim($keyword);
+            $found = false;
+            
+            // Kiểm tra trong title trước (ưu tiên cao hơn)
+            if (mb_stripos($titleLower, $keyword) !== false) {
+                $matchedKeywords++;
+                $titleMatches++;
+                $found = true;
+            } elseif (mb_stripos($text, $keyword) !== false) {
+                $matchedKeywords++;
+                $contentMatches++;
+                $found = true;
+            }
+            
+            if (!$found) {
+                $allKeywordsMatched = false;
+            }
+        }
+        
+        // Nếu không có đủ từ khóa, điểm = 0
+        if (!$allKeywordsMatched || $matchedKeywords === 0) {
+            return 0;
+        }
+        
+        // Tính điểm dựa trên tỷ lệ từ khóa khớp và vị trí khớp
+        $totalKeywords = count($validKeywords);
+        $matchRatio = $matchedKeywords / $totalKeywords;
+        
+        // Điểm cơ bản: tỷ lệ từ khóa khớp
+        $baseScore = $matchRatio * 60; // Tối đa 60% cho tất cả từ khóa
+        
+        // Bonus cho từ khóa trong title (mỗi từ = 5%)
+        $titleBonus = min(20, $titleMatches * 5);
+        
+        // Bonus cho cụm từ dài hơn (nếu có cụm từ >= 2 từ liên tiếp khớp)
+        $phraseBonus = 0;
+        if (count($validKeywords) >= 2) {
+            // Kiểm tra các cụm từ 2-3 từ liên tiếp
+            for ($i = 0; $i < count($validKeywords) - 1; $i++) {
+                $phrase2 = $validKeywords[$i] . ' ' . $validKeywords[$i + 1];
+                if (mb_stripos($titleLower, $phrase2) !== false) {
+                    $phraseBonus += 10;
+                    break;
+                }
+            }
+        }
+        
+        $finalScore = min(100, $baseScore + $titleBonus + $phraseBonus);
+        
+        // Chỉ trả về điểm nếu >= 30% (ngưỡng tối thiểu)
+        return $finalScore >= 30 ? $finalScore : 0;
     }
 
     // DEBUG: Kiểm tra cấu hình API

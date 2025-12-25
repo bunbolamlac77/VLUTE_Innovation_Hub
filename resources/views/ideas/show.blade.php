@@ -79,8 +79,8 @@
                     @if($idea->content)
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 mb-3">Nội dung chi tiết</h3>
-                        <div class="text-slate-700 leading-relaxed">
-                            {!! $idea->content !!}
+                        <div class="text-slate-700 leading-relaxed prose prose-slate max-w-none" style="word-wrap: break-word; overflow-wrap: break-word;">
+                            {!! \App\Helpers\MarkdownHelper::parse($idea->content) !!}
                         </div>
                     </div>
                     @endif

@@ -58,15 +58,8 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // Kiểm tra trạng thái phê duyệt (đối với các role cần duyệt: staff, enterprise)
-        if ($user && method_exists($user, 'needsApproval') && method_exists($user, 'isApproved')) {
-            if ($user->needsApproval() && !$user->isApproved()) {
-                Auth::logout();
-                throw ValidationException::withMessages([
-                    'email' => 'Tài khoản của bạn đang chờ quản trị viên phê duyệt.',
-                ]);
-            }
-        }
+        // Lưu ý: Kiểm tra approval được xử lý bởi middleware EnsureApprovedToLogin
+        // để tránh trùng lặp logic và đảm bảo nhất quán
 
         RateLimiter::clear($this->throttleKey());
     }
