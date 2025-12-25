@@ -230,6 +230,121 @@
                 </div>
             </div>
 
+            {{-- KHỐI KIỂM TRA ĐẠO VĂN ONLINE (MỚI) --}}
+            <div class="mt-8 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden" x-data="plagiarismChecker()">
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        Tra cứu Trùng lặp Cộng đồng
+                    </h3>
+                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded border border-blue-200">Nguồn: IP Vietnam, Techfest, Google...</span>
+                </div>
+
+                <div class="p-6">
+                    <p class="text-sm text-slate-500 mb-4">
+                        Hệ thống sẽ quét tiêu đề dự án <b>"{{ $idea->title }}"</b> trên các cơ sở dữ liệu công khai để tìm các dự án tương tự.
+                    </p>
+
+                    {{-- Nút bấm --}}
+                    <button @click="checkOnline" 
+                            :disabled="loading"
+                            class="mb-4 px-4 py-2 bg-white border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 flex items-center gap-2 transition shadow-sm">
+                        <span x-show="!loading">🔍 Quét ngay</span>
+                        <span x-show="loading" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Đang tra cứu dữ liệu...
+                        </span>
+                    </button>
+
+                    {{-- Kết quả --}}
+                    <div x-show="hasSearched" x-transition>
+                        <template x-if="results.length > 0">
+                            <div class="space-y-4">
+                                <div class="p-3 bg-amber-50 text-amber-800 text-sm rounded border border-amber-200 flex items-start gap-2">
+                                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                    <span>Phát hiện <strong x-text="results.length"></strong> kết quả có khả năng liên quan:</span>
+                                </div>
+
+                                <ul class="divide-y divide-slate-100">
+                                    <template x-for="item in results" :key="item.link">
+                                        <li class="py-3">
+                                            <div class="flex justify-between items-start">
+                                                <a :href="item.link" target="_blank" class="text-blue-600 font-semibold hover:underline text-base block" x-text="item.title"></a>
+                                                <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded ml-2 whitespace-nowrap" x-text="item.source"></span>
+                                            </div>
+                                            <p class="text-slate-600 text-sm mt-1 line-clamp-2" x-text="item.snippet"></p>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+
+                        <template x-if="results.length === 0">
+                            <div class="text-center py-6 text-green-600 bg-green-50 rounded border border-green-100">
+                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="font-semibold">Không tìm thấy trùng lặp đáng ngờ.</p>
+                                <p class="text-xs text-green-500 mt-1">Chưa phát hiện dự án công khai nào có tên tương tự.</p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function plagiarismChecker() {
+                    return {
+                        loading: false,
+                        hasSearched: false,
+                        results: [],
+                        
+                        checkOnline() {
+                            this.loading = true;
+                            this.hasSearched = false;
+                            this.results = [];
+
+                            // Lấy tiêu đề dự án từ blade PHP sang JS
+                            const projectTitle = "{{ $idea->title }}";
+
+                            fetch('{{ route("plagiarism.check.online") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ title: projectTitle })
+                            })
+                            .then(res => {
+                                // Kiểm tra status code trước khi parse JSON
+                                if (!res.ok) {
+                                    return res.json().then(err => {
+                                        throw new Error(err.message || `HTTP ${res.status}: ${res.statusText}`);
+                                    }).catch(() => {
+                                        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                                    });
+                                }
+                                return res.json();
+                            })
+                            .then(data => {
+                                this.loading = false;
+                                this.hasSearched = true;
+                                if (data.success) {
+                                    this.results = data.results || [];
+                                } else {
+                                    Swal.fire('Lỗi tra cứu', data.message || 'Không thể kết nối Google.', 'error');
+                                }
+                            })
+                            .catch(err => {
+                                this.loading = false;
+                                this.hasSearched = false;
+                                console.error('Plagiarism check error:', err);
+                                Swal.fire('Lỗi', err.message || 'Lỗi hệ thống khi gọi API. Vui lòng thử lại sau.', 'error');
+                            });
+                        }
+                    }
+                }
+            </script>
+
             {{-- 3. FORM QUYẾT ĐỊNH --}}
             <div class="bg-white border-2 border-indigo-300 rounded-xl p-6 lg:p-8 shadow-lg">
                 <h3 class="text-xl lg:text-2xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-indigo-200 flex items-center gap-2">

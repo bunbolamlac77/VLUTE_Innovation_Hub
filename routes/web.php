@@ -7,6 +7,7 @@ use App\Http\Controllers\MyCompetitionsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Api\AIController;
+use App\Http\Controllers\Api\PlagiarismController;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 
@@ -89,6 +90,9 @@ Route::middleware(['auth', 'verified.to.login', 'approved.to.login'])->group(fun
         Route::post('/student/business-plan', [\App\Http\Controllers\Api\StudentAIController::class, 'analyzeBusinessPlan'])
             ->name('student.business-plan');
     });
+
+    // Route kiểm tra đạo văn mở rộng
+    Route::post('/check-plagiarism-online', [PlagiarismController::class, 'check'])->name('plagiarism.check.online');
 
     // Review Queue - Hàng chờ phản biện (cho Giảng viên, Trung tâm ĐMST, BGH)
     Route::prefix('manage')->name('manage.')->group(function () {
