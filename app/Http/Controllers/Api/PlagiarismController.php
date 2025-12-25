@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\PlagiarismService;
 use App\Services\GeminiService;
+use Illuminate\Support\Facades\Log;
 
 class PlagiarismController extends Controller
 {
@@ -45,11 +46,32 @@ Chỉ trả về chuỗi từ khóa, không giải thích gì thêm.";
         // Gọi AI (Nếu AI lỗi thì fallback về dùng Tiêu đề gốc)
         $smartQuery = $this->geminiService->generateText($prompt, false);
         
+        // Kiểm tra xem kết quả có phải là lỗi không
+        // GeminiService trả về các string lỗi với các prefix: "Lỗi:", "Lỗi kết nối", "AI từ chối", "Không có nội dung"
+        $isError = false;
+        if (is_string($smartQuery)) {
+            $errorPrefixes = ['Lỗi:', 'Lỗi kết nối', 'AI từ chối', 'Không có nội dung', 'Lỗi hệ thống'];
+            foreach ($errorPrefixes as $prefix) {
+                if (str_starts_with($smartQuery, $prefix)) {
+                    $isError = true;
+                    break;
+                }
+            }
+        }
+        
         // Làm sạch kết quả từ AI (xóa dấu nháy, xuống dòng, và các ký tự không cần thiết)
         $searchQuery = $smartQuery ? trim(str_replace(['"', "'", "\n", "\r"], '', $smartQuery)) : $title;
         
-        // Nếu kết quả từ AI quá dài hoặc có vẻ không hợp lệ, fallback về logic cũ
-        if (empty($searchQuery) || mb_strlen($searchQuery) > 100) {
+        // Nếu kết quả từ AI là lỗi, quá dài, hoặc có vẻ không hợp lệ, fallback về logic cũ
+        if ($isError || empty($searchQuery) || mb_strlen($searchQuery) > 100) {
+            // Log lỗi nếu có để debug
+            if ($isError) {
+                Log::warning('Plagiarism: Gemini API error, using fallback', [
+                    'error' => $smartQuery,
+                    'title' => $title
+                ]);
+            }
+            
             // Fallback: dùng logic cũ để tạo từ khóa
             $words = explode(' ', mb_strtolower($title));
             $stopWords = ['hệ', 'thống', 'với', 'cho', 'và', 'của', 'trong', 'trên', 'từ', 'đến', 'một', 'các', 'những', 'bằng', 'là'];

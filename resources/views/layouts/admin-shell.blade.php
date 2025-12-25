@@ -18,7 +18,8 @@
   @include('partials.site-header')
 
   <main class="min-h-screen">
-    {{-- Header nhỏ cho Admin --}}
+    {{-- Header nhỏ cho Admin -- chỉ hiển thị khi không phải trang review form --}}
+    @unless(request()->routeIs('manage.review.*'))
     <section class="container py-6">
       <h1 class="text-2xl font-extrabold text-slate-900 m-0">Bảng điều khiển quản trị</h1>
       <p class="text-slate-500 mt-1">Quản lý người dùng, phê duyệt, ý tưởng, phân loại và nhật ký.</p>
@@ -47,6 +48,7 @@
         </ul>
       </nav>
     </section>
+    @endunless
 
     {{-- Tabs + Nội dung --}}
     <section class="container pb-16">

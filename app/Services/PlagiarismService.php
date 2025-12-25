@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -37,13 +38,15 @@ class PlagiarismService
                 ]);
 
             // Kiểm tra HTTP status code
-            if ($response->failed()) {
+            // Laravel Http facade trả về Response object với các methods: successful(), body(), status(), json()
+            if (!$response->successful()) {
                 $errorBody = $response->body();
+                $statusCode = $response->status();
                 Log::error('Google Search HTTP Error', [
-                    'status' => $response->status(),
+                    'status' => $statusCode,
                     'body' => $errorBody
                 ]);
-                return ['success' => false, 'error' => 'Lỗi kết nối Google API (HTTP ' . $response->status() . ').'];
+                return ['success' => false, 'error' => 'Lỗi kết nối Google API (HTTP ' . $statusCode . ').'];
             }
 
             $data = $response->json();
