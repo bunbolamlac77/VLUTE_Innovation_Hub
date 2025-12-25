@@ -256,6 +256,11 @@
                         </span>
                     </button>
 
+                    {{-- Hiển thị từ khóa AI đề xuất --}}
+                    <div x-show="hasSearched && searchQuery" class="mb-4 text-sm text-slate-500 italic">
+                        Đã tìm kiếm với từ khóa AI đề xuất: <span class="font-bold text-blue-600" x-text="searchQuery"></span>
+                    </div>
+
                     {{-- Kết quả --}}
                     <div x-show="hasSearched" x-transition>
                         <template x-if="results.length > 0">
@@ -296,14 +301,18 @@
                         loading: false,
                         hasSearched: false,
                         results: [],
+                        searchQuery: '',
                         
                         checkOnline() {
                             this.loading = true;
                             this.hasSearched = false;
                             this.results = [];
+                            this.searchQuery = '';
 
-                            // Lấy tiêu đề dự án từ blade PHP sang JS
+                            // Lấy tiêu đề và mô tả dự án từ blade PHP sang JS
                             const projectTitle = "{{ $idea->title }}";
+                            // Lấy mô tả (cắt ngắn 500 ký tự cho nhẹ)
+                            const description = `{{ Str::limit(strip_tags($idea->description ?? ''), 500) }}`;
 
                             fetch('{{ route("plagiarism.check.online") }}', {
                                 method: 'POST',
@@ -312,7 +321,10 @@
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                     'Accept': 'application/json'
                                 },
-                                body: JSON.stringify({ title: projectTitle })
+                                body: JSON.stringify({ 
+                                    title: projectTitle,
+                                    description: description 
+                                })
                             })
                             .then(res => {
                                 // Kiểm tra status code trước khi parse JSON
@@ -330,6 +342,7 @@
                                 this.hasSearched = true;
                                 if (data.success) {
                                     this.results = data.results || [];
+                                    this.searchQuery = data.search_query || '';
                                 } else {
                                     Swal.fire('Lỗi tra cứu', data.message || 'Không thể kết nối Google.', 'error');
                                 }
